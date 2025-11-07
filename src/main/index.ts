@@ -2,6 +2,7 @@ import { app, BrowserWindow, globalShortcut } from 'electron';
 import path from 'path';
 import { registerSystemHandlers } from './ipc/systemHandlers';
 import { registerSkillsHandlers } from './ipc/skillsHandlers';
+import { registerAgentsHandlers } from './ipc/agentsHandlers';
 import { registerSettingsHandlers } from './ipc/settingsHandlers';
 
 let mainWindow: BrowserWindow | null = null;
@@ -80,6 +81,7 @@ app.whenReady().then(() => {
   // Register IPC handlers
   registerSystemHandlers();
   registerSkillsHandlers();
+  registerAgentsHandlers();
   registerSettingsHandlers();
 
   createWindow();
