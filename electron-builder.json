@@ -1,0 +1,30 @@
+{
+  "appId": "com.claudeowl.app",
+  "productName": "Claude Owl",
+  "directories": {
+    "output": "release/${version}"
+  },
+  "files": [
+    "dist/**/*",
+    "package.json"
+  ],
+  "mac": {
+    "category": "public.app-category.developer-tools",
+    "target": [
+      {
+        "target": "dmg",
+        "arch": ["x64", "arm64"]
+      }
+    ],
+    "icon": "assets/icon.icns"
+  },
+  "win": {
+    "target": ["nsis"],
+    "icon": "assets/icon.ico"
+  },
+  "linux": {
+    "target": ["AppImage"],
+    "category": "Development",
+    "icon": "assets/icon.png"
+  }
+}

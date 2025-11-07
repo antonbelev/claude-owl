@@ -1,0 +1,336 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f5f5f5;
+  overflow: hidden;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* App Layout */
+.app-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  background: #1e1e1e;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+  flex-shrink: 0;
+}
+
+.sidebar.collapsed {
+  width: 64px;
+}
+
+.sidebar-header {
+  padding: 1.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.sidebar-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar.collapsed .sidebar-title {
+  display: none;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1rem 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  white-space: nowrap;
+}
+
+.sidebar-nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.sidebar-nav-item.active {
+  background: rgba(66, 153, 225, 0.15);
+  color: #4299e1;
+  border-left-color: #4299e1;
+}
+
+.nav-icon {
+  font-size: 1.25rem;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.nav-label {
+  font-size: 0.9375rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar.collapsed .nav-label {
+  display: none;
+}
+
+.sidebar-toggle {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.toggle-icon {
+  font-size: 1.125rem;
+}
+
+/* App Content */
+.app-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin-left: 0;
+  transition: margin-left 0.3s ease;
+}
+
+.content-header {
+  background: white;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.content-main {
+  flex: 1;
+  overflow-y: auto;
+  background: #f5f5f5;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  font-size: 0.875rem;
+}
+
+.breadcrumb-list {
+  display: flex;
+  list-style: none;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.breadcrumb-link {
+  color: #4299e1;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.breadcrumb-link:hover {
+  color: #2b6cb0;
+  text-decoration: underline;
+}
+
+.breadcrumb-current {
+  color: #666;
+  font-weight: 500;
+}
+
+.breadcrumb-separator {
+  color: #ccc;
+}
+
+/* Pages */
+.page {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-title {
+  font-size: 1.875rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.page-description {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.placeholder-content {
+  background: white;
+  padding: 3rem;
+  border-radius: 8px;
+  text-align: center;
+  color: #999;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Dashboard */
+.dashboard-page .dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.status-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s;
+}
+
+.status-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.status-card h2 {
+  font-size: 1.25rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.status-card p {
+  margin: 0.5rem 0;
+  color: #666;
+  line-height: 1.5;
+}
+
+.success-message {
+  color: #22c55e;
+  font-weight: 500;
+}
+
+.warning-message {
+  color: #f59e0b;
+  font-weight: 500;
+}
+
+.error-message {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.help-text {
+  font-size: 0.875rem;
+  color: #888;
+}
+
+.detail-item {
+  font-size: 0.875rem;
+  margin: 0.75rem 0;
+}
+
+.detail-item strong {
+  color: #333;
+}
+
+.path-info {
+  word-break: break-all;
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+.status-card button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.status-card button:hover {
+  background-color: #2563eb;
+}
+
+.status-card button:active {
+  background-color: #1d4ed8;
+}
+
+.install-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.install-link:hover {
+  text-decoration: underline;
+}

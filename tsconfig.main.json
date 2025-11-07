@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Node.js environment for Electron main process
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+
+    // Output configuration
+    "outDir": "dist/main",
+
+    // No JSX in main process
+    "jsx": "preserve"
+  },
+  "include": ["src/main/**/*", "src/shared/**/*"],
+  "exclude": ["node_modules", "dist", "src/renderer", "src/preload"]
+}

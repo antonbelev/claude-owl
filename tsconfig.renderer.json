@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Browser environment for Electron renderer (React)
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+
+    // Output configuration
+    "outDir": "dist/renderer",
+    "rootDir": "src",
+
+    // React JSX
+    "jsx": "react-jsx",
+
+    // Allow importing JSON modules
+    "resolveJsonModule": true,
+
+    // Additional type checking for React
+    "noImplicitAny": true
+  },
+  "include": ["src/renderer/**/*", "src/shared/**/*", "src/renderer/index.html"],
+  "exclude": ["node_modules", "dist", "src/main", "src/preload"]
+}

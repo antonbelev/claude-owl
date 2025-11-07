@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Preload scripts run in both Node.js and browser contexts
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+
+    // Output configuration
+    "outDir": "dist/preload",
+
+    // No JSX in preload scripts
+    "jsx": "preserve"
+  },
+  "include": ["src/preload/**/*", "src/shared/**/*"],
+  "exclude": ["node_modules", "dist", "src/main", "src/renderer"]
+}
