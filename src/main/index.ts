@@ -2,6 +2,7 @@ import { app, BrowserWindow, globalShortcut } from 'electron';
 import path from 'path';
 import { registerSystemHandlers } from './ipc/systemHandlers';
 import { registerSkillsHandlers } from './ipc/skillsHandlers';
+import { registerSettingsHandlers } from './ipc/settingsHandlers';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -9,11 +10,15 @@ function createWindow() {
   const preloadPath = path.join(__dirname, '../preload/index.js');
   console.log('Preload path:', preloadPath);
 
+  // Use the logo as app icon
+  const iconPath = path.join(__dirname, '../../claude-owl-logo.png');
+
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     minWidth: 800,
     minHeight: 600,
+    icon: iconPath,
     webPreferences: {
       preload: preloadPath,
       contextIsolation: true,
@@ -66,9 +71,16 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // Set dock icon on macOS
+  if (process.platform === 'darwin') {
+    const iconPath = path.join(__dirname, '../../claude-owl-logo.png');
+    app.dock.setIcon(iconPath);
+  }
+
   // Register IPC handlers
   registerSystemHandlers();
   registerSkillsHandlers();
+  registerSettingsHandlers();
 
   createWindow();
 

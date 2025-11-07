@@ -10,7 +10,16 @@ import type { Agent, Skill, Command } from './agent.types';
  * IPC Channel names
  */
 export const IPC_CHANNELS = {
-  // Configuration
+  // Settings
+  GET_SETTINGS: 'settings:get',
+  SAVE_SETTINGS: 'settings:save',
+  VALIDATE_SETTINGS: 'settings:validate',
+  GET_EFFECTIVE_SETTINGS: 'settings:get-effective',
+  SETTINGS_FILE_EXISTS: 'settings:file-exists',
+  ENSURE_SETTINGS_FILE: 'settings:ensure-file',
+  DELETE_SETTINGS: 'settings:delete',
+
+  // Configuration (legacy, keeping for backwards compatibility)
   GET_CONFIG: 'config:get',
   SAVE_CONFIG: 'config:save',
   VALIDATE_CONFIG: 'config:validate',
@@ -53,7 +62,81 @@ export const IPC_CHANNELS = {
  * IPC Request/Response types
  */
 
-// Configuration
+// Settings
+export interface GetSettingsRequest {
+  level: 'user' | 'project' | 'local' | 'managed';
+}
+
+export interface GetSettingsResponse {
+  success: boolean;
+  data?: {
+    level: 'user' | 'project' | 'local' | 'managed';
+    path: string;
+    exists: boolean;
+    content: ClaudeSettings;
+  };
+  error?: string;
+}
+
+export interface SaveSettingsRequest {
+  level: 'user' | 'project' | 'local';
+  settings: ClaudeSettings;
+}
+
+export interface SaveSettingsResponse {
+  success: boolean;
+  error?: string;
+}
+
+export interface ValidateSettingsRequest {
+  settings: ClaudeSettings;
+}
+
+export interface ValidateSettingsResponse {
+  success: boolean;
+  data?: {
+    valid: boolean;
+    errors: Array<{ path: string; message: string; severity: 'error' | 'warning' | 'info' }>;
+    warnings: Array<{ path: string; message: string; severity: 'error' | 'warning' | 'info' }>;
+  };
+  error?: string;
+}
+
+export interface GetEffectiveSettingsResponse {
+  success: boolean;
+  data?: EffectiveConfig;
+  error?: string;
+}
+
+export interface SettingsFileExistsRequest {
+  level: 'user' | 'project' | 'local' | 'managed';
+}
+
+export interface SettingsFileExistsResponse {
+  success: boolean;
+  data?: { exists: boolean };
+  error?: string;
+}
+
+export interface EnsureSettingsFileRequest {
+  level: 'user' | 'project' | 'local';
+}
+
+export interface EnsureSettingsFileResponse {
+  success: boolean;
+  error?: string;
+}
+
+export interface DeleteSettingsRequest {
+  level: 'user' | 'project' | 'local';
+}
+
+export interface DeleteSettingsResponse {
+  success: boolean;
+  error?: string;
+}
+
+// Configuration (legacy, keeping for backwards compatibility)
 export interface GetConfigRequest {
   level: 'user' | 'project' | 'local';
 }

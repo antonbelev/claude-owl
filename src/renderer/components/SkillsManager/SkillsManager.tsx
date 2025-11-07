@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSkills } from '../../hooks/useSkills';
 import type { Skill } from '@/shared/types';
+import { parseMarkdownWithFrontmatter, validateSkillMarkdown } from '@/shared/utils/markdown.utils';
 import './SkillsManager.css';
 
 export const SkillsManager: React.FC = () => {
@@ -152,6 +153,89 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
   const [allowedTools, setAllowedTools] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+
+  // Track unsaved changes
+  useEffect(() => {
+    const hasContent = !!(name.trim() || description.trim() || content.trim() || allowedTools.trim());
+    setHasUnsavedChanges(hasContent);
+  }, [name, description, content, allowedTools]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check file type
+    if (!file.name.endsWith('.md')) {
+      setError('Please upload a Markdown (.md) file');
+      return;
+    }
+
+    try {
+      const text = await file.text();
+
+      // Validate the markdown structure
+      const validation = validateSkillMarkdown(text);
+
+      if (!validation.isValid) {
+        setError(`Invalid skill file:\n${validation.errors.join('\n')}`);
+        setValidationWarnings([]);
+        return;
+      }
+
+      // Parse the file
+      const parsed = parseMarkdownWithFrontmatter<{
+        name?: string;
+        description?: string;
+        'allowed-tools'?: string[];
+      }>(text);
+
+      // Populate form with parsed data
+      if (parsed.frontmatter.name) setName(parsed.frontmatter.name);
+      if (parsed.frontmatter.description) setDescription(parsed.frontmatter.description);
+      if (parsed.content) setContent(parsed.content);
+      if (parsed.frontmatter['allowed-tools']) {
+        setAllowedTools(parsed.frontmatter['allowed-tools'].join(', '));
+      }
+
+      // Show warnings if any
+      if (validation.warnings.length > 0) {
+        setValidationWarnings(validation.warnings);
+      }
+
+      setError(null);
+    } catch (err) {
+      setError(`Failed to read file: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+
+    // Reset file input
+    e.target.value = '';
+  };
+
+  const handleClose = () => {
+    if (hasUnsavedChanges && !creating) {
+      setShowCloseConfirm(true);
+    } else {
+      onClose();
+    }
+  };
+
+  const handleConfirmClose = () => {
+    setShowCloseConfirm(false);
+    onClose();
+  };
+
+  const handleCancelClose = () => {
+    setShowCloseConfirm(false);
+  };
+
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      handleClose();
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,6 +247,7 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
     const success = await onCreate(name, description, content, location, toolsArray);
 
     if (success) {
+      setHasUnsavedChanges(false); // Mark as saved before closing
       onClose();
     } else {
       setError('Failed to create skill. Please check your inputs and try again.');
@@ -172,17 +257,55 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>Create New Skill</h2>
-          <button className="btn-close" onClick={onClose}>
-            ×
-          </button>
-        </div>
+    <>
+      <div className="modal-overlay" onClick={handleOverlayClick}>
+        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>Create New Skill</h2>
+            <button className="btn-close" onClick={handleClose} type="button">
+              ×
+            </button>
+          </div>
 
-        <form onSubmit={handleSubmit} className="skill-form">
-          {error && <div className="form-error">{error}</div>}
+          <form onSubmit={handleSubmit} className="skill-form">
+            {error && (
+              <div className="form-error">
+                {error.split('\n').map((line, i) => (
+                  <div key={i}>{line}</div>
+                ))}
+              </div>
+            )}
+
+            {validationWarnings.length > 0 && (
+              <div className="form-warning">
+                <strong>Warnings:</strong>
+                {validationWarnings.map((warning, i) => (
+                  <div key={i}>• {warning}</div>
+                ))}
+              </div>
+            )}
+
+            <div className="form-group file-upload-group">
+              <label htmlFor="skill-file-upload">Upload Skill File (Optional)</label>
+              <div className="file-upload-container">
+                <input
+                  id="skill-file-upload"
+                  type="file"
+                  accept=".md"
+                  onChange={handleFileUpload}
+                  className="file-input"
+                  data-testid="skill-file-input"
+                />
+                <label htmlFor="skill-file-upload" className="file-upload-label">
+                  📁 Choose .md file
+                </label>
+                <small>Upload a skill markdown file to auto-fill the form</small>
+              </div>
+            </div>
+
+            <div className="form-divider">
+              <span>Or create manually</span>
+            </div>
 
           <div className="form-group">
             <label htmlFor="skill-name">
@@ -259,7 +382,7 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
           </div>
 
           <div className="form-actions">
-            <button type="button" onClick={onClose} className="btn-secondary" disabled={creating}>
+            <button type="button" onClick={handleClose} className="btn-secondary" disabled={creating}>
               Cancel
             </button>
             <button type="submit" className="btn-primary" disabled={creating} data-testid="submit-skill-btn">
@@ -269,6 +392,29 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
         </form>
       </div>
     </div>
+
+    {/* Confirmation dialog for unsaved changes */}
+    {showCloseConfirm && (
+      <div className="modal-overlay confirm-overlay" onClick={handleCancelClose}>
+        <div className="modal-content modal-confirm" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>Unsaved Changes</h2>
+          </div>
+          <div className="confirm-body">
+            <p>You have unsaved changes. Are you sure you want to close without saving?</p>
+          </div>
+          <div className="modal-footer">
+            <button onClick={handleCancelClose} className="btn-secondary">
+              Keep Editing
+            </button>
+            <button onClick={handleConfirmClose} className="btn-danger">
+              Discard Changes
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+  </>
   );
 };
 
@@ -281,8 +427,14 @@ interface SkillDetailModalProps {
 const SkillDetailModal: React.FC<SkillDetailModalProps> = ({ skill, onClose, onDelete }) => {
   const locationBadge = skill.location === 'user' ? 'User' : skill.location === 'project' ? 'Project' : 'Plugin';
 
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={handleOverlayClick}>
       <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div>

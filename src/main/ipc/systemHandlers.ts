@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import { ipcMain, shell } from 'electron';
 import { IPC_CHANNELS, CheckClaudeInstalledResponse } from '@/shared/types';
 import { ClaudeService } from '../services/ClaudeService';
 import { app } from 'electron';
@@ -31,6 +31,19 @@ export function registerSystemHandlers() {
       return {
         success: false,
         installed: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  });
+
+  // Open external URL in default browser
+  ipcMain.handle('system:open-external', async (_event, url: string) => {
+    try {
+      await shell.openExternal(url);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
