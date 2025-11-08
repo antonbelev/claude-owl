@@ -224,6 +224,81 @@
   color: #6b7280;
 }
 
+/* Development Section */
+.about-development-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.about-development-header h3 {
+  margin-bottom: 0;
+}
+
+.about-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  background: #f3f4f6;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s;
+}
+
+.about-checkbox:hover {
+  background: #e5e7eb;
+  border-color: #4299e1;
+}
+
+.about-checkbox input[type="checkbox"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: #4299e1;
+}
+
+.about-checkbox span {
+  font-size: 0.9rem;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.about-development-info {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.development-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.development-list li {
+  padding: 0.75rem 0;
+  padding-left: 1.75rem;
+  color: #4b5563;
+  position: relative;
+  font-size: 0.95rem;
+}
+
+.development-list li:before {
+  content: '⚙️';
+  position: absolute;
+  left: 0;
+  font-size: 1rem;
+}
+
+.development-list strong {
+  color: #1f2937;
+}
+
 /* Footer */
 .about-footer {
   margin-top: 2rem;

@@ -11,24 +11,44 @@ interface NavItem {
   path: string;
   label: string;
   icon: string;
+  underDevelopment?: boolean;
 }
 
-const navItems: NavItem[] = [
+const allNavItems: NavItem[] = [
   { path: '/', label: 'Dashboard', icon: '📊' },
   { path: '/settings', label: 'Settings', icon: '⚙️' },
   { path: '/agents', label: 'Subagents', icon: '🤖' },
   { path: '/skills', label: 'Skills', icon: '⚡' },
-  { path: '/plugins', label: 'Plugins', icon: '🔌' },
-  { path: '/commands', label: 'Commands', icon: '⌘' },
+  { path: '/plugins', label: 'Plugins', icon: '🔌', underDevelopment: true },
+  { path: '/commands', label: 'Commands', icon: '⌘', underDevelopment: true },
   { path: '/hooks', label: 'Hooks', icon: '🪝' },
-  { path: '/mcp', label: 'MCP Servers', icon: '🔗' },
+  { path: '/mcp', label: 'MCP Servers', icon: '🔗', underDevelopment: true },
   { path: '/sessions', label: 'Sessions', icon: '📝' },
-  { path: '/tests', label: 'Test Runner', icon: '🧪' },
+  { path: '/tests', label: 'Test Runner', icon: '🧪', underDevelopment: true },
   { path: '/logs', label: 'Debug Logs', icon: '📋' },
   { path: '/about', label: 'About', icon: 'ℹ️' },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
+  const [showUnderDevelopment, setShowUnderDevelopment] = React.useState(() => {
+    const stored = localStorage.getItem('showUnderDevelopment');
+    return stored !== null ? JSON.parse(stored) : false;
+  });
+
+  // Listen for changes from About page
+  React.useEffect(() => {
+    const handleDevelopmentToggle = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      setShowUnderDevelopment(customEvent.detail.showUnderDevelopment);
+    };
+
+    window.addEventListener('showUnderDevelopmentChanged', handleDevelopmentToggle);
+    return () => window.removeEventListener('showUnderDevelopmentChanged', handleDevelopmentToggle);
+  }, []);
+
+  const navItems = allNavItems.filter(
+    (item) => !item.underDevelopment || showUnderDevelopment
+  );
   return (
     <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       {/* Header with logo */}

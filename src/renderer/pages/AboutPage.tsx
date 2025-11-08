@@ -5,6 +5,21 @@ import '../pages/AboutPage.css';
 
 export const AboutPage: React.FC = () => {
   const version = useAppVersion();
+  const [showUnderDevelopment, setShowUnderDevelopment] = React.useState(() => {
+    const stored = localStorage.getItem('showUnderDevelopment');
+    return stored !== null ? JSON.parse(stored) : false;
+  });
+
+  const handleToggleUnderDevelopment = () => {
+    const newValue = !showUnderDevelopment;
+    setShowUnderDevelopment(newValue);
+    localStorage.setItem('showUnderDevelopment', JSON.stringify(newValue));
+
+    // Dispatch custom event to notify other components in the same window
+    window.dispatchEvent(new CustomEvent('showUnderDevelopmentChanged', {
+      detail: { showUnderDevelopment: newValue }
+    }));
+  };
 
   const openGitHub = (url: string) => {
     if (window.electronAPI?.openExternal) {
@@ -123,6 +138,30 @@ export const AboutPage: React.FC = () => {
               </ul>
             </div>
           </div>
+        </div>
+
+        {/* Under Development Section */}
+        <div className="about-section">
+          <div className="about-development-header">
+            <h3>Features Under Development</h3>
+            <label className="about-checkbox">
+              <input
+                type="checkbox"
+                checked={showUnderDevelopment}
+                onChange={handleToggleUnderDevelopment}
+              />
+              <span>Show in navigation</span>
+            </label>
+          </div>
+          <p className="about-development-info">
+            The following features are currently under development and may not be fully functional:
+          </p>
+          <ul className="development-list">
+            <li><strong>Plugins</strong> - Plugin management system</li>
+            <li><strong>Commands</strong> - Custom slash commands editor</li>
+            <li><strong>MCP Servers</strong> - Model Context Protocol server configuration</li>
+            <li><strong>Test Runner</strong> - Built-in test execution interface</li>
+          </ul>
         </div>
 
         {/* Footer */}
