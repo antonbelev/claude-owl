@@ -8,6 +8,7 @@ import { registerCCUsageHandlers } from './ipc/ccusageHandlers';
 import { registerPluginsHandlers } from './ipc/pluginsHandlers';
 import { registerHooksHandlers } from './ipc/hooksHandlers';
 import { registerStatusHandlers } from './ipc/statusHandlers';
+import { registerDebugLogsHandlers } from './ipc/debugLogsHandlers';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -91,6 +92,7 @@ app.whenReady().then(() => {
   registerPluginsHandlers();
   registerHooksHandlers();
   registerStatusHandlers();
+  registerDebugLogsHandlers();
 
   createWindow();
 

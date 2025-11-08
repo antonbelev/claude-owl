@@ -12,6 +12,7 @@ import { HooksPage } from './pages/HooksPage';
 import { MCPPage } from './pages/MCPPage';
 import { SessionsPage } from './pages/SessionsPage';
 import { TestsPage } from './pages/TestsPage';
+import { LogsPage } from './pages/LogsPage';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -39,6 +40,7 @@ export const App: React.FC = () => {
             <Route path="mcp" element={<MCPPage />} />
             <Route path="sessions" element={<SessionsPage />} />
             <Route path="tests" element={<TestsPage />} />
+            <Route path="logs" element={<LogsPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

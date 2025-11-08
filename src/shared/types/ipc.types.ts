@@ -90,6 +90,12 @@ export const IPC_CHANNELS = {
 
   // Service Status
   GET_SERVICE_STATUS: 'status:get-service-status',
+
+  // Debug Logs
+  LIST_DEBUG_LOGS: 'logs:list',
+  GET_DEBUG_LOG: 'logs:get',
+  DELETE_DEBUG_LOG: 'logs:delete',
+  SEARCH_DEBUG_LOGS: 'logs:search',
 } as const;
 
 /**
@@ -528,5 +534,50 @@ export interface ServiceStatus {
 export interface GetServiceStatusResponse {
   success: boolean;
   data?: ServiceStatus;
+  error?: string;
+}
+
+// Debug Logs
+export interface DebugLog {
+  id: string; // UUID filename
+  filename: string;
+  path: string;
+  size: number; // bytes
+  timestamp: number; // Unix timestamp (milliseconds)
+  content?: string; // Only populated when getting full content
+}
+
+export interface ListDebugLogsResponse {
+  success: boolean;
+  data?: DebugLog[];
+  error?: string;
+}
+
+export interface GetDebugLogRequest {
+  filename: string;
+}
+
+export interface GetDebugLogResponse {
+  success: boolean;
+  data?: DebugLog;
+  error?: string;
+}
+
+export interface DeleteDebugLogRequest {
+  filename: string;
+}
+
+export interface DeleteDebugLogResponse {
+  success: boolean;
+  error?: string;
+}
+
+export interface SearchDebugLogsRequest {
+  query: string;
+}
+
+export interface SearchDebugLogsResponse {
+  success: boolean;
+  data?: DebugLog[];
   error?: string;
 }

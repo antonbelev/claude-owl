@@ -24,6 +24,7 @@ const navItems: NavItem[] = [
   { path: '/mcp', label: 'MCP Servers', icon: '🔗' },
   { path: '/sessions', label: 'Sessions', icon: '📝' },
   { path: '/tests', label: 'Test Runner', icon: '🧪' },
+  { path: '/logs', label: 'Debug Logs', icon: '📋' },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {

@@ -1,0 +1,110 @@
+.logs-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.page-title {
+  margin: 0;
+  padding: 20px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.page-description {
+  padding: 0 20px 16px 20px;
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.page-description code {
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  color: #333;
+}
+
+.logs-container {
+  display: flex;
+  flex: 1;
+  gap: 0;
+  overflow: hidden;
+  background: white;
+}
+
+.logs-sidebar {
+  width: 320px;
+  border-right: 1px solid #e0e0e0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.logs-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+  position: relative;
+  overflow: hidden;
+}
+
+.logs-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  color: #999;
+}
+
+.placeholder-icon {
+  font-size: 48px;
+  margin: 0;
+}
+
+.placeholder-text {
+  margin: 0;
+  font-size: 14px;
+}
+
+@media (max-width: 1024px) {
+  .logs-sidebar {
+    width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .logs-container {
+    flex-direction: column;
+  }
+
+  .logs-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+    min-height: 200px;
+    max-height: 50%;
+  }
+
+  .logs-main {
+    min-height: 200px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .page-description {
+    padding: 0 16px 12px 16px;
+    font-size: 12px;
+  }
+}
