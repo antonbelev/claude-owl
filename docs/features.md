@@ -679,100 +679,189 @@ This document details all features planned for Claude Owl, organized by function
 
 ## 8. Hooks Manager
 
-### 8.1 Hooks Overview (P0 - v1.0)
+**⚠️ SECURITY-FIRST APPROACH:** Hooks run automatically with user credentials and can be dangerous. Implementation follows a phased approach prioritizing safety.
+
+**Phase 1 (v1.0):** Read-only viewing, validation, templates
+**Phase 2 (v1.0):** Template-based editing with strong validation
+**Phase 3 (v1.1-v1.2):** Advanced features (prompt hooks, free-form editing, execution logs)
+
+### 8.1 Hooks Overview (P0 - v1.0 Phase 1)
 
 #### Hook Events Browser (P0)
-- **List of all hook events** (PreToolUse, PostToolUse, UserPromptSubmit, etc.)
+- **List of all 8 hook events** (PreToolUse, PostToolUse, UserPromptSubmit, Notification, Stop, SubagentStop, SessionStart, SessionEnd)
+- **Prominent security warning banner** at top of page
 - **Active hooks count** per event
-- **Event descriptions**
-- **Add hook** button per event
-- **Event status** (has hooks / no hooks)
+- **Event descriptions** (when each triggers)
+- **View Hooks** button per event
+- **Learn More** links to documentation
+- **Event status** (Not Configured / X Active Hooks)
 
-### 8.2 Hook Configuration (P0 - v1.0)
+### 8.2 Hook Viewing (P0 - v1.0 Phase 1)
 
-#### Event Selection (P0)
-- **Event selector** dropdown
-- **Event description** and use cases
-- **Event-specific options** (e.g., tools for PreToolUse)
+#### Read-Only Hook Display (P0)
+- **Formatted JSON viewer** with syntax highlighting
+- **Show matcher patterns** (if applicable)
+- **Display hook type** (command vs prompt)
+- **Show command/prompt content** with syntax highlighting
+- **Event context** (when this hook triggers)
+- **"Edit in settings.json"** button (opens external editor)
+- **Link to Claude Code docs** for this hook type
 
-#### Matcher Configuration (P0)
-- **Tool pattern** input (for tool events)
-- **Pattern type** selector (simple string / regex / wildcard)
-- **Pattern validation** (test against tool names)
-- **Multiple matchers** per event (P1)
+### 8.3 Hook Templates (P1 - v1.0 Phase 1)
 
-#### Hook Type Selection (P0)
-- **Command hook** radio button
-- **Prompt hook** radio button
-- **Hook type description** and use cases
+#### Template Library (P1)
+- **Security-reviewed templates** gallery:
+  - Protect .env files (PreToolUse)
+  - Auto-format code (PostToolUse)
+  - Log bash commands (PreToolUse)
+  - Block sensitive file edits (PreToolUse)
+  - Session logging (SessionStart/SessionEnd)
+- **Template descriptions** and use cases
+- **Category badges** (security/automation/logging)
+- **Security level indicators** (safe/caution/review-required)
+- **"Copy to Clipboard"** functionality
+- **Preview template code** before copying
 
-### 8.3 Command Hook Editor (P0 - v1.0)
-
-#### Script Editor (P0)
-- **Bash script editor** with syntax highlighting
-- **Script templates** (common patterns)
-- **Variable helpers** ($CLAUDE_PROJECT_DIR, $CLAUDE_ENV_FILE, etc.)
-- **Script validation** (syntax check)
-- **Security warnings** (dangerous patterns, unquoted variables)
+### 8.4 Hook Validation (P0 - v1.0 Phase 1)
 
 #### Security Validation (P0)
-- **Unquoted variable** detection
-- **Path traversal** detection (../../)
-- **Dangerous command** warnings (rm -rf, etc.)
-- **Best practices** suggestions
-- **Security score** display (P1)
+- **Parse and validate** existing hooks from settings.json
+- **Security checks:**
+  - Unquoted variables in bash commands
+  - Path traversal patterns (`../`)
+  - Dangerous commands (rm -rf, chmod 777, curl | bash, etc.)
+  - Missing timeout values
+  - Invalid matcher patterns
+- **Display validation results:**
+  - Inline warnings/errors
+  - Security score per hook (🟢 Green / 🟡 Yellow / 🔴 Red)
+  - Validation summary panel
+  - Fix suggestions for common issues
 
-#### Script Testing (P1)
-- **Test script execution** with mock data
-- **View script output**
-- **Test exit codes**
-- **Debug mode** (verbose output)
+#### Documentation (P0)
+- **Available context variables** per event type
+- **Matcher syntax examples**
+- **Best practices** guide
+- **Security considerations** with links to docs
+- **Event comparison table**
 
-### 8.4 Prompt Hook Editor (P0 - v1.0)
+### 8.5 Hook Editing (P0 - v1.0 Phase 2)
 
-#### Prompt Configuration (P0)
-- **Prompt text** input for LLM
-- **Context variables** available to prompt
-- **Prompt templates** library
-- **Prompt preview** with sample data (P1)
+#### Template-Based Creation (P0)
+- **"Create from Template"** workflow
+- **Event selector** dropdown
+- **Template picker** from library
+- **Fill template variables** (file paths, matchers, etc.)
+- **Preview generated JSON**
+- **Validate before saving**
+- **Save to user/project settings**
 
-#### Decision Mapping (P0)
-- **Output format** configuration (JSON structure)
-- **Decision field** mapping (allow/block/continue)
-- **Error handling** configuration
+#### Matcher Builder (P0)
+- **Visual tool selector** (multi-select dropdown)
+- **Support OR patterns** (`"Write|Edit|Bash"`)
+- **Wildcard option** (`*` for all tools)
+- **Regex pattern preview**
+- **Real-time validation**
+- **Test against tool list**
+- **Warning for wildcard** usage
+- **MCP tool patterns** support
 
-### 8.5 Hook Testing (P1 - v1.0)
+### 8.6 Command Hook Editor (P1 - v1.0 Phase 2)
 
-#### Test Simulator (P1)
-- **Mock tool execution** input
-- **Simulate event** button
-- **View hook execution** flow
-- **See hook output**
-- **Test parallel hooks** execution
+#### Script Editor with Validation (P1)
+- **Monaco Editor** for bash scripts
+- **Shell syntax highlighting**
+- **Variable helper buttons** ($CLAUDE_PROJECT_DIR, etc.)
+- **Real-time security validation:**
+  - Inline errors for unquoted variables
+  - Warnings for path traversal (`../`)
+  - Alerts for dangerous commands
+- **Validation results inline**
+- **Fix suggestions** for common issues
+- **Required timeout** configuration (default: 60s)
+- **Block saving** if Red security issues
+- **Acknowledgment checkbox** for Yellow warnings
+- **Best practices** tips panel
+- **Template code snippets** (proper quoting, path validation)
 
-#### Test Scenarios (P1)
-- **Predefined test scenarios** for common events
-- **Custom scenario** builder
-- **Save test scenarios**
+### 8.7 Hook Testing (P1 - v1.0 Phase 2)
 
-### 8.6 Hook Management (P0 - v1.0)
+#### Test Preview (P1)
+- **Sample input panel** with mock data
+- **Show hook input JSON** (stdin)
+- **Display command** to be executed
+- **Preview expected output** format
+- **Decision flow diagram** (for PreToolUse)
+- **Test with different inputs**
+- **Validation results** before testing
+- **Note:** Full sandbox execution deferred to v1.1
 
-#### CRUD Operations (P0)
-- **Add new hook** to event
-- **Edit existing hook**
-- **Delete hook** with confirmation
-- **Disable hook** temporarily (P1)
-- **Reorder hooks** (execution order) (P1)
+### 8.8 Hook Management (P1 - v1.0 Phase 2)
 
-#### Hook Library (P1)
-- **Built-in hook examples**
-  - Validate file paths
-  - Check for secrets
-  - Enforce code style
-  - Rate limiting
-  - Audit logging
-- **Import hook** from library
-- **Export hook** for sharing
+#### Enable/Disable (P1)
+- **Toggle per hook** in list view
+- **Preserve configuration** when disabled
+- **Grayed-out display** for disabled hooks
+- **"Disabled" badge** on hook cards
+- **Bulk enable/disable** for all hooks in event
+- **Quick toggle** without deletion
+
+### 8.9 Advanced Hook Features (v1.1-v1.2)
+
+#### Prompt Hook Editor (P0 - v1.1)
+- **LLM prompt editor** for context-aware decisions
+- **$ARGUMENTS placeholder** for input JSON
+- **Decision flow configuration**
+- **Output format** (JSON structure)
+- **Estimated cost** per invocation
+- **Test with sample inputs**
+- **Supported events:** Stop, SubagentStop, UserPromptSubmit, PreToolUse
+
+#### Hook Execution Logs (P1 - v1.1)
+- **Execution history** browser
+- **Input/output per invocation**
+- **Success/failure rates**
+- **Execution times**
+- **Filter by event, hook, date**
+- **Export logs** for debugging
+
+#### Advanced Security Scanner (P1 - v1.1)
+- **Static analysis** of bash scripts
+- **Command injection** detection
+- **Sensitive file access** patterns
+- **Environment variable** usage analysis
+- **Security report** with recommendations
+
+#### Free-Form Hook Creation (P2 - v1.2)
+- **Create hooks from scratch** (not templates)
+- **Advanced matcher editor** (regex support)
+- **Multi-hook configuration** per event
+- **Reorder hook execution** priority
+- **Import/export hooks** as JSON
+
+#### Testing Framework (P2 - v1.2)
+- **Create test scenarios** for hooks
+- **Mock different tool inputs**
+- **Test all decision paths**
+- **Automated regression** testing
+- **Test suite management**
+
+### 8.10 Hook Collaboration (v1.3)
+
+#### Hook Library & Sharing (v1.3)
+- **Community hook marketplace**
+- **Import from GitHub gists**
+- **Share with team**
+- **Rate and review hooks**
+- **Team-level policies**
+
+### 8.11 AI-Powered Hooks (v2.0)
+
+#### AI Hook Generation (v2.0)
+- **Plain English description** → hook code
+- **AI security review** of hooks
+- **Optimization suggestions**
+- **Intelligent error diagnosis**
 
 ---
 

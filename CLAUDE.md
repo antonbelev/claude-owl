@@ -212,11 +212,157 @@ When working with Claude configs:
 - Debounce search/filter operations
 - Cache file system reads when appropriate
 
+### Logging Best Practices
+
+Desktop applications need comprehensive logging for debugging user issues. Follow these guidelines:
+
+#### Logging Levels
+
+Use appropriate log levels for different scenarios:
+
+```typescript
+// DEBUG - Detailed information for diagnosing problems
+console.log('[PluginsService] Fetching marketplace manifest from:', url);
+
+// INFO - General informational messages
+console.log('[PluginsService] Successfully installed plugin:', pluginId);
+
+// WARN - Warning messages for potentially harmful situations
+console.warn('[PluginsService] Marketplace manifest missing optional field:', field);
+
+// ERROR - Error events that might still allow the application to continue
+console.error('[PluginsService] Failed to fetch marketplace:', error.message);
+```
+
+#### Logging Format
+
+Use consistent formatting with prefixes to identify the source:
+
+```typescript
+// Format: [Component/Service] Action: details
+console.log('[PluginsService] Loading plugins from marketplace:', marketplaceName);
+console.log('[PluginsHandler] IPC request received:', channelName, request);
+console.error('[PluginsService] Installation failed:', { pluginId, error: error.message });
+```
+
+#### When to Add Logging
+
+**ALWAYS log:**
+1. **Entry points** - When IPC handlers receive requests
+2. **Service method calls** - Start of business logic operations
+3. **External calls** - HTTP requests, file system operations, CLI executions
+4. **State changes** - Configuration updates, plugin installations
+5. **Errors** - All caught exceptions with context
+6. **User actions** - Important user-triggered operations
+
+**Example - IPC Handler with Logging:**
+```typescript
+ipcMain.handle(PLUGINS_CHANNELS.INSTALL_PLUGIN, async (_, request: InstallPluginRequest) => {
+  console.log('[PluginsHandler] Install plugin request:', {
+    pluginName: request.pluginName,
+    marketplace: request.marketplaceName
+  });
+
+  try {
+    const result = await pluginsService.installPlugin(
+      request.pluginName,
+      request.marketplaceName
+    );
+
+    console.log('[PluginsHandler] Plugin installation completed:', {
+      success: result.success,
+      pluginId: result.pluginId
+    });
+
+    return { success: result.success, data: result, error: result.error };
+  } catch (error) {
+    console.error('[PluginsHandler] Plugin installation failed:', {
+      pluginName: request.pluginName,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to install plugin',
+    };
+  }
+});
+```
+
+**Example - Service Method with Logging:**
+```typescript
+async installPlugin(pluginName: string, marketplaceName: string): Promise<PluginInstallResult> {
+  console.log('[PluginsService] Starting plugin installation:', { pluginName, marketplaceName });
+
+  try {
+    const marketplace = await this.getMarketplace(marketplaceName);
+    if (!marketplace) {
+      console.error('[PluginsService] Marketplace not found:', marketplaceName);
+      return { success: false, error: 'Marketplace not found' };
+    }
+
+    console.log('[PluginsService] Fetching plugin manifest:', pluginName);
+    const plugin = await this.fetchPluginFromMarketplace(pluginName, marketplace);
+
+    console.log('[PluginsService] Downloading plugin files...');
+    await this.downloadPlugin(plugin);
+
+    console.log('[PluginsService] Plugin installed successfully:', pluginName);
+    return { success: true, pluginId: `${pluginName}@${marketplaceName}` };
+  } catch (error) {
+    console.error('[PluginsService] Installation failed:', {
+      pluginName,
+      marketplaceName,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    throw error;
+  }
+}
+```
+
+#### Debugging IPC Issues
+
+When debugging "conversion failure from undefined" or similar IPC errors:
+
+1. **Log the request object** at the handler entry point
+2. **Verify parameter names** match between renderer and main
+3. **Check for undefined values** in request payload
+4. **Log the channel name** being invoked
+
+```typescript
+// In IPC handler
+ipcMain.handle(CHANNEL_NAME, async (_, request) => {
+  console.log('[Handler] Received request:', {
+    channel: CHANNEL_NAME,
+    request: JSON.stringify(request, null, 2)
+  });
+  // ... rest of handler
+});
+
+// In renderer/hook
+console.log('[usePlugins] Calling installPlugin:', { pluginName, marketplaceName });
+const response = await window.electronAPI.installPlugin({ pluginName, marketplaceName });
+console.log('[usePlugins] Response received:', response);
+```
+
+#### Future: Disk Logging
+
+We will implement disk-based logging for production debugging:
+- Log files stored in user data directory
+- Rotation policy (max file size, keep last N files)
+- Sensitive data filtering (API keys, tokens)
+- Option to export logs for GitHub issues
+
+Until then, use console logging which appears in both DevTools (renderer) and terminal (main process).
+
 ### Development Workflow
 - Run `npm run typecheck` before committing
 - Format with Prettier (`npm run format`)
 - Write tests for new features
 - Follow the established patterns (see ClaudeStatusCard example)
+- **Add comprehensive logging** to all new features (DEBUG for entry points, ERROR for failures)
 
 ## Current State
 

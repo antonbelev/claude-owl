@@ -5,6 +5,14 @@
 
 import type { ClaudeSettings, EffectiveConfig } from './config.types';
 import type { Agent, Skill, Command } from './agent.types';
+import type {
+  Marketplace,
+  MarketplacePlugin,
+  InstalledPlugin,
+  PluginInstallResult,
+  GitHubRepoInfo,
+  PluginHealthScore,
+} from './plugin.types';
 
 /**
  * IPC Channel names
@@ -61,6 +69,24 @@ export const IPC_CHANNELS = {
   CHECK_CCUSAGE_INSTALLED: 'ccusage:check-installed',
   GET_CCUSAGE_VERSION: 'ccusage:get-version',
   GET_USAGE_REPORT: 'ccusage:get-report',
+
+  // Plugins
+  GET_MARKETPLACES: 'plugins:get-marketplaces',
+  ADD_MARKETPLACE: 'plugins:add-marketplace',
+  REMOVE_MARKETPLACE: 'plugins:remove-marketplace',
+  GET_AVAILABLE_PLUGINS: 'plugins:get-available',
+  GET_INSTALLED_PLUGINS: 'plugins:get-installed',
+  INSTALL_PLUGIN: 'plugins:install',
+  UNINSTALL_PLUGIN: 'plugins:uninstall',
+  TOGGLE_PLUGIN: 'plugins:toggle',
+  GET_GITHUB_REPO_INFO: 'plugins:get-github-info',
+  GET_PLUGIN_HEALTH: 'plugins:get-health',
+
+  // Hooks
+  GET_ALL_HOOKS: 'hooks:get-all',
+  GET_TEMPLATES: 'hooks:get-templates',
+  GET_SETTINGS_PATH: 'hooks:get-settings-path',
+  OPEN_SETTINGS_FILE: 'hooks:open-settings',
 } as const;
 
 /**
@@ -320,6 +346,94 @@ export interface GetUsageReportResponse {
   error?: string;
 }
 
+// Plugins
+export interface GetMarketplacesResponse {
+  success: boolean;
+  data?: Marketplace[];
+  error?: string;
+}
+
+export interface AddMarketplaceRequest {
+  name: string;
+  source: string;
+}
+
+export interface AddMarketplaceResponse {
+  success: boolean;
+  error?: string;
+}
+
+export interface RemoveMarketplaceRequest {
+  name: string;
+}
+
+export interface RemoveMarketplaceResponse {
+  success: boolean;
+  error?: string;
+}
+
+export interface GetAvailablePluginsResponse {
+  success: boolean;
+  data?: MarketplacePlugin[];
+  error?: string;
+}
+
+export interface GetInstalledPluginsResponse {
+  success: boolean;
+  data?: InstalledPlugin[];
+  error?: string;
+}
+
+export interface InstallPluginRequest {
+  pluginName: string;
+  marketplaceName: string;
+}
+
+export interface InstallPluginResponse {
+  success: boolean;
+  data?: PluginInstallResult;
+  error?: string;
+}
+
+export interface UninstallPluginRequest {
+  pluginId: string;
+}
+
+export interface UninstallPluginResponse {
+  success: boolean;
+  error?: string;
+}
+
+export interface TogglePluginRequest {
+  pluginId: string;
+  enabled: boolean;
+}
+
+export interface TogglePluginResponse {
+  success: boolean;
+  error?: string;
+}
+
+export interface GetGitHubRepoInfoRequest {
+  repoUrl: string;
+}
+
+export interface GetGitHubRepoInfoResponse {
+  success: boolean;
+  data?: GitHubRepoInfo | null;
+  error?: string;
+}
+
+export interface GetPluginHealthRequest {
+  plugin: MarketplacePlugin | InstalledPlugin;
+}
+
+export interface GetPluginHealthResponse {
+  success: boolean;
+  data?: PluginHealthScore;
+  error?: string;
+}
+
 /**
  * IPC Event types for streaming/notifications
  */
@@ -340,4 +454,45 @@ export interface ValidationErrorEvent {
     line?: number;
     column?: number;
   }>;
+}
+
+// Hooks
+export interface GetAllHooksRequest {
+  projectPath?: string;
+}
+
+export interface GetAllHooksResponse {
+  success: boolean;
+  data?: import('./hook.types').HookEventSummary[];
+  error?: string;
+}
+
+export interface GetTemplatesResponse {
+  success: boolean;
+  data?: import('./hook.types').HookTemplate[];
+  error?: string;
+}
+
+export interface GetSettingsPathRequest {
+  location: 'user' | 'project';
+  projectPath?: string;
+}
+
+export interface GetSettingsPathResponse {
+  success: boolean;
+  data?: {
+    path: string;
+    exists: boolean;
+  };
+  error?: string;
+}
+
+export interface OpenSettingsFileRequest {
+  location: 'user' | 'project';
+  projectPath?: string;
+}
+
+export interface OpenSettingsFileResponse {
+  success: boolean;
+  error?: string;
 }

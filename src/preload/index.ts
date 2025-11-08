@@ -20,6 +20,28 @@ const CCUSAGE_CHANNELS = {
   GET_RAW_OUTPUT: 'ccusage:get-raw-output',
 } as const;
 
+// Define plugins channel strings directly to avoid tree-shaking
+const PLUGINS_CHANNELS = {
+  GET_MARKETPLACES: 'plugins:get-marketplaces',
+  ADD_MARKETPLACE: 'plugins:add-marketplace',
+  REMOVE_MARKETPLACE: 'plugins:remove-marketplace',
+  GET_AVAILABLE_PLUGINS: 'plugins:get-available',
+  GET_INSTALLED_PLUGINS: 'plugins:get-installed',
+  INSTALL_PLUGIN: 'plugins:install',
+  UNINSTALL_PLUGIN: 'plugins:uninstall',
+  TOGGLE_PLUGIN: 'plugins:toggle',
+  GET_GITHUB_REPO_INFO: 'plugins:get-github-info',
+  GET_PLUGIN_HEALTH: 'plugins:get-health',
+} as const;
+
+// Define hooks channel strings directly to avoid tree-shaking
+const HOOKS_CHANNELS = {
+  GET_ALL_HOOKS: 'hooks:get-all',
+  GET_TEMPLATES: 'hooks:get-templates',
+  GET_SETTINGS_PATH: 'hooks:get-settings-path',
+  OPEN_SETTINGS_FILE: 'hooks:open-settings',
+} as const;
+
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -62,11 +84,29 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveCommand: (args: unknown) => ipcRenderer.invoke(IPC_CHANNELS.SAVE_COMMAND, args),
   deleteCommand: (args: unknown) => ipcRenderer.invoke(IPC_CHANNELS.DELETE_COMMAND, args),
 
+  // Plugins
+  getMarketplaces: () => ipcRenderer.invoke(PLUGINS_CHANNELS.GET_MARKETPLACES),
+  addMarketplace: (args: unknown) => ipcRenderer.invoke(PLUGINS_CHANNELS.ADD_MARKETPLACE, args),
+  removeMarketplace: (args: unknown) => ipcRenderer.invoke(PLUGINS_CHANNELS.REMOVE_MARKETPLACE, args),
+  getAvailablePlugins: () => ipcRenderer.invoke(PLUGINS_CHANNELS.GET_AVAILABLE_PLUGINS),
+  getInstalledPlugins: () => ipcRenderer.invoke(PLUGINS_CHANNELS.GET_INSTALLED_PLUGINS),
+  installPlugin: (args: unknown) => ipcRenderer.invoke(PLUGINS_CHANNELS.INSTALL_PLUGIN, args),
+  uninstallPlugin: (args: unknown) => ipcRenderer.invoke(PLUGINS_CHANNELS.UNINSTALL_PLUGIN, args),
+  togglePlugin: (args: unknown) => ipcRenderer.invoke(PLUGINS_CHANNELS.TOGGLE_PLUGIN, args),
+  getGitHubRepoInfo: (args: unknown) => ipcRenderer.invoke(PLUGINS_CHANNELS.GET_GITHUB_REPO_INFO, args),
+  getPluginHealth: (args: unknown) => ipcRenderer.invoke(PLUGINS_CHANNELS.GET_PLUGIN_HEALTH, args),
+
   // CCUsage
   checkCCUsageInstalled: () => ipcRenderer.invoke(CCUSAGE_CHANNELS.CHECK_CCUSAGE_INSTALLED),
   getCCUsageVersion: () => ipcRenderer.invoke(CCUSAGE_CHANNELS.GET_CCUSAGE_VERSION),
   getUsageReport: () => ipcRenderer.invoke(CCUSAGE_CHANNELS.GET_USAGE_REPORT),
   getCCUsageRawOutput: () => ipcRenderer.invoke(CCUSAGE_CHANNELS.GET_RAW_OUTPUT),
+
+  // Hooks
+  getAllHooks: (args: unknown) => ipcRenderer.invoke(HOOKS_CHANNELS.GET_ALL_HOOKS, args),
+  getHookTemplates: () => ipcRenderer.invoke(HOOKS_CHANNELS.GET_TEMPLATES),
+  getHookSettingsPath: (args: unknown) => ipcRenderer.invoke(HOOKS_CHANNELS.GET_SETTINGS_PATH, args),
+  openHookSettingsFile: (args: unknown) => ipcRenderer.invoke(HOOKS_CHANNELS.OPEN_SETTINGS_FILE, args),
 
   // Claude CLI
   executeCLI: (args: unknown) => ipcRenderer.invoke(IPC_CHANNELS.EXECUTE_CLI, args),
@@ -117,6 +157,16 @@ export interface ElectronAPI {
   getCommand: (args: unknown) => Promise<unknown>;
   saveCommand: (args: unknown) => Promise<unknown>;
   deleteCommand: (args: unknown) => Promise<unknown>;
+  getMarketplaces: () => Promise<unknown>;
+  addMarketplace: (args: unknown) => Promise<unknown>;
+  removeMarketplace: (args: unknown) => Promise<unknown>;
+  getAvailablePlugins: () => Promise<unknown>;
+  getInstalledPlugins: () => Promise<unknown>;
+  installPlugin: (args: unknown) => Promise<unknown>;
+  uninstallPlugin: (args: unknown) => Promise<unknown>;
+  togglePlugin: (args: unknown) => Promise<unknown>;
+  getGitHubRepoInfo: (args: unknown) => Promise<unknown>;
+  getPluginHealth: (args: unknown) => Promise<unknown>;
   executeCLI: (args: unknown) => Promise<unknown>;
   stopCLI: (args: unknown) => Promise<unknown>;
   readFile: (args: unknown) => Promise<unknown>;

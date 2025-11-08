@@ -493,65 +493,80 @@ This roadmap outlines the phased development plan for Claude Owl, organized into
 
 ## Phase 5: Hooks & MCP (Weeks 17-19)
 
-**Goal:** Enable hooks configuration and MCP server management
+**Goal:** Enable safe hooks viewing/validation and MCP server management
 
-### Hooks Manager
+**⚠️ SECURITY-FIRST APPROACH:** Hooks run with user credentials and can be dangerous. Phase 5 focuses on read-only viewing, validation, and templates. Full editing deferred to Phase 5.5.
 
-- [ ] **TASK-501**: Hooks overview page
-  - Create hook events list (PreToolUse, PostToolUse, etc.)
+### Hooks Manager (Phase 1: Read-Only + Templates)
+
+- [ ] **TASK-501**: Hooks overview page with security warning
+  - Display prominent security warning banner
+  - Create hook events list (all 8 events: PreToolUse, PostToolUse, UserPromptSubmit, Notification, Stop, SubagentStop, SessionStart, SessionEnd)
   - Show active hooks count per event
-  - Add quick actions
-  - Display hook status
-  - **Estimate:** 1.5 days
+  - Display event descriptions (when each triggers)
+  - Add "View Hooks" and "Learn More" buttons per event
+  - **Estimate:** 2 days
   - **Priority:** P0
+  - **Reference:** See docs/hooks-implementation-plan.md (TASK-H01)
 
-- [ ] **TASK-502**: Hook configuration builder
-  - Create hook editor interface
-  - Add event selector
-  - Implement matcher configuration (tool patterns)
-  - Build hook type selector (command/prompt)
-  - Add multiple hooks per event
+- [ ] **TASK-502**: Hooks detail viewer (read-only)
+  - Create read-only hooks viewer
+  - Display hook configuration as formatted JSON
+  - Show matcher patterns with syntax highlighting
+  - Display hook type (command vs prompt)
+  - Show command/prompt content with syntax highlighting
+  - Add "Edit in settings.json" button (opens external editor)
+  - Link to Claude Code hooks documentation
+  - **Estimate:** 2 days
+  - **Priority:** P0
+  - **Reference:** See docs/hooks-implementation-plan.md (TASK-H02)
+
+- [ ] **TASK-503**: Hook templates library
+  - Create template gallery UI
+  - Implement 5+ security-reviewed templates:
+    1. Protect .env files (PreToolUse)
+    2. Auto-format code (PostToolUse)
+    3. Log bash commands (PreToolUse)
+    4. Block sensitive file edits (PreToolUse)
+    5. Session logging (SessionStart/SessionEnd)
+  - Show template descriptions and use cases
+  - Add "Copy to Clipboard" functionality
+  - Display category badges (security/automation/logging)
+  - Show security level for each template
+  - **Estimate:** 2 days
+  - **Priority:** P1
+  - **Reference:** See docs/hooks-implementation-plan.md (TASK-H03)
+
+- [ ] **TASK-504**: Hook validation engine
+  - Parse hooks from settings.json
+  - Validate hook structure against schema
+  - Implement security checks:
+    - Detect unquoted variables in bash
+    - Flag path traversal patterns (../)
+    - Warn on dangerous commands (rm -rf, chmod 777, curl | bash, etc.)
+    - Check for missing timeout values
+    - Validate matcher patterns
+  - Display validation warnings/errors in UI
+  - Show security score per hook (Green/Yellow/Red)
+  - Create validation summary panel
   - **Estimate:** 3 days
   - **Priority:** P0
+  - **Reference:** See docs/hooks-implementation-plan.md (TASK-H04)
 
-- [ ] **TASK-503**: Command hook editor
-  - Create bash script editor
-  - Add syntax highlighting
-  - Implement variable helper ($CLAUDE_PROJECT_DIR, etc.)
-  - Add script validation
-  - Show example patterns
-  - **Estimate:** 2.5 days
+- [ ] **TASK-505**: Contextual documentation and help
+  - Add "Learn More" links to Claude Code docs per event
+  - Show available context variables for each event type
+  - Display matcher syntax examples
+  - Create inline tooltips for technical terms
+  - Link to security best practices
+  - Add hook event comparison table
+  - **Estimate:** 1 day
   - **Priority:** P0
-
-- [ ] **TASK-504**: Prompt hook editor
-  - Create prompt input field
-  - Add LLM response preview
-  - Show decision flow (allow/block)
-  - Implement output format editor
-  - **Estimate:** 2 days
-  - **Priority:** P0
-
-- [ ] **TASK-505**: Hook testing simulator
-  - Create test interface
-  - Add mock tool execution
-  - Show hook execution flow
-  - Display hook output
-  - Test multiple hooks in parallel
-  - **Estimate:** 2.5 days
-  - **Priority:** P1
-
-- [ ] **TASK-506**: Security validation
-  - Implement dangerous pattern detection
-  - Add path traversal checks
-  - Validate shell quoting
-  - Show security warnings
-  - Create security best practices docs
-  - **Estimate:** 2 days
-  - **Priority:** P0
+  - **Reference:** See docs/hooks-implementation-plan.md (TASK-H05)
 
 ### MCP Servers Manager
 
-- [ ] **TASK-507**: MCP servers list view
+- [ ] **TASK-506**: MCP servers list view
   - Create servers list
   - Show connection status
   - Display available tools per server
@@ -559,7 +574,7 @@ This roadmap outlines the phased development plan for Claude Owl, organized into
   - **Estimate:** 2 days
   - **Priority:** P0
 
-- [ ] **TASK-508**: MCP server configuration
+- [ ] **TASK-507**: MCP server configuration
   - Create .mcp.json editor
   - Add server type selector (stdio/HTTP)
   - Implement environment variables config
@@ -567,7 +582,7 @@ This roadmap outlines the phased development plan for Claude Owl, organized into
   - **Estimate:** 2.5 days
   - **Priority:** P0
 
-- [ ] **TASK-509**: MCP server testing
+- [ ] **TASK-508**: MCP server testing
   - Create connection test interface
   - Show available tools
   - Test tool invocation
@@ -575,7 +590,7 @@ This roadmap outlines the phased development plan for Claude Owl, organized into
   - **Estimate:** 2 days
   - **Priority:** P1
 
-- [ ] **TASK-510**: MCP permissions manager
+- [ ] **TASK-509**: MCP permissions manager
   - Create tool permissions interface
   - Add allow/deny rules
   - Show tool usage examples
@@ -583,16 +598,108 @@ This roadmap outlines the phased development plan for Claude Owl, organized into
   - **Priority:** P1
 
 **Phase 5 Deliverables:**
-- Complete hooks management
-- Hook testing and validation
-- MCP server configuration
-- Security validation
+- ✅ Hooks viewing and validation (read-only)
+- ✅ Hook template library with security-reviewed patterns
+- ✅ Comprehensive security warnings and documentation
+- ✅ MCP server configuration and testing
+- ❌ Hook editing (intentionally deferred to Phase 5.5)
 
-**Total Estimate:** 21.5 days
+**Total Estimate:** 18 days (reduced from 21.5 by removing editing features)
 
 ---
 
-## Phase 6: Monitoring & Debugging (Weeks 20-22)
+## Phase 5.5: Hooks Editing (Weeks 20-21)
+
+**Goal:** Enable safe, controlled hook editing with strong validation guardrails
+
+**Prerequisites:** Phase 5 complete with user feedback on validation and templates
+
+### Safe Hook Editing
+
+- [ ] **TASK-H06**: Template-based hook creation
+  - Create "New Hook from Template" workflow
+  - Select hook event from dropdown
+  - Choose template from library
+  - Fill in template variables (file paths, matchers, etc.)
+  - Preview generated JSON configuration
+  - Validate before saving
+  - Write to settings.json (user or project level selector)
+  - Show success notification with validation results
+  - **Estimate:** 3 days
+  - **Priority:** P0
+  - **Reference:** See docs/hooks-implementation-plan.md (TASK-H06)
+
+- [ ] **TASK-H07**: Visual matcher builder
+  - Create tool selector dropdown with all Claude Code tools
+  - Support multi-select for OR patterns (`"Write|Edit|Bash"`)
+  - Add wildcard `*` option for "All Tools"
+  - Show regex pattern preview
+  - Validate matcher syntax in real-time
+  - Test matcher against tool list
+  - Add warning banner for wildcard usage
+  - Support MCP tool patterns (`mcp__*`)
+  - **Estimate:** 2.5 days
+  - **Priority:** P0
+  - **Reference:** See docs/hooks-implementation-plan.md (TASK-H07)
+
+- [ ] **TASK-H08**: Command hook editor with validation
+  - Integrate Monaco Editor for bash scripts
+  - Add shell syntax highlighting
+  - Create variable helper buttons ($CLAUDE_PROJECT_DIR, etc.)
+  - Implement real-time security validation:
+    - Detect unquoted variables (show inline errors)
+    - Flag path traversal attempts (`../`)
+    - Warn on dangerous commands (rm -rf, curl | bash, etc.)
+    - Check for proper error handling
+  - Show validation errors inline with suggestions
+  - Require timeout value (default: 60s, max: 300s)
+  - Block saving if Red security issues found
+  - Require acknowledgment checkbox for Yellow warnings
+  - Show "Best Practice" tips panel
+  - Add template code snippets (proper quoting, path validation)
+  - **Estimate:** 3 days
+  - **Priority:** P1
+  - **Reference:** See docs/hooks-implementation-plan.md (TASK-H08)
+
+- [ ] **TASK-H09**: Hook testing preview
+  - Create test panel with sample inputs
+  - Show hook input JSON (what hook receives via stdin)
+  - Display command that would be executed
+  - Preview expected output format
+  - Show decision flow diagram (for PreToolUse hooks)
+  - Add test with different tool inputs
+  - Display validation results before testing
+  - **Note:** Full sandboxed execution deferred to Phase 3
+  - **Estimate:** 2.5 days
+  - **Priority:** P1
+  - **Reference:** See docs/hooks-implementation-plan.md (TASK-H09)
+
+- [ ] **TASK-H10**: Enable/disable hook toggles
+  - Add enable/disable toggle per hook in list view
+  - Comment out hooks in JSON (add `_disabled_` prefix to event key)
+  - Show disabled hooks in grayed-out state
+  - Quick enable/disable without deleting configuration
+  - Preserve hook configuration when disabled
+  - Show "Disabled" badge in hook cards
+  - Bulk enable/disable for event (all hooks for PreToolUse, etc.)
+  - **Estimate:** 1.5 days
+  - **Priority:** P1
+  - **Reference:** See docs/hooks-implementation-plan.md (TASK-H10)
+
+**Phase 5.5 Deliverables:**
+- ✅ Template-based hook creation (safe, guided)
+- ✅ Visual matcher builder (no manual regex needed)
+- ✅ Command hook editor with real-time validation
+- ✅ Hook testing preview (without full execution)
+- ✅ Enable/disable toggles for easy management
+- ❌ Prompt hooks (deferred to Phase 3)
+- ❌ Free-form hook creation (deferred to Phase 3)
+
+**Total Estimate:** 12.5 days
+
+---
+
+## Phase 6: Monitoring & Debugging (Weeks 22-24)
 
 **Goal:** Build session monitoring and debugging capabilities
 
@@ -1058,6 +1165,10 @@ This roadmap outlines the phased development plan for Claude Owl, organized into
 - [ ] Team configuration templates
 - [ ] Shared agent/skill library
 - [ ] Configuration versioning
+- [ ] **Advanced Hooks Features (Phase 3):**
+  - [ ] Hook execution logs and monitoring (TASK-H13)
+  - [ ] Prompt-based hooks editor (TASK-H11)
+  - [ ] Advanced security scanner (TASK-H12)
 
 ### v1.2 - Advanced Features (Months 9-10)
 
@@ -1066,6 +1177,9 @@ This roadmap outlines the phased development plan for Claude Owl, organized into
 - [ ] Plugin development toolkit
 - [ ] Custom theme builder
 - [ ] Advanced analytics dashboard
+- [ ] **Advanced Hooks Features (Phase 3 cont.):**
+  - [ ] Free-form hook creation (TASK-H14)
+  - [ ] Comprehensive hook testing framework (TASK-H15)
 
 ### v1.3 - Enterprise Features (Months 11-12)
 
@@ -1074,6 +1188,10 @@ This roadmap outlines the phased development plan for Claude Owl, organized into
 - [ ] Role-based access control
 - [ ] Centralized policy management
 - [ ] Audit logging and compliance
+- [ ] **Hooks Collaboration (Phase 4):**
+  - [ ] Hook library and sharing
+  - [ ] Community hook templates marketplace
+  - [ ] Team-level hook policies
 
 ### v2.0 - AI-Powered Features (Year 2)
 
@@ -1082,6 +1200,10 @@ This roadmap outlines the phased development plan for Claude Owl, organized into
 - [ ] Intelligent error diagnosis
 - [ ] Automated optimization recommendations
 - [ ] Predictive analytics
+- [ ] **AI-Powered Hooks (Phase 4):**
+  - [ ] AI-generated hooks from plain English description
+  - [ ] AI security review of hooks
+  - [ ] Intelligent hook optimization suggestions
 
 ---
 
