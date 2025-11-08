@@ -334,3 +334,12 @@ code {
 .install-link:hover {
   text-decoration: underline;
 }
+
+/* Service Status Card */
+.incident-item {
+  transition: background-color 0.2s;
+}
+
+.incident-item:hover {
+  background-color: #f3f4f6 !important;
+}

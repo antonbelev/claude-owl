@@ -87,6 +87,9 @@ export const IPC_CHANNELS = {
   GET_TEMPLATES: 'hooks:get-templates',
   GET_SETTINGS_PATH: 'hooks:get-settings-path',
   OPEN_SETTINGS_FILE: 'hooks:open-settings',
+
+  // Service Status
+  GET_SERVICE_STATUS: 'status:get-service-status',
 } as const;
 
 /**
@@ -494,5 +497,36 @@ export interface OpenSettingsFileRequest {
 
 export interface OpenSettingsFileResponse {
   success: boolean;
+  error?: string;
+}
+
+// Service Status
+export type ServiceStatusLevel = 'operational' | 'degraded' | 'outage' | 'maintenance' | 'unknown';
+
+export interface ServiceIncidentUpdate {
+  status: string; // e.g., "Resolved", "Investigating", "Monitoring"
+  message: string;
+  timestamp: string; // ISO 8601
+}
+
+export interface ServiceIncident {
+  id: string;
+  title: string;
+  url: string;
+  publishedAt: string; // ISO 8601
+  updates: ServiceIncidentUpdate[];
+  resolved: boolean;
+}
+
+export interface ServiceStatus {
+  level: ServiceStatusLevel;
+  message: string;
+  lastChecked: string; // ISO 8601
+  recentIncidents: ServiceIncident[];
+}
+
+export interface GetServiceStatusResponse {
+  success: boolean;
+  data?: ServiceStatus;
   error?: string;
 }

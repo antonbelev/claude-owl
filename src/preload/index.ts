@@ -42,6 +42,11 @@ const HOOKS_CHANNELS = {
   OPEN_SETTINGS_FILE: 'hooks:open-settings',
 } as const;
 
+// Define status channel strings directly to avoid tree-shaking
+const STATUS_CHANNELS = {
+  GET_SERVICE_STATUS: 'status:get-service-status',
+} as const;
+
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -107,6 +112,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getHookTemplates: () => ipcRenderer.invoke(HOOKS_CHANNELS.GET_TEMPLATES),
   getHookSettingsPath: (args: unknown) => ipcRenderer.invoke(HOOKS_CHANNELS.GET_SETTINGS_PATH, args),
   openHookSettingsFile: (args: unknown) => ipcRenderer.invoke(HOOKS_CHANNELS.OPEN_SETTINGS_FILE, args),
+
+  // Service Status
+  getServiceStatus: () => ipcRenderer.invoke(STATUS_CHANNELS.GET_SERVICE_STATUS),
 
   // Claude CLI
   executeCLI: (args: unknown) => ipcRenderer.invoke(IPC_CHANNELS.EXECUTE_CLI, args),
@@ -177,4 +185,9 @@ export interface ElectronAPI {
   checkCCUsageInstalled: () => Promise<unknown>;
   getCCUsageVersion: () => Promise<unknown>;
   getUsageReport: () => Promise<unknown>;
+  getServiceStatus: () => Promise<unknown>;
+  getAllHooks: (args: unknown) => Promise<unknown>;
+  getHookTemplates: () => Promise<unknown>;
+  getHookSettingsPath: (args: unknown) => Promise<unknown>;
+  openHookSettingsFile: (args: unknown) => Promise<unknown>;
 }
