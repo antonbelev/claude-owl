@@ -25,6 +25,7 @@ const navItems: NavItem[] = [
   { path: '/sessions', label: 'Sessions', icon: '📝' },
   { path: '/tests', label: 'Test Runner', icon: '🧪' },
   { path: '/logs', label: 'Debug Logs', icon: '📋' },
+  { path: '/about', label: 'About', icon: 'ℹ️' },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
@@ -33,7 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
       {/* Header with logo */}
       <div className="sidebar-header">
         <img src={logoImage} alt="Claude Owl" className="sidebar-logo" />
-        {!isCollapsed && <span className="sidebar-title">Claude Owl</span>}
+        {!isCollapsed && <span className="sidebar-title">Claude Owl [Beta]</span>}
       </div>
 
       {/* Navigation items */}
