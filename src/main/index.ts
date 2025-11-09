@@ -16,15 +16,15 @@ function createWindow() {
   const preloadPath = path.join(__dirname, '../preload/index.js');
   console.log('Preload path:', preloadPath);
 
-  // Use the logo as app icon
-  const iconPath = path.join(__dirname, '../../claude-owl-logo.png');
+  // In packaged app, icon is set by electron-builder
+  // In development, skip icon since it may not exist
+  const isDev = !app.isPackaged;
 
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     minWidth: 800,
     minHeight: 600,
-    icon: iconPath,
     webPreferences: {
       preload: preloadPath,
       contextIsolation: true,
@@ -52,7 +52,6 @@ function createWindow() {
   });
 
   // Load the app
-  const isDev = !app.isPackaged;
   console.log('Is development:', isDev);
   console.log('VITE_DEV_SERVER_URL:', process.env.VITE_DEV_SERVER_URL);
 
@@ -65,10 +64,12 @@ function createWindow() {
     });
     mainWindow.webContents.openDevTools();
   } else {
-    // In production
-    const indexPath = path.join(__dirname, '../renderer/index.html');
+    // In production, load from dist folder within asar
+    const indexPath = path.join(__dirname, '../../dist/renderer/index.html');
     console.log('Loading from file:', indexPath);
-    mainWindow.loadFile(indexPath);
+    mainWindow.loadFile(indexPath).catch(err => {
+      console.error('Failed to load file:', err);
+    });
   }
 
   mainWindow.on('closed', () => {
@@ -77,10 +78,17 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  // Set dock icon on macOS
-  if (process.platform === 'darwin') {
-    const iconPath = path.join(__dirname, '../../claude-owl-logo.png');
-    app.dock.setIcon(iconPath);
+  // Set dock icon on macOS (only in production - electron-builder handles it)
+  if (process.platform === 'darwin' && app.isPackaged) {
+    const fs = require('fs');
+    const iconPath = path.join(__dirname, '../../assets/icon.icns');
+    if (fs.existsSync(iconPath)) {
+      try {
+        app.dock.setIcon(iconPath);
+      } catch (error) {
+        console.warn('Failed to set dock icon:', error instanceof Error ? error.message : String(error));
+      }
+    }
   }
 
   // Register IPC handlers

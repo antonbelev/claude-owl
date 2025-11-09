@@ -1,7 +1,6 @@
 import { ipcMain } from 'electron';
 import { debugLogsService } from '../services/DebugLogsService';
 import {
-  IPC_CHANNELS,
   ListDebugLogsResponse,
   GetDebugLogRequest,
   GetDebugLogResponse,

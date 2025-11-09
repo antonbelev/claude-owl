@@ -241,10 +241,5 @@ Claude Owl is open-source software licensed under the [MIT License](LICENSE).
 - 📖 [Documentation](docs/)
 - 💬 [Discussions](https://github.com/yourusername/claude-owl/discussions)
 - 🐛 [Issue Tracker](https://github.com/yourusername/claude-owl/issues)
-- 📧 Email: support@example.com (update with actual email)
 
 ---
-
-**Made with ❤️ by the Claude Owl community**
-
-*Empowering developers to harness the full power of Claude Code*
