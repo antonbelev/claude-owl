@@ -4,11 +4,21 @@
     // Node.js environment for Electron main process
     "target": "ES2022",
     "lib": ["ES2022"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "importHelpers": false,
 
     // Output configuration
+    "rootDir": "src",
     "outDir": "dist/main",
+
+    // Path aliases for main process
+    "baseUrl": ".",
+    "paths": {
+      "@/main/*": ["src/main/*"],
+      "@/shared/*": ["src/shared/*"],
+      "@/*": ["src/*"]
+    },
 
     // No JSX in main process
     "jsx": "preserve"

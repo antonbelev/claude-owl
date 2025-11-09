@@ -16,6 +16,8 @@ export default defineConfig({
       outDir: 'dist/main',
       lib: {
         entry: 'src/main/index.ts',
+        fileName: () => 'index.js',
+        formats: ['cjs'],
       },
     },
   },
@@ -32,6 +34,8 @@ export default defineConfig({
       outDir: 'dist/preload',
       lib: {
         entry: 'src/preload/index.ts',
+        fileName: () => 'index.js',
+        formats: ['cjs'],
       },
     },
   },
