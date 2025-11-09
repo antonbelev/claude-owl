@@ -35,6 +35,8 @@ Claude Owl is actively being developed. Currently available features include:
 
 See [SCREENSHOTS.md](SCREENSHOTS.md) for feature screenshots and [docs/features.md](docs/features.md) for the complete planned feature list.
 
+![Claude Owl Dashboard](screenshots/dashboard.png)
+
 ## Installation
 
 ### Prerequisites

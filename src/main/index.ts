@@ -20,7 +20,8 @@ function createWindow() {
   // In development, skip icon since it may not exist
   const isDev = !app.isPackaged;
 
-  mainWindow = new BrowserWindow({
+  // Prepare window icon (used in dev mode, packaged app uses electron-builder config)
+  const browserWindowConfig: import('electron').BrowserWindowConstructorOptions = {
     width: 1200,
     height: 800,
     minWidth: 800,
@@ -34,7 +35,18 @@ function createWindow() {
     title: 'Claude Owl',
     titleBarStyle: 'default',
     show: false,
-  });
+  };
+
+  // Add icon for dev mode if available
+  if (isDev) {
+    const iconPath = path.join(__dirname, '../../claude-owl-logo.png');
+    const fs = require('fs');
+    if (fs.existsSync(iconPath)) {
+      browserWindowConfig.icon = iconPath;
+    }
+  }
+
+  mainWindow = new BrowserWindow(browserWindowConfig);
 
   // Show window when ready
   mainWindow.once('ready-to-show', () => {
@@ -78,10 +90,18 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  // Set dock icon on macOS (only in production - electron-builder handles it)
-  if (process.platform === 'darwin' && app.isPackaged) {
+  // Set dock icon on macOS
+  if (process.platform === 'darwin') {
     const fs = require('fs');
-    const iconPath = path.join(__dirname, '../../assets/icon.icns');
+    let iconPath: string;
+
+    // In development, use the PNG logo; in production, use the icns file
+    if (app.isPackaged) {
+      iconPath = path.join(__dirname, '../../assets/icon.icns');
+    } else {
+      iconPath = path.join(__dirname, '../../claude-owl-logo.png');
+    }
+
     if (fs.existsSync(iconPath)) {
       try {
         app.dock.setIcon(iconPath);
