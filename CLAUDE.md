@@ -358,11 +358,67 @@ We will implement disk-based logging for production debugging:
 Until then, use console logging which appears in both DevTools (renderer) and terminal (main process).
 
 ### Development Workflow
-- Run `npm run typecheck` before committing
-- Format with Prettier (`npm run format`)
+
+**Before Every Commit - Run Full CI Checks Locally:**
+
+Follow the same checks that run in `.github/workflows/ci.yml` to catch issues before pushing:
+
+```bash
+# 1. Format code
+npm run format
+
+# 2. Run linter
+npm run lint
+
+# 3. Type checking
+npm run typecheck
+
+# 4. Unit tests
+npm run test:unit
+
+# 5. Build all targets
+npm run build
+npm run build:renderer
+npm run build:main
+npm run build:preload
+```
+
+**Or run everything at once:**
+```bash
+npm run format && npm run lint && npm run typecheck && npm run test:unit && npm run build
+```
+
+**General Guidelines:**
 - Write tests for new features
 - Follow the established patterns (see ClaudeStatusCard example)
 - **Add comprehensive logging** to all new features (DEBUG for entry points, ERROR for failures)
+- **Do NOT commit if:**
+  - `npm run lint` has errors (warnings OK)
+  - `npm run typecheck` has errors
+  - `npm run test:unit` fails
+  - `npm run build` fails
+
+**CI Pipeline Gates:**
+The automated CI pipeline (`.github/workflows/ci.yml`) runs these jobs and **ALL must pass**:
+- ✅ **Lint** - Code quality checks
+- ✅ **Type Check** - TypeScript compilation
+- ✅ **Unit Tests** - All tests must pass
+- ✅ **Build** - All build targets (main, renderer, preload)
+- ⚠️ **Security Scan** - Trivy vulnerability scanner (informational)
+- ⚠️ **Integration Tests** - Optional, runs if above pass
+
+**Quick Reference:**
+```bash
+# Check everything matches CI requirements
+npm run format && npm run lint && npm run typecheck && npm run test:unit && npm run build
+
+# Or check individual items:
+npm run lint              # Code style
+npm run typecheck         # Type errors
+npm run test:unit         # Unit tests
+npm run build             # Build all
+npm run test:coverage     # Coverage report
+```
 
 ## Critical Design Constraint
 
@@ -389,16 +445,25 @@ Until then, use console logging which appears in both DevTools (renderer) and te
 
 ## Current State
 
-Phase 0 is complete with first end-to-end feature implemented:
+**Phase 0** - Complete ✅
 - ✅ Claude Code detection on Dashboard
 - ✅ Full stack: Service → IPC → Hook → Component
 - ✅ 11 unit tests passing
 - ✅ Build system working
 
-Phase 1 (v0.2) Editable Settings:
-- ✅ Permission rules builder with templates
-- ⚠️ Smart suggestions feature - **NEEDS REDESIGN** (violates design constraint above)
-  - Should not auto-detect project characteristics
-  - Users should manually select templates instead
+**Phase 1 (v0.2)** - Editable Settings & Permission Rules - **COMPLETE** ✅
+- ✅ Full-featured permission rules builder with visual editor
+- ✅ 6 pre-built security templates for common use cases
+- ✅ Live rule validation with examples
+- ✅ Interactive rule tester
+- ✅ Backup/restore settings functionality
+- ✅ ESC key support for modal windows
+- ✅ Compact, optimized UI (4x more rules visible without scrolling)
+- ✅ 2000+ lines of production-ready code
+- ✅ Full TypeScript strict mode compliance
+- ⚠️ Removed auto-detection feature (violated design constraint - Claude Owl is standalone app)
 
-Next phase focuses on core services (FileSystemService, ConfigurationService, ValidationService).
+**Phase 2** - Next Focus
+- Core services (FileSystemService, ConfigurationService, ValidationService)
+- Additional settings editor sections
+- UI components for other Claude Code configurations
