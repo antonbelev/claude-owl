@@ -1,0 +1,58 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers on version tags like v0.1.0, v0.1.1, etc.
+
+permissions:
+  contents: write # Required to create releases
+
+jobs:
+  build-and-release:
+    name: Build and Release macOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Package macOS app
+        run: npm run package:mac
+        env:
+          # Prevents electron-builder from publishing automatically
+          GH_TOKEN: ''
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            release/**/*.dmg
+            release/**/latest-mac.yml
+          draft: true
+          prerelease: ${{ contains(github.ref, 'beta') || contains(github.ref, 'alpha') }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: build-logs
+          path: |
+            release/**/builder-debug.yml
+            release/**/builder-effective-config.yaml
+          retention-days: 7
