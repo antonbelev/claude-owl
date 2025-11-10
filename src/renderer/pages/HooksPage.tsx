@@ -119,7 +119,7 @@ export function HooksPage() {
         <p className="footer-note-title">📝 Phase 1: Read-Only Mode</p>
         <p>
           This is Phase 1 implementation focused on viewing and validation. To modify hooks, use the
-          "Edit in settings.json" button to open the file in your external editor. Template-based
+          &quot;Edit in settings.json&quot; button to open the file in your external editor. Template-based
           editing will be available in Phase 2.
         </p>
       </div>

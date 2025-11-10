@@ -18,7 +18,17 @@
     "resolveJsonModule": true,
 
     // Additional type checking for React
-    "noImplicitAny": true
+    "noImplicitAny": true,
+
+    // Path Aliases (must be explicitly defined here for renderer config)
+    "baseUrl": ".",
+    "paths": {
+      "@/main/*": ["src/main/*"],
+      "@/renderer/*": ["src/renderer/*"],
+      "@/preload/*": ["src/preload/*"],
+      "@/shared/*": ["src/shared/*"],
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src/renderer/**/*", "src/shared/**/*", "src/renderer/index.html"],
   "exclude": ["node_modules", "dist", "src/main", "src/preload"]

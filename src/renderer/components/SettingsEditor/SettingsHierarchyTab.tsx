@@ -88,11 +88,11 @@ export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ leve
           <div className="empty-icon">🔒</div>
           <h3>No Managed Settings</h3>
           <p>
-            Your organization hasn't configured any managed policies. Managed settings are typically set by IT
+            Your organization hasn&apos;t configured any managed policies. Managed settings are typically set by IT
             departments in enterprise environments to enforce security and compliance rules.
           </p>
           <p className="empty-hint">
-            If you're part of an organization and expect to see managed settings here, contact your IT administrator.
+            If you&apos;re part of an organization and expect to see managed settings here, contact your IT administrator.
           </p>
         </div>
       </div>

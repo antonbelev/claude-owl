@@ -38,7 +38,7 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({ settings, up
             disabled={readOnly}
             rows={4}
           />
-          <p className="form-help">Adjust Claude's system prompt behavior</p>
+          <p className="form-help">Adjust Claude&apos;s system prompt behavior</p>
         </div>
       </div>
 
@@ -66,7 +66,7 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({ settings, up
               const value = e.target.value;
               if (value === '') {
                 // Remove the property entirely instead of setting to undefined
-                const { forceLoginMethod, ...rest } = settings;
+                const { forceLoginMethod: _removed, ...rest } = settings;
                 updateSettings(rest);
               } else {
                 updateSettings({
@@ -138,7 +138,7 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({ settings, up
             />
             Include Claude co-authored attribution in commits
           </label>
-          <p className="form-help">Add "Co-Authored-By: Claude" to git commits (default: true)</p>
+          <p className="form-help">Add &quot;Co-Authored-By: Claude&quot; to git commits (default: true)</p>
         </div>
       </div>
 

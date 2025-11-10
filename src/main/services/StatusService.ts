@@ -160,7 +160,7 @@ export class StatusService {
     const updates: ServiceIncidentUpdate[] = [];
 
     // Remove CDATA wrapper if present
-    let html = descriptionHtml.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1');
+    const html = descriptionHtml.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1');
 
     // Try pattern 1: <strong>Status</strong> - message <br> <small>timestamp</small>
     // This handles: <strong>Resolved</strong> - Between 17:20... <br><small>Nov 7, 22:47 UTC</small>

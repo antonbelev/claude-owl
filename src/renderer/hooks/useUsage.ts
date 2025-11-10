@@ -50,9 +50,9 @@ export function useUsage() {
       if (response.success) {
         setState(prev => ({
           ...prev,
-          installed: response.installed,
+          installed: response.installed ?? false,
         }));
-        return response.installed;
+        return response.installed ?? false;
       } else {
         setState(prev => ({
           ...prev,
@@ -86,9 +86,9 @@ export function useUsage() {
       if (response.success) {
         setState(prev => ({
           ...prev,
-          version: response.version,
+          version: response.version ?? null,
         }));
-        return response.version;
+        return response.version ?? null;
       }
 
       return null;

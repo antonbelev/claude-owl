@@ -235,7 +235,7 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({ permission
             placeholder='e.g., acceptEdits'
             disabled={readOnly}
           />
-          <p className="form-help">Initial permission mode (e.g., "acceptEdits")</p>
+          <p className="form-help">Initial permission mode (e.g., &quot;acceptEdits&quot;)</p>
         </div>
 
         <div className="form-group">

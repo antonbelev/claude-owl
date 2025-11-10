@@ -31,8 +31,8 @@ coverage/
 .env.test.local
 .env.production.local
 
-# Logs
-logs/
+# Logs (exclude actual log directories, not source code with 'Logs' in the name)
+/logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -55,7 +55,8 @@ release/
 .cache/
 
 # Package manager
-package-lock.json
+# Lock files should be committed to version control
+# package-lock.json  # Uncomment if not using npm
 yarn.lock
 pnpm-lock.yaml
 

@@ -118,7 +118,7 @@ export const AboutPage: React.FC = () => {
             <div className="guide-item">
               <h4>💡 Have a Feature Request?</h4>
               <p>
-                We'd love to hear your ideas! Create a{' '}
+                We&apos;d love to hear your ideas! Create a{' '}
                 <a
                   className="inline-link"
                   onClick={() =>
@@ -132,7 +132,7 @@ export const AboutPage: React.FC = () => {
                 with:
               </p>
               <ul className="guide-list">
-                <li>A clear description of what you'd like to see</li>
+                <li>A clear description of what you&apos;d like to see</li>
                 <li>Why this feature would be useful</li>
                 <li>Any examples or mockups (optional)</li>
               </ul>

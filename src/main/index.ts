@@ -1,5 +1,6 @@
 import { app, BrowserWindow, globalShortcut } from 'electron';
 import path from 'path';
+import fs from 'fs';
 import { registerSystemHandlers } from './ipc/systemHandlers';
 import { registerSkillsHandlers } from './ipc/skillsHandlers';
 import { registerAgentsHandlers } from './ipc/agentsHandlers';
@@ -40,7 +41,6 @@ function createWindow() {
   // Add icon for dev mode if available
   if (isDev) {
     const iconPath = path.join(__dirname, '../../claude-owl-logo.png');
-    const fs = require('fs');
     if (fs.existsSync(iconPath)) {
       browserWindowConfig.icon = iconPath;
     }
@@ -92,7 +92,6 @@ function createWindow() {
 app.whenReady().then(() => {
   // Set dock icon on macOS
   if (process.platform === 'darwin') {
-    const fs = require('fs');
     let iconPath: string;
 
     // In development, use the PNG logo; in production, use the icns file

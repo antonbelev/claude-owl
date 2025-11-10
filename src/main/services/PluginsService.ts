@@ -585,33 +585,43 @@ export class PluginsService {
       const commandsDir = path.join(pluginPath, 'commands');
       const commandFiles = await fs.readdir(commandsDir);
       counts.commands = commandFiles.filter((f) => f.endsWith('.md')).length;
-    } catch {}
+    } catch {
+      // Commands directory doesn't exist, keep default count of 0
+    }
 
     try {
       const agentsDir = path.join(pluginPath, 'agents');
       const agentFiles = await fs.readdir(agentsDir);
       counts.agents = agentFiles.filter((f) => f.endsWith('.md')).length;
-    } catch {}
+    } catch {
+      // Agents directory doesn't exist, keep default count of 0
+    }
 
     try {
       const skillsDir = path.join(pluginPath, 'skills');
       const skillDirs = await fs.readdir(skillsDir, { withFileTypes: true });
       counts.skills = skillDirs.filter((d) => d.isDirectory()).length;
-    } catch {}
+    } catch {
+      // Skills directory doesn't exist, keep default count of 0
+    }
 
     try {
       const hooksPath = path.join(pluginPath, 'hooks', 'hooks.json');
       const hooksContent = await fs.readFile(hooksPath, 'utf-8');
       const hooks = JSON.parse(hooksContent);
       counts.hooks = Object.keys(hooks).length;
-    } catch {}
+    } catch {
+      // Hooks file doesn't exist, keep default count of 0
+    }
 
     try {
       const mcpPath = path.join(pluginPath, '.mcp.json');
       const mcpContent = await fs.readFile(mcpPath, 'utf-8');
       const mcp = JSON.parse(mcpContent);
       counts.mcpServers = Object.keys(mcp.mcpServers || {}).length;
-    } catch {}
+    } catch {
+      // MCP config file doesn't exist, keep default count of 0
+    }
 
     return counts;
   }
@@ -621,7 +631,9 @@ export class PluginsService {
     try {
       const content = await fs.readFile(this.installedPluginsFile, 'utf-8');
       data = JSON.parse(content);
-    } catch {}
+    } catch {
+      // File doesn't exist yet, use empty template
+    }
 
     data.plugins[plugin.id] = {
       name: plugin.name,

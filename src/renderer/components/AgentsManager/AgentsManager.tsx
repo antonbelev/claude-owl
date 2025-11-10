@@ -143,7 +143,7 @@ export const AgentsManager: React.FC = () => {
           <div className="agents-empty">
             <div className="empty-icon">🔍</div>
             <h3>No Agents Found</h3>
-            <p>No agents match your search query "{searchQuery}"</p>
+            <p>No agents match your search query &quot;{searchQuery}&quot;</p>
             <button onClick={() => setSearchQuery('')} className="btn-create-empty">
               Clear Search
             </button>

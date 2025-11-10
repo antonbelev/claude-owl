@@ -39,7 +39,7 @@ export function useClaudeInstallation() {
       if (response.success) {
         setStatus({
           loading: false,
-          installed: response.installed,
+          installed: response.installed ?? false,
           version: response.version ?? null,
           path: response.path ?? null,
           error: null,

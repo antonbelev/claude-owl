@@ -5,5 +5,6 @@
 
 export * from './config.types';
 export * from './agent.types';
-export * from './ipc.types';
+export * from './hook.types';
 export * from './plugin.types';
+export * from './ipc.types';

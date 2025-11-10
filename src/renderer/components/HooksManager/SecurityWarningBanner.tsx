@@ -15,7 +15,7 @@ export function SecurityWarningBanner() {
           <div className="security-warning-text">
             <p>
               Claude Code hooks execute arbitrary commands on your system automatically during agent
-              operations. Hooks run with your current environment's credentials.
+              operations. Hooks run with your current environment&apos;s credentials.
             </p>
 
             <div style={{ marginTop: '0.75rem' }}>
