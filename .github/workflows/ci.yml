@@ -5,6 +5,7 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main, develop]
+    types: [opened, synchronize, reopened]
   # Run tests on schedule (daily at 2 AM UTC)
   schedule:
     - cron: '0 2 * * *'
