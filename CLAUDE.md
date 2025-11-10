@@ -387,11 +387,6 @@ Until then, use console logging which appears in both DevTools (renderer) and te
 - Project structure or dependencies
 - Current working directory
 
-### Violating Features to Remove/Redesign
-- ❌ "Smart suggestions based on detected tools" - removes ability to detect npm, git, TypeScript, Docker
-  - **Fix:** Provide templates manually, let users choose based on their needs
-  - Users can click "📋 Templates" and apply relevant ones themselves
-
 ## Current State
 
 Phase 0 is complete with first end-to-end feature implemented:
