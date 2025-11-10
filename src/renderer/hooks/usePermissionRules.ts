@@ -40,7 +40,7 @@ export function usePermissionRules() {
       };
 
       if (response.success && response.data) {
-        const { id, level, ...rest } = response.data;
+        const { id: _id, level: _level, ...rest } = response.data;
         return rest;
       }
 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import type { PermissionsConfig, PermissionRule } from '@/shared/types';
-import { usePermissionRules } from '../../../../hooks/usePermissionRules';
+import type { PermissionsConfig, PermissionRule, ToolType } from '@/shared/types';
 import { PermissionRuleItem } from './PermissionRule';
 import { RuleEditorModal } from './RuleEditorModal';
 import { RuleTemplatesModal } from './RuleTemplatesModal';
@@ -35,7 +34,7 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
       if (parts) {
         const rule: PermissionRule = {
           id: uuidv4(),
-          tool: parts[1] as any,
+          tool: parts[1] as ToolType,
           level: 'deny',
           createdFrom: 'custom',
         };
@@ -52,7 +51,7 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
       if (parts) {
         const rule: PermissionRule = {
           id: uuidv4(),
-          tool: parts[1] as any,
+          tool: parts[1] as ToolType,
           level: 'ask',
           createdFrom: 'custom',
         };
@@ -69,7 +68,7 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
       if (parts) {
         const rule: PermissionRule = {
           id: uuidv4(),
-          tool: parts[1] as any,
+          tool: parts[1] as ToolType,
           level: 'allow',
           createdFrom: 'custom',
         };
@@ -285,7 +284,7 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
             placeholder="e.g., acceptEdits"
             disabled={readOnly}
           />
-          <p className="form-help">Initial permission mode (e.g., "acceptEdits", "bypassPermissions")</p>
+          <p className="form-help">Initial permission mode (e.g., &quot;acceptEdits&quot;, &quot;bypassPermissions&quot;)</p>
         </div>
 
         <div className="form-group">
