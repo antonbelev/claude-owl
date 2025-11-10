@@ -10,6 +10,15 @@ const SETTINGS_CHANNELS = {
   SETTINGS_FILE_EXISTS: 'settings:file-exists',
   ENSURE_SETTINGS_FILE: 'settings:ensure-file',
   DELETE_SETTINGS: 'settings:delete',
+  CREATE_BACKUP: 'settings:create-backup',
+  RESTORE_BACKUP: 'settings:restore-backup',
+  PARSE_RULE: 'settings:parse-rule',
+  FORMAT_RULE: 'settings:format-rule',
+  VALIDATE_RULE: 'settings:validate-rule',
+  VALIDATE_PATTERN: 'settings:validate-pattern',
+  TEST_RULE: 'settings:test-rule',
+  GET_RULE_TEMPLATES: 'settings:get-rule-templates',
+  APPLY_TEMPLATE: 'settings:apply-template',
 } as const;
 
 // Define ccusage channel strings directly to avoid tree-shaking
@@ -72,6 +81,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   settingsFileExists: (args: unknown) => ipcRenderer.invoke(SETTINGS_CHANNELS.SETTINGS_FILE_EXISTS, args),
   ensureSettingsFile: (args: unknown) => ipcRenderer.invoke(SETTINGS_CHANNELS.ENSURE_SETTINGS_FILE, args),
   deleteSettings: (args: unknown) => ipcRenderer.invoke(SETTINGS_CHANNELS.DELETE_SETTINGS, args),
+  createBackup: (args: unknown) => ipcRenderer.invoke(SETTINGS_CHANNELS.CREATE_BACKUP, args),
+  restoreBackup: (args: unknown) => ipcRenderer.invoke(SETTINGS_CHANNELS.RESTORE_BACKUP, args),
+
+  // Permission Rules
+  parseRule: (args: unknown) => ipcRenderer.invoke(SETTINGS_CHANNELS.PARSE_RULE, args),
+  formatRule: (args: unknown) => ipcRenderer.invoke(SETTINGS_CHANNELS.FORMAT_RULE, args),
+  validateRule: (args: unknown) => ipcRenderer.invoke(SETTINGS_CHANNELS.VALIDATE_RULE, args),
+  validatePattern: (args: unknown) => ipcRenderer.invoke(SETTINGS_CHANNELS.VALIDATE_PATTERN, args),
+  testRule: (args: unknown) => ipcRenderer.invoke(SETTINGS_CHANNELS.TEST_RULE, args),
+  getRuleTemplates: () => ipcRenderer.invoke(SETTINGS_CHANNELS.GET_RULE_TEMPLATES),
+  applyTemplate: (args: unknown) => ipcRenderer.invoke(SETTINGS_CHANNELS.APPLY_TEMPLATE, args),
 
   // Configuration (legacy)
   getConfig: (args: unknown) => ipcRenderer.invoke(IPC_CHANNELS.GET_CONFIG, args),
@@ -163,6 +183,15 @@ export interface ElectronAPI {
   settingsFileExists: (args: unknown) => Promise<unknown>;
   ensureSettingsFile: (args: unknown) => Promise<unknown>;
   deleteSettings: (args: unknown) => Promise<unknown>;
+  createBackup: (args: unknown) => Promise<unknown>;
+  restoreBackup: (args: unknown) => Promise<unknown>;
+  parseRule: (args: unknown) => Promise<unknown>;
+  formatRule: (args: unknown) => Promise<unknown>;
+  validateRule: (args: unknown) => Promise<unknown>;
+  validatePattern: (args: unknown) => Promise<unknown>;
+  testRule: (args: unknown) => Promise<unknown>;
+  getRuleTemplates: () => Promise<unknown>;
+  applyTemplate: (args: unknown) => Promise<unknown>;
   getConfig: (args: unknown) => Promise<unknown>;
   saveConfig: (args: unknown) => Promise<unknown>;
   validateConfig: (args: unknown) => Promise<unknown>;

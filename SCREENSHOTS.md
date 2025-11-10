@@ -48,6 +48,18 @@ Edit your Claude Code settings through an intuitive visual editor. No more manua
 
 Configure individual settings with validation and helpful descriptions.
 
+## Permission Rules Builder
+
+![Rule Templates](screenshots/template-rules.png)
+
+Manage Claude Code permissions with an intuitive rules builder. Choose from 6 pre-built security templates covering common scenarios like blocking environment files, allowing npm scripts, git read-only access, and more. Each template shows a preview of the rules it includes.
+
+## Rule Testing & Validation
+
+![Test Rules](screenshots/testing-rules.png)
+
+Test your permission rules before saving to ensure they work as expected. The interactive rule tester lets you specify a tool, permission level, pattern, and test input to see if the rule matches. Get instant feedback with detailed explanations of why a rule matches or doesn't match.
+
 ## Hooks Management (Read-Only)
 
 ![Hooks Manager](screenshots/read-only-hooks.png)

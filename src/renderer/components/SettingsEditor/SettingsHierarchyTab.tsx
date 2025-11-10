@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLevelSettings } from '../../hooks/useSettings';
 import type { ConfigLevel } from '@/shared/types';
-import { PermissionsEditor } from './editors/PermissionsEditor';
+import { EnhancedPermissionsEditor } from './editors/PermissionsEditor/EnhancedPermissionsEditor';
 import { EnvironmentEditor } from './editors/EnvironmentEditor';
 import { CoreConfigEditor } from './editors/CoreConfigEditor';
 
@@ -105,7 +105,7 @@ export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ leve
         return <CoreConfigEditor settings={settings} updateSettings={updateSettings} readOnly={isReadOnly} />;
       case 'permissions':
         return (
-          <PermissionsEditor
+          <EnhancedPermissionsEditor
             permissions={settings.permissions || {}}
             updatePermissions={(permissions) => updateSettings({ permissions })}
             readOnly={isReadOnly}

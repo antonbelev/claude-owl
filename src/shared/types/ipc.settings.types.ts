@@ -4,6 +4,13 @@
 
 import type { ClaudeSettings, EffectiveConfig } from './config.types';
 import type { IPCResponse } from './ipc.common.types';
+import type {
+  PermissionRule,
+  RuleTemplate,
+  RuleValidationResult,
+  RuleMatchResult,
+  ToolType,
+} from './permissions.types';
 
 /**
  * Settings request/response types
@@ -77,3 +84,60 @@ export interface SaveConfigRequest {
 export interface SaveConfigResponse extends IPCResponse {}
 
 export interface GetEffectiveConfigResponse extends IPCResponse<EffectiveConfig> {}
+
+/**
+ * Permission Rules IPC types
+ */
+
+export interface ParseRuleRequest {
+  ruleString: string;
+}
+
+export interface ParseRuleResponse extends IPCResponse<PermissionRule> {}
+
+export interface FormatRuleRequest {
+  rule: Omit<PermissionRule, 'id'>;
+}
+
+export interface FormatRuleResponse extends IPCResponse<{ ruleString: string }> {}
+
+export interface ValidateRuleRequest {
+  rule: Omit<PermissionRule, 'id'>;
+}
+
+export interface ValidateRuleResponse extends IPCResponse<RuleValidationResult> {}
+
+export interface ValidatePatternRequest {
+  tool: ToolType;
+  pattern: string;
+}
+
+export interface ValidatePatternResponse extends IPCResponse<RuleValidationResult> {}
+
+export interface TestRuleRequest {
+  rule: Omit<PermissionRule, 'id'>;
+  testInput: string;
+}
+
+export interface TestRuleResponse extends IPCResponse<RuleMatchResult> {}
+
+export interface GetRuleTemplatesResponse extends IPCResponse<{ templates: RuleTemplate[] }> {}
+
+export interface ApplyTemplateRequest {
+  templateId: string;
+}
+
+export interface ApplyTemplateResponse extends IPCResponse<{ rules: PermissionRule[] }> {}
+
+export interface CreateBackupRequest {
+  level: 'user' | 'project' | 'local';
+}
+
+export interface CreateBackupResponse extends IPCResponse<{ backupPath: string }> {}
+
+export interface RestoreBackupRequest {
+  backupPath: string;
+  level: 'user' | 'project' | 'local';
+}
+
+export interface RestoreBackupResponse extends IPCResponse {}

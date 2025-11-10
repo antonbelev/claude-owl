@@ -44,6 +44,23 @@ export type {
   SaveConfigRequest,
   SaveConfigResponse,
   GetEffectiveConfigResponse,
+  CreateBackupRequest,
+  CreateBackupResponse,
+  RestoreBackupRequest,
+  RestoreBackupResponse,
+  ParseRuleRequest,
+  ParseRuleResponse,
+  FormatRuleRequest,
+  FormatRuleResponse,
+  ValidateRuleRequest,
+  ValidateRuleResponse,
+  ValidatePatternRequest,
+  ValidatePatternResponse,
+  TestRuleRequest,
+  TestRuleResponse,
+  GetRuleTemplatesResponse,
+  ApplyTemplateRequest,
+  ApplyTemplateResponse,
 } from './ipc.settings.types';
 
 // Re-export agent types
