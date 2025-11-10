@@ -11,7 +11,17 @@
     "outDir": "dist/preload",
 
     // No JSX in preload scripts
-    "jsx": "preserve"
+    "jsx": "preserve",
+
+    // Path Aliases (must be explicitly defined here for preload config)
+    "baseUrl": ".",
+    "paths": {
+      "@/main/*": ["src/main/*"],
+      "@/renderer/*": ["src/renderer/*"],
+      "@/preload/*": ["src/preload/*"],
+      "@/shared/*": ["src/shared/*"],
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src/preload/**/*", "src/shared/**/*"],
   "exclude": ["node_modules", "dist", "src/main", "src/renderer"]
