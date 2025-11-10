@@ -130,11 +130,12 @@ export class FileSystemService {
 
       // Parse frontmatter
       const frontmatterMatch = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-      if (!frontmatterMatch) {
+      if (!frontmatterMatch || !frontmatterMatch[1] || frontmatterMatch[2] === undefined) {
         throw new Error('Invalid markdown format: missing frontmatter delimiters (---)');
       }
 
-      const [, frontmatterStr, content] = frontmatterMatch;
+      const frontmatterStr = frontmatterMatch[1];
+      const content = frontmatterMatch[2];
 
       // Parse YAML frontmatter (simple key: value parser)
       const frontmatter = this.parseYAML<T>(frontmatterStr);
@@ -154,14 +155,14 @@ export class FileSystemService {
    * Write markdown file with YAML frontmatter
    * @throws Error if write fails
    */
-  async writeMarkdownWithFrontmatter<T = Record<string, unknown>>(
+  async writeMarkdownWithFrontmatter<T extends Record<string, unknown> = Record<string, unknown>>(
     filePath: string,
     frontmatter: T,
     content: string
   ): Promise<void> {
     console.log('[FileSystemService] Writing markdown with frontmatter:', filePath);
     try {
-      const frontmatterStr = this.stringifyYAML(frontmatter);
+      const frontmatterStr = this.stringifyYAML(frontmatter as Record<string, unknown>);
       const markdown = `---\n${frontmatterStr}\n---\n${content}`;
 
       await this.ensureDirectory(path.dirname(filePath));
@@ -295,8 +296,12 @@ export class FileSystemService {
 
     const lines = yamlStr.split('\n').filter((line) => line.trim());
     for (const line of lines) {
-      const [key, ...valueParts] = line.split(':');
+      const parts = line.split(':');
+      const key = parts[0];
+      const valueParts = parts.slice(1);
       const value = valueParts.join(':').trim();
+
+      if (!key) continue;
 
       // Simple type detection
       if (value === 'true') obj[key.trim()] = true;

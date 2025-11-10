@@ -11,7 +11,7 @@
  */
 export interface ValidationResult<T = unknown> {
   valid: boolean;
-  data?: T;
+  data: T | undefined;
   errors: ValidationError[];
 }
 
@@ -48,7 +48,7 @@ export class ValidationService {
         message: `Expected object, got ${typeof data}`,
         severity: 'error',
       });
-      return { valid: false, errors };
+      return { valid: false, data: undefined, errors };
     }
 
     const obj = data as Record<string, unknown>;
@@ -101,7 +101,10 @@ export class ValidationService {
         continue;
       }
 
-      const [key, ...valueParts] = line.split(':');
+      const parts = line.split(':');
+      const key = parts[0];
+      if (!key) continue;
+      const valueParts = parts.slice(1);
       const trimmedKey = key.trim();
       const value = valueParts.join(':').trim();
 
@@ -221,7 +224,7 @@ export class ValidationService {
         message: `Expected string, got ${typeof value}`,
         severity: 'error',
       });
-      return { valid: false, errors };
+      return { valid: false, data: undefined, errors };
     }
 
     if (value.trim() === '') {
@@ -230,7 +233,7 @@ export class ValidationService {
         message: `${fieldName} cannot be empty`,
         severity: 'error',
       });
-      return { valid: false, errors };
+      return { valid: false, data: undefined, errors };
     }
 
     return {
@@ -252,7 +255,7 @@ export class ValidationService {
         message: `Expected string, got ${typeof email}`,
         severity: 'error',
       });
-      return { valid: false, errors };
+      return { valid: false, data: undefined, errors };
     }
 
     // Basic email validation
@@ -263,7 +266,7 @@ export class ValidationService {
         message: 'Invalid email format',
         severity: 'error',
       });
-      return { valid: false, errors };
+      return { valid: false, data: undefined, errors };
     }
 
     return {
@@ -285,7 +288,7 @@ export class ValidationService {
         message: `Expected string, got ${typeof url}`,
         severity: 'error',
       });
-      return { valid: false, errors };
+      return { valid: false, data: undefined, errors };
     }
 
     try {
@@ -296,7 +299,7 @@ export class ValidationService {
         message: 'Invalid URL format',
         severity: 'error',
       });
-      return { valid: false, errors };
+      return { valid: false, data: undefined, errors };
     }
 
     return {
@@ -322,7 +325,7 @@ export class ValidationService {
         message: `Invalid value. Expected one of: ${allowedValues.join(', ')}`,
         severity: 'error',
       });
-      return { valid: false, errors };
+      return { valid: false, data: undefined, errors };
     }
 
     return {
@@ -348,7 +351,7 @@ export class ValidationService {
         message: `Expected array, got ${typeof value}`,
         severity: 'error',
       });
-      return { valid: false, errors };
+      return { valid: false, data: undefined, errors };
     }
 
     if (minLength !== undefined && value.length < minLength) {

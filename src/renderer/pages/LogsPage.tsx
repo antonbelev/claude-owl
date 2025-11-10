@@ -1,7 +1,7 @@
 import React from 'react';
-import { useDebugLogs } from '../hooks/useDebugLogs';
-import { LogsList } from '../components/Logs/LogsList';
-import { LogViewer } from '../components/Logs/LogViewer';
+import { useDebugLogs } from '@/renderer/hooks/useDebugLogs';
+import { LogsList } from '@/renderer/components/Logs/LogsList';
+import { LogViewer } from '@/renderer/components/Logs/LogViewer';
 import './LogsPage.css';
 
 export const LogsPage: React.FC = () => {
