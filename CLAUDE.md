@@ -364,6 +364,34 @@ Until then, use console logging which appears in both DevTools (renderer) and te
 - Follow the established patterns (see ClaudeStatusCard example)
 - **Add comprehensive logging** to all new features (DEBUG for entry points, ERROR for failures)
 
+## Critical Design Constraint
+
+**⚠️ IMPORTANT: Claude Owl is a standalone desktop application, NOT a project-aware tool**
+
+- Users launch Claude Owl from the Applications folder (or via DMG installer)
+- Claude Owl does NOT have access to the user's current working directory or project structure
+- Do NOT build features that assume Claude Owl knows about the user's project setup
+- Do NOT use `process.cwd()` or detect project files/frameworks during runtime
+- **Development vs Production Reality:**
+  - ✗ During `npm run dev:electron`: We run from claude-owl project directory (misleading!)
+  - ✓ When installed: Users launch from Applications, no project context available
+
+### What Claude Owl CAN Know
+- Global Claude Code settings (`~/.claude/settings.json`)
+- Project-level settings (if user opens a project's `.claude/settings.json`)
+- User's home directory
+
+### What Claude Owl CANNOT Know
+- Which project the user is currently working on
+- What tools/frameworks are installed in user's projects
+- Project structure or dependencies
+- Current working directory
+
+### Violating Features to Remove/Redesign
+- ❌ "Smart suggestions based on detected tools" - removes ability to detect npm, git, TypeScript, Docker
+  - **Fix:** Provide templates manually, let users choose based on their needs
+  - Users can click "📋 Templates" and apply relevant ones themselves
+
 ## Current State
 
 Phase 0 is complete with first end-to-end feature implemented:
@@ -371,5 +399,11 @@ Phase 0 is complete with first end-to-end feature implemented:
 - ✅ Full stack: Service → IPC → Hook → Component
 - ✅ 11 unit tests passing
 - ✅ Build system working
+
+Phase 1 (v0.2) Editable Settings:
+- ✅ Permission rules builder with templates
+- ⚠️ Smart suggestions feature - **NEEDS REDESIGN** (violates design constraint above)
+  - Should not auto-detect project characteristics
+  - Users should manually select templates instead
 
 Next phase focuses on core services (FileSystemService, ConfigurationService, ValidationService).

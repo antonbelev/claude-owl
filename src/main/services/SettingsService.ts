@@ -537,4 +537,99 @@ export class SettingsService {
       }
     }
   }
+
+  /**
+   * Create a backup of settings file
+   * Returns the path to the backup file
+   */
+  async createBackup(level: ConfigLevel): Promise<string> {
+    const settingsPath = this.getSettingsPath(level);
+    const exists = await this.settingsFileExists(level);
+
+    if (!exists) {
+      throw new Error(`Settings file does not exist at ${level} level`);
+    }
+
+    // Create backup filename with timestamp
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const backupDir = path.join(path.dirname(settingsPath), '.backups');
+    const backupFilename = `settings.${level}.${timestamp}.json`;
+    const backupPath = path.join(backupDir, backupFilename);
+
+    console.log(`[SettingsService] Creating backup: ${backupPath}`);
+
+    // Create backup directory if it doesn't exist
+    await fs.mkdir(backupDir, { recursive: true });
+
+    // Copy settings file to backup
+    await fs.copyFile(settingsPath, backupPath);
+
+    console.log(`[SettingsService] Backup created successfully`);
+    return backupPath;
+  }
+
+  /**
+   * Restore settings from a backup file
+   */
+  async restoreBackup(backupPath: string, level: ConfigLevel): Promise<void> {
+    if (level === 'managed') {
+      throw new Error('Cannot restore to managed settings');
+    }
+
+    console.log(`[SettingsService] Restoring from backup: ${backupPath}`);
+
+    // Verify backup file exists
+    try {
+      await fs.access(backupPath);
+    } catch {
+      throw new Error(`Backup file not found: ${backupPath}`);
+    }
+
+    // Read and validate backup content
+    const backupContent = await fs.readFile(backupPath, 'utf-8');
+    const backupSettings = JSON.parse(backupContent) as ClaudeSettings;
+
+    // Validate backup settings
+    const validation = this.validateSettings(backupSettings);
+    if (!validation.valid) {
+      console.error(`[SettingsService] Backup validation failed:`, validation.errors);
+      throw new Error(`Backup file contains invalid settings: ${validation.errors.map(e => e.message).join(', ')}`);
+    }
+
+    // Create a backup of current settings before restoring
+    const currentExists = await this.settingsFileExists(level);
+    if (currentExists) {
+      await this.createBackup(level);
+      console.log(`[SettingsService] Created backup of current settings before restore`);
+    }
+
+    // Restore from backup
+    await this.writeSettings(level, backupSettings);
+    console.log(`[SettingsService] Settings restored successfully from backup`);
+  }
+
+  /**
+   * List all available backups for a level
+   */
+  async listBackups(level: ConfigLevel): Promise<string[]> {
+    const settingsPath = this.getSettingsPath(level);
+    const backupDir = path.join(path.dirname(settingsPath), '.backups');
+
+    try {
+      const files = await fs.readdir(backupDir);
+      const backupFiles = files
+        .filter(file => file.startsWith(`settings.${level}.`) && file.endsWith('.json'))
+        .map(file => path.join(backupDir, file))
+        .sort()
+        .reverse(); // Most recent first
+
+      return backupFiles;
+    } catch (error) {
+      // Backup directory doesn't exist
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        return [];
+      }
+      throw error;
+    }
+  }
 }

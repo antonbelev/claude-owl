@@ -222,6 +222,55 @@ export function useSettings() {
     }
   }, [loadEffectiveSettings]);
 
+  /**
+   * Create a backup of settings file
+   */
+  const createBackup = useCallback(async (level: ConfigLevel): Promise<string | null> => {
+    if (!window.electronAPI) {
+      return null;
+    }
+
+    try {
+      const response = (await window.electronAPI.createBackup({ level })) as { success: boolean; data?: { backupPath: string } };
+
+      if (response.success && response.data) {
+        return response.data.backupPath;
+      }
+
+      return null;
+    } catch (error) {
+      console.error(`Failed to create backup for ${level} settings:`, error);
+      return null;
+    }
+  }, []);
+
+  /**
+   * Restore settings from a backup file
+   */
+  const restoreBackup = useCallback(async (backupPath: string, level: Exclude<ConfigLevel, 'managed'>): Promise<boolean> => {
+    if (!window.electronAPI) {
+      return false;
+    }
+
+    try {
+      const response = (await window.electronAPI.restoreBackup({
+        backupPath,
+        level,
+      })) as { success: boolean };
+
+      if (response.success) {
+        // Reload effective settings after restore
+        await loadEffectiveSettings();
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error(`Failed to restore backup:`, error);
+      return false;
+    }
+  }, [loadEffectiveSettings]);
+
   // Load settings on mount
   useEffect(() => {
     loadEffectiveSettings();
@@ -235,6 +284,8 @@ export function useSettings() {
     settingsFileExists,
     ensureSettingsFile,
     deleteSettings,
+    createBackup,
+    restoreBackup,
     refetch: loadEffectiveSettings,
   };
 }
