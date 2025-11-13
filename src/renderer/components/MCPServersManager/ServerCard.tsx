@@ -54,7 +54,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({
         <div className="server-actions">
           <button
             className="btn-action btn-test"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               onTest();
             }}
@@ -65,7 +65,7 @@ export const ServerCard: React.FC<ServerCardProps> = ({
           </button>
           <button
             className="btn-action btn-delete"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               onDelete();
             }}

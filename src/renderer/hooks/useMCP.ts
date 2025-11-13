@@ -71,53 +71,59 @@ export function useMCP(options: UseMCPOptions = {}) {
   /**
    * Add a new MCP server
    */
-  const addServer = useCallback(async (config: AddMCPServerRequest) => {
-    try {
-      setError(null);
-      console.log('[useMCP] Adding server:', config.name);
+  const addServer = useCallback(
+    async (config: AddMCPServerRequest) => {
+      try {
+        setError(null);
+        console.log('[useMCP] Adding server:', config.name);
 
-      const response: AddMCPServerResponse = await window.electronAPI.addMCPServer(config);
+        const response: AddMCPServerResponse = await window.electronAPI.addMCPServer(config);
 
-      if (!response.success) {
-        throw new Error(response.error || 'Failed to add server');
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to add server');
+        }
+
+        // Refresh servers list
+        await listServers();
+        console.log('[useMCP] Server added:', config.name);
+        return response.data;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        console.error('[useMCP] Failed to add server:', message);
+        setError(message);
+        throw err;
       }
-
-      // Refresh servers list
-      await listServers();
-      console.log('[useMCP] Server added:', config.name);
-      return response.data;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      console.error('[useMCP] Failed to add server:', message);
-      setError(message);
-      throw err;
-    }
-  }, [listServers]);
+    },
+    [listServers]
+  );
 
   /**
    * Remove an MCP server
    */
-  const removeServer = useCallback(async (request: RemoveMCPServerRequest) => {
-    try {
-      setError(null);
-      console.log('[useMCP] Removing server:', request.name);
+  const removeServer = useCallback(
+    async (request: RemoveMCPServerRequest) => {
+      try {
+        setError(null);
+        console.log('[useMCP] Removing server:', request.name);
 
-      const response: RemoveMCPServerResponse = await window.electronAPI.removeMCPServer(request);
+        const response: RemoveMCPServerResponse = await window.electronAPI.removeMCPServer(request);
 
-      if (!response.success) {
-        throw new Error(response.error || 'Failed to remove server');
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to remove server');
+        }
+
+        // Refresh servers list
+        await listServers();
+        console.log('[useMCP] Server removed:', request.name);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        console.error('[useMCP] Failed to remove server:', message);
+        setError(message);
+        throw err;
       }
-
-      // Refresh servers list
-      await listServers();
-      console.log('[useMCP] Server removed:', request.name);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      console.error('[useMCP] Failed to remove server:', message);
-      setError(message);
-      throw err;
-    }
-  }, [listServers]);
+    },
+    [listServers]
+  );
 
   /**
    * Test MCP server connection
@@ -127,7 +133,10 @@ export function useMCP(options: UseMCPOptions = {}) {
       setError(null);
       console.log('[useMCP] Testing connection for:', name);
 
-      const response: TestMCPServerResponse = await window.electronAPI.testMCPServer({ name, timeout: timeout ?? 10000 });
+      const response: TestMCPServerResponse = await window.electronAPI.testMCPServer({
+        name,
+        timeout: timeout ?? 10000,
+      });
 
       if (!response.success) {
         throw new Error(response.error || 'Failed to test connection');

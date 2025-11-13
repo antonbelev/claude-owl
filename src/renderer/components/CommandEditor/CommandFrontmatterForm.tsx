@@ -57,7 +57,7 @@ export function CommandFrontmatterForm({
               id="command-name"
               type="text"
               value={name}
-              onChange={(e) => onNameChange(e.target.value)}
+              onChange={e => onNameChange(e.target.value)}
               placeholder="my-command"
               className="form-input"
             />
@@ -74,7 +74,7 @@ export function CommandFrontmatterForm({
           <textarea
             id="description"
             value={description}
-            onChange={(e) => onDescriptionChange(e.target.value)}
+            onChange={e => onDescriptionChange(e.target.value)}
             placeholder="Brief description of what this command does"
             className="form-textarea"
             rows={3}
@@ -90,13 +90,11 @@ export function CommandFrontmatterForm({
             id="argument-hint"
             type="text"
             value={argumentHint}
-            onChange={(e) => onArgumentHintChange(e.target.value)}
-            placeholder='[branch-name] [message]'
+            onChange={e => onArgumentHintChange(e.target.value)}
+            placeholder="[branch-name] [message]"
             className="form-input"
           />
-          <div className="field-hint">
-            Optional hint showing what arguments the command expects
-          </div>
+          <div className="field-hint">Optional hint showing what arguments the command expects</div>
         </div>
       </div>
 
@@ -143,7 +141,7 @@ export function CommandFrontmatterForm({
             id="namespace"
             type="text"
             value={namespace}
-            onChange={(e) => onNamespaceChange(e.target.value)}
+            onChange={e => onNamespaceChange(e.target.value)}
             placeholder="workflows, tools, git"
             className="form-input"
           />
@@ -157,10 +155,7 @@ export function CommandFrontmatterForm({
       {/* Tools Section */}
       <div className="form-section">
         <h3>Allowed Tools</h3>
-        <CommandToolSelector
-          selectedTools={allowedTools}
-          onChange={onToolsChange}
-        />
+        <CommandToolSelector selectedTools={allowedTools} onChange={onToolsChange} />
         <div className="field-hint">
           Select which Claude Code tools this command is allowed to use. The more specific, the
           safer.
@@ -184,7 +179,7 @@ export function CommandFrontmatterForm({
               <select
                 id="model"
                 value={model}
-                onChange={(e) => onModelChange(e.target.value)}
+                onChange={e => onModelChange(e.target.value)}
                 className="form-select"
               >
                 <option value="default">Default (Current Model)</option>
@@ -193,7 +188,8 @@ export function CommandFrontmatterForm({
                 <option value="haiku">Haiku (Fastest)</option>
               </select>
               <div className="field-hint">
-                Specify which Claude model should run this command. Defaults to user&apos;s current model.
+                Specify which Claude model should run this command. Defaults to user&apos;s current
+                model.
               </div>
             </div>
 
@@ -203,12 +199,13 @@ export function CommandFrontmatterForm({
                   id="disable-model-invocation"
                   type="checkbox"
                   checked={disableModelInvocation}
-                  onChange={(e) => onDisableModelInvocationChange(e.target.checked)}
+                  onChange={e => onDisableModelInvocationChange(e.target.checked)}
                 />
                 <span>Disable Model Invocation</span>
               </label>
               <div className="field-hint">
-                If checked, Claude cannot invoke this command programmatically. Users must type it manually.
+                If checked, Claude cannot invoke this command programmatically. Users must type it
+                manually.
               </div>
             </div>
           </>

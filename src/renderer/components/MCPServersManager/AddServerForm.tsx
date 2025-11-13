@@ -77,8 +77,8 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
   const parseArgs = (argsString: string): string[] => {
     return argsString
       .split('\n')
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0);
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
   };
 
   /**
@@ -127,12 +127,7 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
     <form className="add-server-form" onSubmit={handleSubmit}>
       <div className="form-header">
         <h2>Add MCP Server</h2>
-        <button
-          type="button"
-          className="btn-close"
-          onClick={onCancel}
-          title="Close"
-        >
+        <button type="button" className="btn-close" onClick={onCancel} title="Close">
           ✕
         </button>
       </div>
@@ -148,7 +143,7 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
         <input
           type="text"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={e => setName(e.target.value)}
           placeholder="e.g., sequential-thinking"
           className={`form-input ${validationErrors.name ? 'input-error' : ''}`}
         />
@@ -166,7 +161,7 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
               type="radio"
               value="stdio"
               checked={transport === 'stdio'}
-              onChange={(e) => setTransport(e.target.value as typeof transport)}
+              onChange={e => setTransport(e.target.value as typeof transport)}
             />
             Stdio (local process)
           </label>
@@ -175,7 +170,7 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
               type="radio"
               value="http"
               checked={transport === 'http'}
-              onChange={(e) => setTransport(e.target.value as typeof transport)}
+              onChange={e => setTransport(e.target.value as typeof transport)}
             />
             HTTP (remote server)
           </label>
@@ -184,7 +179,7 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
               type="radio"
               value="sse"
               checked={transport === 'sse'}
-              onChange={(e) => setTransport(e.target.value as typeof transport)}
+              onChange={e => setTransport(e.target.value as typeof transport)}
             />
             SSE (deprecated)
           </label>
@@ -201,7 +196,7 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
             <input
               type="text"
               value={command}
-              onChange={(e) => setCommand(e.target.value)}
+              onChange={e => setCommand(e.target.value)}
               placeholder="e.g., npx, node, python"
               className={`form-input ${validationErrors.command ? 'input-error' : ''}`}
             />
@@ -213,7 +208,7 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
             <label className="form-label">Arguments</label>
             <textarea
               value={args}
-              onChange={(e) => setArgs(e.target.value)}
+              onChange={e => setArgs(e.target.value)}
               placeholder="One argument per line, e.g.:-y&#10;@modelcontextprotocol/server-sequential-thinking"
               className="form-textarea"
               rows={4}
@@ -232,7 +227,7 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
           <input
             type="url"
             value={url}
-            onChange={(e) => setUrl(e.target.value)}
+            onChange={e => setUrl(e.target.value)}
             placeholder="https://mcp.example.com/mcp"
             className={`form-input ${validationErrors.url ? 'input-error' : ''}`}
           />
@@ -271,52 +266,43 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
           <input
             type="text"
             value={envKey}
-            onChange={(e) => setEnvKey(e.target.value)}
+            onChange={e => setEnvKey(e.target.value)}
             placeholder="Variable name (e.g., API_KEY)"
             className="form-input"
           />
           <input
             type="password"
             value={envValue}
-            onChange={(e) => setEnvValue(e.target.value)}
+            onChange={e => setEnvValue(e.target.value)}
             placeholder="Variable value"
             className="form-input"
           />
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={handleAddEnvVar}
-          >
+          <button type="button" className="btn-secondary" onClick={handleAddEnvVar}>
             Add
           </button>
         </div>
       </div>
 
       {/* Note: Servers are always stored in user-level config */}
-      <div className="form-group" style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
+      <div
+        className="form-group"
+        style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}
+      >
         <p style={{ margin: 0, fontSize: '0.9rem', color: '#6c757d' }}>
-          ℹ️ MCP servers are managed globally at the user level (~/.claude/mcp-servers.json) and available to all your projects.
+          ℹ️ MCP servers are managed globally at the user level (~/.claude/mcp-servers.json) and
+          available to all your projects.
         </p>
         <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.85rem', color: '#6c757d' }}>
-          For project-specific MCP servers, edit your project's .mcp.json directly.
+          For project-specific MCP servers, edit your project&apos;s .mcp.json directly.
         </p>
       </div>
 
       {/* Buttons */}
       <div className="form-actions">
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={onCancel}
-          disabled={loading}
-        >
+        <button type="button" className="btn btn-secondary" onClick={onCancel} disabled={loading}>
           Cancel
         </button>
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={loading}
-        >
+        <button type="submit" className="btn btn-primary" disabled={loading}>
           {loading ? 'Adding...' : 'Add Server'}
         </button>
       </div>

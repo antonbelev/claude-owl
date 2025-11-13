@@ -52,7 +52,7 @@ export class MCPService {
     try {
       console.log('[MCPService] Getting server:', name);
       const servers = await this.listServers();
-      const server = servers.find((s) => s.name === name);
+      const server = servers.find(s => s.name === name);
 
       if (!server) {
         throw new Error(`Server not found: ${name}`);
@@ -82,14 +82,14 @@ export class MCPService {
       // Validate configuration
       const validation = await this.validateConfig(config);
       if (!validation.valid) {
-        throw new Error(`Validation failed: ${validation.errors?.map((e) => e.message).join(', ')}`);
+        throw new Error(`Validation failed: ${validation.errors?.map(e => e.message).join(', ')}`);
       }
 
       // Get config file path (always user-level for Claude Owl standalone app)
       const filePath = this.userMcpPath;
 
       // Load existing config
-      let configData = await this.loadConfigFile(filePath);
+      const configData = await this.loadConfigFile(filePath);
 
       // Add new server
       configData.mcpServers[config.name] = this.configToStorageFormat(config);
@@ -176,7 +176,7 @@ export class MCPService {
           this.testingServers.set(name, serverProcess);
 
           // Set timeout
-          const testPromise = new Promise<MCPConnectionTestResult>((resolve) => {
+          const testPromise = new Promise<MCPConnectionTestResult>(resolve => {
             const timer = setTimeout(() => {
               serverProcess.kill();
               this.testingServers.delete(name);
@@ -359,10 +359,7 @@ export class MCPService {
   /**
    * Load servers from a config file
    */
-  private async loadServersFromFile(
-    filePath: string,
-    scope: 'user'
-  ): Promise<MCPServer[]> {
+  private async loadServersFromFile(filePath: string, scope: 'user'): Promise<MCPServer[]> {
     try {
       const configData = await this.loadConfigFile(filePath);
       const servers: MCPServer[] = [];

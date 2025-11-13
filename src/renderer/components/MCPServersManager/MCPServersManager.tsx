@@ -65,7 +65,7 @@ export const MCPServersManager: React.FC = () => {
   /**
    * Filter servers based on search
    */
-  const filteredServers = servers.filter((server) => {
+  const filteredServers = servers.filter(server => {
     const matchesSearch =
       !searchQuery ||
       server.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -132,29 +132,24 @@ export const MCPServersManager: React.FC = () => {
             type="text"
             placeholder="Search servers by name or description..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
             className="mcp-search-input"
           />
         </div>
-
       </div>
 
       {/* Servers List */}
       <div className="mcp-content">
         {filteredServers.length === 0 ? (
           <div className="mcp-empty">
-            <p>
-              {searchQuery
-                ? 'No servers match your search'
-                : 'No MCP servers configured yet'}
-            </p>
+            <p>{searchQuery ? 'No servers match your search' : 'No MCP servers configured yet'}</p>
             <button onClick={() => setShowAddForm(true)} className="btn-add-empty">
               Add Your First Server
             </button>
           </div>
         ) : (
           <div className="mcp-servers-grid">
-            {filteredServers.map((server) => (
+            {filteredServers.map(server => (
               <ServerCard
                 key={`${server.scope}-${server.name}`}
                 server={server}
@@ -170,11 +165,8 @@ export const MCPServersManager: React.FC = () => {
       {/* Add Server Modal */}
       {showAddForm && (
         <div className="mcp-modal-overlay" onClick={() => setShowAddForm(false)}>
-          <div className="mcp-modal-content" onClick={(e) => e.stopPropagation()}>
-            <AddServerForm
-              onSubmit={handleAddServer}
-              onCancel={() => setShowAddForm(false)}
-            />
+          <div className="mcp-modal-content" onClick={e => e.stopPropagation()}>
+            <AddServerForm onSubmit={handleAddServer} onCancel={() => setShowAddForm(false)} />
           </div>
         </div>
       )}
@@ -201,9 +193,7 @@ export const MCPServersManager: React.FC = () => {
       )}
 
       {/* Show error toast if needed */}
-      {error && servers.length > 0 && (
-        <div className="mcp-error-toast">{error}</div>
-      )}
+      {error && servers.length > 0 && <div className="mcp-error-toast">{error}</div>}
     </div>
   );
 };

@@ -92,7 +92,8 @@ export function registerMCPHandlers() {
         if (request.command !== undefined) config.command = request.command;
         if (request.args !== undefined) config.args = request.args;
         if (request.env !== undefined) config.env = request.env;
-        if (request.workingDirectory !== undefined) config.workingDirectory = request.workingDirectory;
+        if (request.workingDirectory !== undefined)
+          config.workingDirectory = request.workingDirectory;
         if (request.url !== undefined) config.url = request.url;
         if (request.headers !== undefined) config.headers = request.headers;
 
@@ -167,7 +168,9 @@ export function registerMCPHandlers() {
       try {
         console.log('[MCPHandler] VALIDATE_MCP_CONFIG request:', request.name);
         // Cast the request config to the expected type (includes name)
-        const validation = await mcpService.validateConfig(request.config as Omit<MCPServerConfig, 'scope'>);
+        const validation = await mcpService.validateConfig(
+          request.config as Omit<MCPServerConfig, 'scope'>
+        );
         return {
           success: true,
           data: validation,

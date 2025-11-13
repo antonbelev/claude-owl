@@ -39,7 +39,7 @@ export function RawMarkdownEditor({ markdown, onSave, onCancel }: RawMarkdownEdi
 
   return (
     <div className="raw-editor-overlay" onClick={onCancel}>
-      <div className="raw-editor-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="raw-editor-modal" onClick={e => e.stopPropagation()}>
         <div className="editor-header">
           <h2>Edit Raw Markdown</h2>
           <button onClick={onCancel} className="modal-close">
@@ -55,7 +55,7 @@ export function RawMarkdownEditor({ markdown, onSave, onCancel }: RawMarkdownEdi
         <div className="editor-body">
           <textarea
             value={editedMarkdown}
-            onChange={(e) => {
+            onChange={e => {
               setEditedMarkdown(e.target.value);
               setValidationErrors([]);
             }}
@@ -70,8 +70,7 @@ export function RawMarkdownEditor({ markdown, onSave, onCancel }: RawMarkdownEdi
               ✅ Valid markdown
               <br />
               ✅ Frontmatter is valid YAML
-              <br />
-              ✅ Ready to save
+              <br />✅ Ready to save
             </div>
           )}
 
@@ -102,11 +101,7 @@ export function RawMarkdownEditor({ markdown, onSave, onCancel }: RawMarkdownEdi
           <button onClick={onCancel} className="btn-secondary">
             Cancel
           </button>
-          <button
-            onClick={handleSave}
-            className="btn-primary"
-            disabled={!validation.valid}
-          >
+          <button onClick={handleSave} className="btn-primary" disabled={!validation.valid}>
             Save Edits
           </button>
         </div>

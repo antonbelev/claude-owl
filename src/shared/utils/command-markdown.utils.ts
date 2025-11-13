@@ -3,10 +3,7 @@ import { CommandFrontmatter } from '../types/command.types';
 /**
  * Generate markdown content from command configuration
  */
-export function generateCommandMarkdown(
-  frontmatter: CommandFrontmatter,
-  content: string
-): string {
+export function generateCommandMarkdown(frontmatter: CommandFrontmatter, content: string): string {
   const frontmatterLines: string[] = ['---'];
 
   // Add frontmatter fields in order
@@ -67,7 +64,7 @@ export function parseCommandMarkdown(markdown: string): {
       frontmatter: {},
       content: markdown,
       isValid: false,
-      error: 'Incomplete frontmatter (missing closing ---)' ,
+      error: 'Incomplete frontmatter (missing closing ---)',
     };
   }
 

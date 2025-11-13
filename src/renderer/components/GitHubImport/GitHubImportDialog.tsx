@@ -147,7 +147,9 @@ export function GitHubImportDialog({ onClose, onImportComplete }: GitHubImportDi
       setScanProgress(null);
     } catch (err) {
       console.error('[GitHubImportDialog] Error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to browse repository. Please try again.');
+      setError(
+        err instanceof Error ? err.message : 'Failed to browse repository. Please try again.'
+      );
       setStep('url-entry');
       setScanProgress(null);
     } finally {
@@ -326,7 +328,8 @@ export function GitHubImportDialog({ onClose, onImportComplete }: GitHubImportDi
             <div className="info-box">
               <span className="info-icon">ℹ️</span>
               <span>
-                Supports repo root, folders, and single files. Custom branches detected automatically.
+                Supports repo root, folders, and single files. Custom branches detected
+                automatically.
               </span>
             </div>
           </div>
@@ -394,7 +397,11 @@ export function GitHubImportDialog({ onClose, onImportComplete }: GitHubImportDi
           </div>
 
           <div className="import-footer">
-            <button onClick={() => setStep('url-entry')} className="btn-secondary" disabled={isImporting}>
+            <button
+              onClick={() => setStep('url-entry')}
+              className="btn-secondary"
+              disabled={isImporting}
+            >
               Back
             </button>
             <button

@@ -48,7 +48,7 @@ export const ConnectionTester: React.FC<ConnectionTesterProps> = ({
 
   return (
     <div className="connection-tester-overlay" onClick={onClose}>
-      <div className="connection-tester-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="connection-tester-modal" onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="tester-header">
           <h2>Testing: {serverName}</h2>
@@ -75,7 +75,9 @@ export const ConnectionTester: React.FC<ConnectionTesterProps> = ({
           ) : result ? (
             <>
               {/* Success or Failure Banner */}
-              <div className={`tester-result ${result.success ? 'result-success' : 'result-error'}`}>
+              <div
+                className={`tester-result ${result.success ? 'result-success' : 'result-error'}`}
+              >
                 <h3>{result.success ? '✓ Connection Successful' : '✕ Connection Failed'}</h3>
                 {result.error && <p className="error-detail">{result.error}</p>}
               </div>
@@ -128,7 +130,7 @@ export const ConnectionTester: React.FC<ConnectionTesterProps> = ({
                 <div className="tester-tools">
                   <h4>Available Tools</h4>
                   <ul className="tools-list">
-                    {result.tools.map((tool) => (
+                    {result.tools.map(tool => (
                       <li key={tool.name} className="tool-item">
                         <div className="tool-name">{tool.name}</div>
                         {tool.description && (

@@ -34,11 +34,7 @@ export class SecurityScanner {
   /**
    * Scan a single command for security issues and calculate trust score
    */
-  static scanCommand(
-    commandName: string,
-    content: string,
-    repoUrl?: string
-  ): ScanResult {
+  static scanCommand(commandName: string, content: string, repoUrl?: string): ScanResult {
     console.log('[SecurityScanner] Scanning command:', commandName);
 
     const issues: SecurityIssue[] = [];
@@ -83,26 +79,39 @@ export class SecurityScanner {
     // Check for bash execution patterns
     const bashIssues = this.checkBashPatterns(commandContent, frontmatter);
     issues.push(...bashIssues);
-    score = Math.max(0, score - bashIssues.reduce((sum, issue) => {
-      if (issue.severity === 'critical') return sum + 50;
-      if (issue.severity === 'high') return sum + 20;
-      if (issue.severity === 'medium') return sum + 10;
-      return sum + 0;
-    }, 0));
+    score = Math.max(
+      0,
+      score -
+        bashIssues.reduce((sum, issue) => {
+          if (issue.severity === 'critical') return sum + 50;
+          if (issue.severity === 'high') return sum + 20;
+          if (issue.severity === 'medium') return sum + 10;
+          return sum + 0;
+        }, 0)
+    );
 
     // Check for overly permissive tool permissions
     const toolIssues = this.checkToolPermissions(frontmatter);
     issues.push(...toolIssues);
-    score = Math.max(0, score - toolIssues.reduce((sum, issue) => {
-      if (issue.severity === 'critical') return sum + 50;
-      if (issue.severity === 'high') return sum + 20;
-      if (issue.severity === 'medium') return sum + 10;
-      return sum + 0;
-    }, 0));
+    score = Math.max(
+      0,
+      score -
+        toolIssues.reduce((sum, issue) => {
+          if (issue.severity === 'critical') return sum + 50;
+          if (issue.severity === 'high') return sum + 20;
+          if (issue.severity === 'medium') return sum + 10;
+          return sum + 0;
+        }, 0)
+    );
 
     // Determine trust level
     const trustLevel = this.getTrustLevel(score);
-    console.log('[SecurityScanner] Scan complete:', { commandName, score, trustLevel, issueCount: issues.length });
+    console.log('[SecurityScanner] Scan complete:', {
+      commandName,
+      score,
+      trustLevel,
+      issueCount: issues.length,
+    });
 
     return {
       commandName,
@@ -156,7 +165,10 @@ export class SecurityScanner {
         const [key, ...valueParts] = line.split(':');
         if (!key) continue;
 
-        const value = valueParts.join(':').trim().replace(/^['"]|['"]$/g, '');
+        const value = valueParts
+          .join(':')
+          .trim()
+          .replace(/^['"]|['"]$/g, '');
 
         // Handle arrays
         if (value.startsWith('[') && value.endsWith(']')) {

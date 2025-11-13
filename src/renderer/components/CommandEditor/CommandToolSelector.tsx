@@ -81,8 +81,8 @@ export function CommandToolSelector({ selectedTools, onChange }: CommandToolSele
     <div className="tool-selector">
       <div className="tool-buttons">
         {AVAILABLE_TOOLS.map(tool => {
-          const isSelected = selectedTools.some(t =>
-            t === tool.name || t.startsWith(`${tool.name}(`)
+          const isSelected = selectedTools.some(
+            t => t === tool.name || t.startsWith(`${tool.name}(`)
           );
 
           return (
@@ -107,15 +107,17 @@ export function CommandToolSelector({ selectedTools, onChange }: CommandToolSele
               <input
                 type="text"
                 value={bashInput}
-                onChange={(e) => setBashInput(e.target.value)}
+                onChange={e => setBashInput(e.target.value)}
                 placeholder="e.g., git add:*, npm run test:*"
-                onKeyPress={(e) => e.key === 'Enter' && handleBashAdd()}
+                onKeyPress={e => e.key === 'Enter' && handleBashAdd()}
               />
               <button onClick={handleBashAdd} className="add-filter-btn">
                 Add
               </button>
             </div>
-            <div className="filter-hint">Specify which bash commands are allowed (e.g., git:*, npm run:*)</div>
+            <div className="filter-hint">
+              Specify which bash commands are allowed (e.g., git:*, npm run:*)
+            </div>
             {selectedTools
               .filter(t => t.startsWith('Bash('))
               .map(tool => (
@@ -140,15 +142,17 @@ export function CommandToolSelector({ selectedTools, onChange }: CommandToolSele
               <input
                 type="text"
                 value={writeInput}
-                onChange={(e) => setWriteInput(e.target.value)}
+                onChange={e => setWriteInput(e.target.value)}
                 placeholder="e.g., src/**, docs/**, *.md"
-                onKeyPress={(e) => e.key === 'Enter' && handleWriteAdd()}
+                onKeyPress={e => e.key === 'Enter' && handleWriteAdd()}
               />
               <button onClick={handleWriteAdd} className="add-filter-btn">
                 Add
               </button>
             </div>
-            <div className="filter-hint">Specify which files can be written (use globbing patterns)</div>
+            <div className="filter-hint">
+              Specify which files can be written (use globbing patterns)
+            </div>
             {selectedTools
               .filter(t => t.startsWith('Write('))
               .map(tool => (
@@ -173,15 +177,17 @@ export function CommandToolSelector({ selectedTools, onChange }: CommandToolSele
               <input
                 type="text"
                 value={editInput}
-                onChange={(e) => setEditInput(e.target.value)}
+                onChange={e => setEditInput(e.target.value)}
                 placeholder="e.g., src/**, *.ts, *.tsx"
-                onKeyPress={(e) => e.key === 'Enter' && handleEditAdd()}
+                onKeyPress={e => e.key === 'Enter' && handleEditAdd()}
               />
               <button onClick={handleEditAdd} className="add-filter-btn">
                 Add
               </button>
             </div>
-            <div className="filter-hint">Specify which files can be edited (use globbing patterns)</div>
+            <div className="filter-hint">
+              Specify which files can be edited (use globbing patterns)
+            </div>
             {selectedTools
               .filter(t => t.startsWith('Edit('))
               .map(tool => (
@@ -206,9 +212,9 @@ export function CommandToolSelector({ selectedTools, onChange }: CommandToolSele
               <input
                 type="text"
                 value={globInput}
-                onChange={(e) => setGlobInput(e.target.value)}
+                onChange={e => setGlobInput(e.target.value)}
                 placeholder="e.g., src/**, *.ts"
-                onKeyPress={(e) => e.key === 'Enter' && handleGlobAdd()}
+                onKeyPress={e => e.key === 'Enter' && handleGlobAdd()}
               />
               <button onClick={handleGlobAdd} className="add-filter-btn">
                 Add
@@ -240,11 +246,7 @@ export function CommandToolSelector({ selectedTools, onChange }: CommandToolSele
             {selectedTools.map(tool => (
               <div key={tool} className="tool-item">
                 <code>{tool}</code>
-                <button
-                  className="remove-btn"
-                  onClick={() => removeTool(tool)}
-                  title="Remove tool"
-                >
+                <button className="remove-btn" onClick={() => removeTool(tool)} title="Remove tool">
                   ×
                 </button>
               </div>

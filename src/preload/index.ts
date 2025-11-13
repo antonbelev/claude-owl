@@ -179,8 +179,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   browseGitHubUrl: (args: unknown) => ipcRenderer.invoke(GITHUB_CHANNELS.GITHUB_BROWSE_URL, args),
   navigateGitHubFolder: (args: unknown) =>
     ipcRenderer.invoke(GITHUB_CHANNELS.GITHUB_NAVIGATE_FOLDER, args),
-  fetchGitHubFiles: (args: unknown) =>
-    ipcRenderer.invoke(GITHUB_CHANNELS.FETCH_GITHUB_FILES, args),
+  fetchGitHubFiles: (args: unknown) => ipcRenderer.invoke(GITHUB_CHANNELS.FETCH_GITHUB_FILES, args),
   scanCommandSecurity: (args: unknown) =>
     ipcRenderer.invoke(GITHUB_CHANNELS.SCAN_COMMAND_SECURITY, args),
   autoFixCommand: (args: unknown) => ipcRenderer.invoke(GITHUB_CHANNELS.AUTO_FIX_COMMAND, args),
@@ -228,11 +227,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   testAllMCPServers: (args: unknown) => ipcRenderer.invoke(MCP_CHANNELS.TEST_ALL_MCP_SERVERS, args),
   getMCPServerTools: (args: unknown) => ipcRenderer.invoke(MCP_CHANNELS.GET_MCP_SERVER_TOOLS, args),
   getMCPTemplates: () => ipcRenderer.invoke(MCP_CHANNELS.GET_MCP_TEMPLATES),
-  searchMCPTemplates: (args: unknown) => ipcRenderer.invoke(MCP_CHANNELS.SEARCH_MCP_TEMPLATES, args),
-  installMCPFromTemplate: (args: unknown) => ipcRenderer.invoke(MCP_CHANNELS.INSTALL_MCP_FROM_TEMPLATE, args),
+  searchMCPTemplates: (args: unknown) =>
+    ipcRenderer.invoke(MCP_CHANNELS.SEARCH_MCP_TEMPLATES, args),
+  installMCPFromTemplate: (args: unknown) =>
+    ipcRenderer.invoke(MCP_CHANNELS.INSTALL_MCP_FROM_TEMPLATE, args),
   validateMCPConfig: (args: unknown) => ipcRenderer.invoke(MCP_CHANNELS.VALIDATE_MCP_CONFIG, args),
   getMCPEnvironmentVariables: () => ipcRenderer.invoke(MCP_CHANNELS.GET_MCP_ENV_VARS),
-  setMCPEnvironmentVariable: (args: unknown) => ipcRenderer.invoke(MCP_CHANNELS.SET_MCP_ENV_VAR, args),
+  setMCPEnvironmentVariable: (args: unknown) =>
+    ipcRenderer.invoke(MCP_CHANNELS.SET_MCP_ENV_VAR, args),
   deleteMCPEnvironmentVariable: (args: unknown) =>
     ipcRenderer.invoke(MCP_CHANNELS.DELETE_MCP_ENV_VAR, args),
   toggleMCPServer: (args: unknown) => ipcRenderer.invoke(MCP_CHANNELS.TOGGLE_MCP_SERVER, args),

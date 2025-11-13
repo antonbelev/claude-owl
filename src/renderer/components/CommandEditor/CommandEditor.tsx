@@ -179,10 +179,10 @@ export function CommandEditor({ command, onSave, onCancel, isLoading }: CommandE
               onNameChange={setName}
               onDescriptionChange={setDescription}
               onArgumentHintChange={setArgumentHint}
-              onModelChange={(val) => setModel(val as any)}
+              onModelChange={val => setModel(val as any)}
               onToolsChange={setAllowedTools}
               onDisableModelInvocationChange={setDisableModelInvocation}
-              onLocationChange={(loc) => setLocation(loc as 'user' | 'project')}
+              onLocationChange={loc => setLocation(loc as 'user' | 'project')}
               onNamespaceChange={setNamespace}
               onContentChange={setContent}
             />

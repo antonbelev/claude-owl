@@ -16,23 +16,25 @@ export function CommandContentEditor({
 }: CommandContentEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const insertVariable = useCallback((variable: string) => {
-    if (!textareaRef.current) return;
+  const insertVariable = useCallback(
+    (variable: string) => {
+      if (!textareaRef.current) return;
 
-    const textarea = textareaRef.current;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const newContent =
-      content.substring(0, start) + variable + content.substring(end);
+      const textarea = textareaRef.current;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const newContent = content.substring(0, start) + variable + content.substring(end);
 
-    onChange(newContent);
+      onChange(newContent);
 
-    // Move cursor after inserted variable
-    setTimeout(() => {
-      textarea.selectionStart = textarea.selectionEnd = start + variable.length;
-      textarea.focus();
-    }, 0);
-  }, [content, onChange]);
+      // Move cursor after inserted variable
+      setTimeout(() => {
+        textarea.selectionStart = textarea.selectionEnd = start + variable.length;
+        textarea.focus();
+      }, 0);
+    },
+    [content, onChange]
+  );
 
   const insertBashTemplate = useCallback(() => {
     const template = '!`your-command here`';
@@ -104,7 +106,7 @@ export function CommandContentEditor({
       <textarea
         ref={textareaRef}
         value={content}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={e => onChange(e.target.value)}
         className={`content-textarea ${rawMode ? 'raw-mode' : ''}`}
         placeholder={
           rawMode
@@ -115,7 +117,9 @@ description: Your command description
 Your command content here.
 
 Use $1, $2, etc. for arguments.
-Use !` + '`command`' + ` for bash execution.
+Use !` +
+              '`command`' +
+              ` for bash execution.
 Use @file for file references.`
             : 'Write your command content here. Use the buttons above to insert variables.'
         }
@@ -141,9 +145,7 @@ Use @file for file references.`
           </ul>
 
           {hasBashTool && (
-            <div className="bash-info">
-              ✅ Bash execution is enabled (Bash tool configured)
-            </div>
+            <div className="bash-info">✅ Bash execution is enabled (Bash tool configured)</div>
           )}
           {!hasBashTool && content.includes('!`') && (
             <div className="bash-warning">

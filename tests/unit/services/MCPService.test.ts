@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MCPService } from '@/main/services/MCPService';
 import type { MCPServerConfig } from '@/shared/types';
 import { promises as fs } from 'fs';
-import path from 'path';
 import os from 'os';
 
 // Mock fs module
@@ -190,9 +189,9 @@ describe('MCPService', () => {
   describe('prepareCommand', () => {
     it('should wrap npx with cmd /c on Windows', () => {
       // Mock platform as Windows
-      vi.spyOn(require('os'), 'platform').mockReturnValue('win32');
+      vi.spyOn(os, 'platform').mockReturnValue('win32');
 
-      const [cmd, args] = (mcpService as any).prepareCommand('npx', ['-y', 'package']);
+      const [, args] = (mcpService as any).prepareCommand('npx', ['-y', 'package']);
 
       // Note: This test might fail if running on non-Windows
       // In a real test environment, we'd mock the platform check
@@ -200,15 +199,15 @@ describe('MCPService', () => {
     });
 
     it('should not modify non-npx commands', () => {
-      const [cmd, args] = (mcpService as any).prepareCommand('node', ['script.js']);
+      const [command, args] = (mcpService as any).prepareCommand('node', ['script.js']);
 
-      expect(cmd).toBe('node');
+      expect(command).toBe('node');
       expect(args).toEqual(['script.js']);
     });
 
     it('should preserve arguments order', () => {
       const originalArgs = ['-y', 'package-name', '--flag', 'value'];
-      const [cmd, args] = (mcpService as any).prepareCommand('npx', originalArgs);
+      const [, args] = (mcpService as any).prepareCommand('npx', originalArgs);
 
       expect(args).toContain('-y');
       expect(args).toContain('package-name');

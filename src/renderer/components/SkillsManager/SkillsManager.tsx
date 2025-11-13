@@ -40,7 +40,10 @@ export const SkillsManager: React.FC = () => {
   const handleConfirmDelete = async () => {
     if (!deleteConfirm) return;
 
-    const success = await deleteSkill(deleteConfirm.frontmatter.name, deleteConfirm.location as 'user' | 'project');
+    const success = await deleteSkill(
+      deleteConfirm.frontmatter.name,
+      deleteConfirm.location as 'user' | 'project'
+    );
     if (success) {
       setSelectedSkill(null);
     }
@@ -50,7 +53,10 @@ export const SkillsManager: React.FC = () => {
   if (loading) {
     return (
       <div className="skills-manager" data-testid="skills-manager">
-        <PageHeader title="Skills" description="Custom skills that extend Claude Code capabilities" />
+        <PageHeader
+          title="Skills"
+          description="Custom skills that extend Claude Code capabilities"
+        />
         <div className="skills-loading">
           <p>Loading skills...</p>
         </div>
