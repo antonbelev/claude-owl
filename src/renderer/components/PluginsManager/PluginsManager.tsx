@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { usePlugins } from '../../hooks/usePlugins';
 import type { MarketplacePlugin, InstalledPlugin, Marketplace } from '@/shared/types';
+import { ConfirmDialog } from '../common/ConfirmDialog';
 import './PluginsManager.css';
 
 type TabView = 'browse' | 'installed' | 'marketplaces';
@@ -33,6 +34,7 @@ export const PluginsManager: React.FC = () => {
   const [selectedPlugin, setSelectedPlugin] = useState<MarketplacePlugin | InstalledPlugin | null>(
     null
   );
+  const [uninstallConfirm, setUninstallConfirm] = useState<InstalledPlugin | null>(null);
 
   // Get unique categories
   const categories = useMemo(() => {
@@ -106,14 +108,18 @@ export const PluginsManager: React.FC = () => {
     }
   };
 
-  const handleUninstallPlugin = async (plugin: InstalledPlugin) => {
-    if (!confirm(`Are you sure you want to uninstall "${plugin.name}"?`)) {
-      return;
-    }
-    const success = await uninstallPlugin(plugin.id);
+  const handleUninstallPlugin = (plugin: InstalledPlugin) => {
+    setUninstallConfirm(plugin);
+  };
+
+  const handleConfirmUninstall = async () => {
+    if (!uninstallConfirm) return;
+
+    const success = await uninstallPlugin(uninstallConfirm.id);
     if (success) {
       setSelectedPlugin(null);
     }
+    setUninstallConfirm(null);
   };
 
   const handleTogglePlugin = async (plugin: InstalledPlugin, enabled: boolean) => {
@@ -361,6 +367,18 @@ export const PluginsManager: React.FC = () => {
           onToggle={handleTogglePlugin}
         />
       )}
+
+      {uninstallConfirm && (
+        <ConfirmDialog
+          title="Uninstall Plugin"
+          message={`Are you sure you want to uninstall "${uninstallConfirm.name}"?`}
+          confirmText="Uninstall"
+          cancelText="Cancel"
+          isDangerous={true}
+          onConfirm={handleConfirmUninstall}
+          onCancel={() => setUninstallConfirm(null)}
+        />
+      )}
     </div>
   );
 };
@@ -372,11 +390,16 @@ interface MarketplacesViewProps {
 }
 
 const MarketplacesView: React.FC<MarketplacesViewProps> = ({ marketplaces, onRemove }) => {
-  const handleRemove = async (marketplace: Marketplace) => {
-    if (!confirm(`Are you sure you want to remove the marketplace "${marketplace.name}"?`)) {
-      return;
-    }
-    await onRemove(marketplace.name);
+  const [removeConfirm, setRemoveConfirm] = useState<Marketplace | null>(null);
+
+  const handleRemove = (marketplace: Marketplace) => {
+    setRemoveConfirm(marketplace);
+  };
+
+  const handleConfirmRemove = async () => {
+    if (!removeConfirm) return;
+    await onRemove(removeConfirm.name);
+    setRemoveConfirm(null);
   };
 
   if (marketplaces.length === 0) {
@@ -439,6 +462,18 @@ const MarketplacesView: React.FC<MarketplacesViewProps> = ({ marketplaces, onRem
           </div>
         </div>
       ))}
+
+      {removeConfirm && (
+        <ConfirmDialog
+          title="Remove Marketplace"
+          message={`Are you sure you want to remove the marketplace "${removeConfirm.name}"?`}
+          confirmText="Remove"
+          cancelText="Cancel"
+          isDangerous={true}
+          onConfirm={handleConfirmRemove}
+          onCancel={() => setRemoveConfirm(null)}
+        />
+      )}
     </div>
   );
 };

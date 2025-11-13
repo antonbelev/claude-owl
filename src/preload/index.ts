@@ -74,6 +74,16 @@ const COMMANDS_CHANNELS = {
   MOVE_COMMAND: 'commands:move',
 } as const;
 
+// Define GitHub import channel strings directly to avoid tree-shaking
+const GITHUB_CHANNELS = {
+  GITHUB_BROWSE_URL: 'github:browse-url',
+  GITHUB_NAVIGATE_FOLDER: 'github:navigate-folder',
+  FETCH_GITHUB_FILES: 'github:fetch-files',
+  SCAN_COMMAND_SECURITY: 'github:scan-security',
+  AUTO_FIX_COMMAND: 'github:auto-fix',
+  IMPORT_GITHUB_COMMANDS: 'github:import-commands',
+} as const;
+
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -131,6 +141,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
   updateCommand: (args: unknown) => ipcRenderer.invoke(COMMANDS_CHANNELS.UPDATE_COMMAND, args),
   deleteCommand: (args: unknown) => ipcRenderer.invoke(COMMANDS_CHANNELS.DELETE_COMMAND, args),
   moveCommand: (args: unknown) => ipcRenderer.invoke(COMMANDS_CHANNELS.MOVE_COMMAND, args),
+
+  // GitHub Import
+  // GitHub Import (refactored with lazy loading)
+  browseGitHubUrl: (args: unknown) => ipcRenderer.invoke(GITHUB_CHANNELS.GITHUB_BROWSE_URL, args),
+  navigateGitHubFolder: (args: unknown) =>
+    ipcRenderer.invoke(GITHUB_CHANNELS.GITHUB_NAVIGATE_FOLDER, args),
+  fetchGitHubFiles: (args: unknown) =>
+    ipcRenderer.invoke(GITHUB_CHANNELS.FETCH_GITHUB_FILES, args),
+  scanCommandSecurity: (args: unknown) =>
+    ipcRenderer.invoke(GITHUB_CHANNELS.SCAN_COMMAND_SECURITY, args),
+  autoFixCommand: (args: unknown) => ipcRenderer.invoke(GITHUB_CHANNELS.AUTO_FIX_COMMAND, args),
+  importGitHubCommands: (args: unknown) =>
+    ipcRenderer.invoke(GITHUB_CHANNELS.IMPORT_GITHUB_COMMANDS, args),
 
   // Plugins
   getMarketplaces: () => ipcRenderer.invoke(PLUGINS_CHANNELS.GET_MARKETPLACES),
@@ -229,6 +252,13 @@ export interface ElectronAPI {
   updateCommand: (args: unknown) => Promise<unknown>;
   deleteCommand: (args: unknown) => Promise<unknown>;
   moveCommand: (args: unknown) => Promise<unknown>;
+  // GitHub Import (refactored with lazy loading)
+  browseGitHubUrl: (args: unknown) => Promise<unknown>;
+  navigateGitHubFolder: (args: unknown) => Promise<unknown>;
+  fetchGitHubFiles: (args: unknown) => Promise<unknown>;
+  scanCommandSecurity: (args: unknown) => Promise<unknown>;
+  autoFixCommand: (args: unknown) => Promise<unknown>;
+  importGitHubCommands: (args: unknown) => Promise<unknown>;
   getMarketplaces: () => Promise<unknown>;
   addMarketplace: (args: unknown) => Promise<unknown>;
   removeMarketplace: (args: unknown) => Promise<unknown>;

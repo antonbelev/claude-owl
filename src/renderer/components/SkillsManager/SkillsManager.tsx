@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useSkills } from '../../hooks/useSkills';
 import type { Skill } from '@/shared/types';
 import { parseMarkdownWithFrontmatter, validateSkillMarkdown } from '@/shared/utils/markdown.utils';
+import { ConfirmDialog } from '../common/ConfirmDialog';
+import { PageHeader } from '../common/PageHeader';
 import './SkillsManager.css';
 
 export const SkillsManager: React.FC = () => {
   const { skills, loading, error, refetch, createSkill, deleteSkill } = useSkills();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<Skill | null>(null);
 
   const handleCreateSkill = () => {
     setShowCreateModal(true);
@@ -25,28 +28,29 @@ export const SkillsManager: React.FC = () => {
     setSelectedSkill(null);
   };
 
-  const handleDeleteSkill = async (skill: Skill) => {
-    if (!confirm(`Are you sure you want to delete the skill "${skill.frontmatter.name}"?`)) {
-      return;
-    }
-
+  const handleDeleteSkill = (skill: Skill) => {
     // Plugin skills cannot be deleted
     if (skill.location === 'plugin') {
       return;
     }
 
-    const success = await deleteSkill(skill.frontmatter.name, skill.location);
+    setDeleteConfirm(skill);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirm) return;
+
+    const success = await deleteSkill(deleteConfirm.frontmatter.name, deleteConfirm.location as 'user' | 'project');
     if (success) {
       setSelectedSkill(null);
     }
+    setDeleteConfirm(null);
   };
 
   if (loading) {
     return (
       <div className="skills-manager" data-testid="skills-manager">
-        <div className="skills-header">
-          <h1>Skills Manager</h1>
-        </div>
+        <PageHeader title="Skills" description="Custom skills that extend Claude Code capabilities" />
         <div className="skills-loading">
           <p>Loading skills...</p>
         </div>
@@ -57,14 +61,19 @@ export const SkillsManager: React.FC = () => {
   if (error) {
     return (
       <div className="skills-manager" data-testid="skills-manager">
-        <div className="skills-header">
-          <h1>Skills Manager</h1>
-        </div>
+        <PageHeader
+          title="Skills"
+          description="Custom skills that extend Claude Code capabilities"
+          actions={[
+            {
+              label: 'Retry',
+              onClick: refetch,
+              variant: 'secondary',
+            },
+          ]}
+        />
         <div className="skills-error">
           <p className="error-message">Error: {error}</p>
-          <button onClick={refetch} className="btn-retry">
-            Retry
-          </button>
         </div>
       </div>
     );
@@ -72,12 +81,17 @@ export const SkillsManager: React.FC = () => {
 
   return (
     <div className="skills-manager" data-testid="skills-manager">
-      <div className="skills-header">
-        <h1>Skills Manager</h1>
-        <button onClick={handleCreateSkill} className="btn-create" data-testid="create-skill-btn">
-          + Create Skill
-        </button>
-      </div>
+      <PageHeader
+        title="Skills"
+        description="Custom skills that extend Claude Code capabilities"
+        actions={[
+          {
+            label: '+ Create Skill',
+            onClick: handleCreateSkill,
+            variant: 'primary',
+          },
+        ]}
+      />
 
       <div className="skills-content">
         {skills.length === 0 ? (
@@ -108,6 +122,18 @@ export const SkillsManager: React.FC = () => {
           skill={selectedSkill}
           onClose={handleCloseDetail}
           onDelete={handleDeleteSkill}
+        />
+      )}
+
+      {deleteConfirm && (
+        <ConfirmDialog
+          title="Delete Skill"
+          message={`Are you sure you want to delete the skill "${deleteConfirm.frontmatter.name}"?`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          isDangerous={true}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeleteConfirm(null)}
         />
       )}
     </div>

@@ -11,6 +11,7 @@ import { registerPluginsHandlers } from './ipc/pluginsHandlers';
 import { registerHooksHandlers } from './ipc/hooksHandlers';
 import { registerStatusHandlers } from './ipc/statusHandlers';
 import { registerDebugLogsHandlers } from './ipc/debugLogsHandlers';
+import { registerGitHubImportHandlers } from './ipc/githubImportHandlers';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -125,6 +126,7 @@ app.whenReady().then(() => {
   registerHooksHandlers();
   registerStatusHandlers();
   registerDebugLogsHandlers();
+  registerGitHubImportHandlers();
 
   createWindow();
 

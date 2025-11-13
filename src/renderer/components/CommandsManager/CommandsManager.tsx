@@ -2,18 +2,23 @@ import React, { useState, useMemo } from 'react';
 import { useCommands } from '../../hooks/useCommands';
 import type { CommandWithMetadata } from '@/shared/types/command.types';
 import { CommandEditor } from '../CommandEditor/CommandEditor';
+import { GitHubImportDialog } from '../GitHubImport/GitHubImportDialog';
+import { ConfirmDialog } from '../common/ConfirmDialog';
+import { PageHeader } from '../common/PageHeader';
 import './CommandsManager.css';
 
 export const CommandsManager: React.FC = () => {
   const { commands, loading, error, refetch, createCommand, updateCommand, deleteCommand } =
     useCommands();
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [selectedCommand, setSelectedCommand] = useState<CommandWithMetadata | null>(null);
   const [editingCommand, setEditingCommand] = useState<CommandWithMetadata | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [locationFilter, setLocationFilter] = useState<'all' | 'user' | 'project' | 'plugin'>(
     'all'
   );
+  const [deleteConfirm, setDeleteConfirm] = useState<CommandWithMetadata | null>(null);
 
   const handleCreateCommand = () => {
     setEditingCommand(null);
@@ -31,6 +36,14 @@ export const CommandsManager: React.FC = () => {
     setEditingCommand(null);
   };
 
+  const handleImportCommand = () => {
+    setShowImportModal(true);
+  };
+
+  const handleCloseImportModal = () => {
+    setShowImportModal(false);
+  };
+
   const handleViewCommand = (command: CommandWithMetadata) => {
     setSelectedCommand(command);
   };
@@ -39,23 +52,29 @@ export const CommandsManager: React.FC = () => {
     setSelectedCommand(null);
   };
 
-  const handleDeleteCommand = async (command: CommandWithMetadata) => {
-    if (!confirm(`Are you sure you want to delete the command "/${command.name}"?`)) {
-      return;
-    }
-
+  const handleDeleteCommand = (command: CommandWithMetadata) => {
     // Plugin commands cannot be deleted
     if (command.location === 'plugin' || command.location === 'mcp') {
       alert('Plugin and MCP commands cannot be deleted.');
       return;
     }
 
-    const result = await deleteCommand(command.filePath, command.location as 'user' | 'project');
+    setDeleteConfirm(command);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirm) return;
+
+    const result = await deleteCommand(
+      deleteConfirm.filePath,
+      deleteConfirm.location as 'user' | 'project'
+    );
     if (result.success) {
       setSelectedCommand(null);
     } else {
       alert(`Failed to delete command: ${result.error}`);
     }
+    setDeleteConfirm(null);
   };
 
   // Filter commands based on search query and location filter
@@ -85,9 +104,7 @@ export const CommandsManager: React.FC = () => {
   if (loading) {
     return (
       <div className="commands-manager" data-testid="commands-manager">
-        <div className="commands-header">
-          <h1>Slash Commands</h1>
-        </div>
+        <PageHeader title="Slash Commands" description="Custom slash commands that extend Claude Code functionality" />
         <div className="commands-loading">
           <p>Loading commands...</p>
         </div>
@@ -98,14 +115,19 @@ export const CommandsManager: React.FC = () => {
   if (error) {
     return (
       <div className="commands-manager" data-testid="commands-manager">
-        <div className="commands-header">
-          <h1>Slash Commands</h1>
-        </div>
+        <PageHeader
+          title="Slash Commands"
+          description="Custom slash commands that extend Claude Code functionality"
+          actions={[
+            {
+              label: 'Retry',
+              onClick: refetch,
+              variant: 'secondary',
+            },
+          ]}
+        />
         <div className="commands-error">
           <p className="error-message">Error: {error}</p>
-          <button onClick={refetch} className="btn-retry">
-            Retry
-          </button>
         </div>
       </div>
     );
@@ -113,21 +135,22 @@ export const CommandsManager: React.FC = () => {
 
   return (
     <div className="commands-manager" data-testid="commands-manager">
-      <div className="commands-header">
-        <div>
-          <h1>Slash Commands</h1>
-          <p className="header-description">
-            Custom slash commands that extend Claude Code functionality
-          </p>
-        </div>
-        <button
-          onClick={handleCreateCommand}
-          className="btn-create"
-          data-testid="create-command-btn"
-        >
-          + Create Command
-        </button>
-      </div>
+      <PageHeader
+        title="Slash Commands"
+        description="Custom slash commands that extend Claude Code functionality"
+        actions={[
+          {
+            label: '⬇️ Import from GitHub',
+            onClick: handleImportCommand,
+            variant: 'primary',
+          },
+          {
+            label: '+ Create Command',
+            onClick: handleCreateCommand,
+            variant: 'primary',
+          },
+        ]}
+      />
 
       {commands.length > 0 && (
         <div className="commands-filters">
@@ -279,6 +302,28 @@ export const CommandsManager: React.FC = () => {
           onClose={handleCloseDetail}
           onEdit={handleEditCommand}
           onDelete={handleDeleteCommand}
+        />
+      )}
+
+      {showImportModal && (
+        <GitHubImportDialog
+          onClose={handleCloseImportModal}
+          onImportComplete={() => {
+            handleCloseImportModal();
+            refetch();
+          }}
+        />
+      )}
+
+      {deleteConfirm && (
+        <ConfirmDialog
+          title="Delete Command"
+          message={`Are you sure you want to delete the command "/${deleteConfirm.name}"?`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          isDangerous={true}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeleteConfirm(null)}
         />
       )}
     </div>

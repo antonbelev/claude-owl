@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useAgents } from '../../hooks/useAgents';
 import type { Agent, AgentFrontmatter } from '@/shared/types';
+import { ConfirmDialog } from '../common/ConfirmDialog';
+import { PageHeader } from '../common/PageHeader';
 import './AgentsManager.css';
 
 export const AgentsManager: React.FC = () => {
@@ -9,6 +11,7 @@ export const AgentsManager: React.FC = () => {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState<Agent | null>(null);
 
   const handleCreateAgent = () => {
     setEditingAgent(null);
@@ -34,21 +37,24 @@ export const AgentsManager: React.FC = () => {
     setSelectedAgent(null);
   };
 
-  const handleDeleteAgent = async (agent: Agent) => {
-    if (!confirm(`Are you sure you want to delete the agent "${agent.frontmatter.name}"?`)) {
-      return;
-    }
-
+  const handleDeleteAgent = (agent: Agent) => {
     // Plugin agents cannot be deleted
     if (agent.location === 'plugin') {
       alert('Plugin agents cannot be deleted.');
       return;
     }
 
-    const success = await deleteAgent(agent.filePath);
+    setDeleteConfirm(agent);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirm) return;
+
+    const success = await deleteAgent(deleteConfirm.filePath);
     if (success) {
       setSelectedAgent(null);
     }
+    setDeleteConfirm(null);
   };
 
   // Filter agents based on search query
@@ -68,9 +74,7 @@ export const AgentsManager: React.FC = () => {
   if (loading) {
     return (
       <div className="agents-manager" data-testid="agents-manager">
-        <div className="agents-header">
-          <h1>Subagents Manager</h1>
-        </div>
+        <PageHeader title="Subagents" description="Custom agents with specialized capabilities and system prompts" />
         <div className="agents-loading">
           <p>Loading subagents...</p>
         </div>
@@ -81,14 +85,19 @@ export const AgentsManager: React.FC = () => {
   if (error) {
     return (
       <div className="agents-manager" data-testid="agents-manager">
-        <div className="agents-header">
-          <h1>Subagents Manager</h1>
-        </div>
+        <PageHeader
+          title="Subagents"
+          description="Custom agents with specialized capabilities and system prompts"
+          actions={[
+            {
+              label: 'Retry',
+              onClick: refetch,
+              variant: 'secondary',
+            },
+          ]}
+        />
         <div className="agents-error">
           <p className="error-message">Error: {error}</p>
-          <button onClick={refetch} className="btn-retry">
-            Retry
-          </button>
         </div>
       </div>
     );
@@ -96,17 +105,17 @@ export const AgentsManager: React.FC = () => {
 
   return (
     <div className="agents-manager" data-testid="agents-manager">
-      <div className="agents-header">
-        <div>
-          <h1>Subagents</h1>
-          <p className="header-description">
-            Custom agents with specialized capabilities and system prompts
-          </p>
-        </div>
-        <button onClick={handleCreateAgent} className="btn-create" data-testid="create-agent-btn">
-          + Create Subagent
-        </button>
-      </div>
+      <PageHeader
+        title="Subagents"
+        description="Custom agents with specialized capabilities and system prompts"
+        actions={[
+          {
+            label: '+ Create Subagent',
+            onClick: handleCreateAgent,
+            variant: 'primary',
+          },
+        ]}
+      />
 
       {agents.length > 0 && (
         <div className="agents-search">
@@ -176,6 +185,18 @@ export const AgentsManager: React.FC = () => {
           onClose={handleCloseDetail}
           onEdit={handleEditAgent}
           onDelete={handleDeleteAgent}
+        />
+      )}
+
+      {deleteConfirm && (
+        <ConfirmDialog
+          title="Delete Subagent"
+          message={`Are you sure you want to delete the agent "${deleteConfirm.frontmatter.name}"?`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          isDangerous={true}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeleteConfirm(null)}
         />
       )}
     </div>

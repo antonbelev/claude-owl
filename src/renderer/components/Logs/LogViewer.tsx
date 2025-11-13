@@ -1,5 +1,6 @@
 import React from 'react';
 import type { DebugLog } from '@/shared/types';
+import { ConfirmDialog } from '../common/ConfirmDialog';
 import './LogViewer.css';
 
 interface LogViewerProps {
@@ -14,6 +15,7 @@ export const LogViewer: React.FC<LogViewerProps> = ({ log, onClose, onDelete }) 
   const [searchMatches, setSearchMatches] = React.useState(0);
   const [_currentMatch, setCurrentMatch] = React.useState(0);
   const [showSearch, setShowSearch] = React.useState(false);
+  const [deleteConfirm, setDeleteConfirm] = React.useState(false);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
   const contentRef = React.useRef<HTMLPreElement>(null);
 
@@ -38,15 +40,17 @@ export const LogViewer: React.FC<LogViewerProps> = ({ log, onClose, onDelete }) 
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose, showSearch]);
 
-  const handleDelete = async () => {
-    if (confirm(`Are you sure you want to delete ${log.filename}?`)) {
-      setIsDeleting(true);
-      try {
-        await onDelete(log.filename);
-        onClose();
-      } finally {
-        setIsDeleting(false);
-      }
+  const handleDelete = () => {
+    setDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await onDelete(log.filename);
+      onClose();
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -164,6 +168,18 @@ export const LogViewer: React.FC<LogViewerProps> = ({ log, onClose, onDelete }) 
           {isDeleting ? 'Deleting...' : 'Delete Log'}
         </button>
       </div>
+
+      {deleteConfirm && (
+        <ConfirmDialog
+          title="Delete Log"
+          message={`Are you sure you want to delete ${log.filename}?`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          isDangerous={true}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeleteConfirm(false)}
+        />
+      )}
     </div>
   );
 };
