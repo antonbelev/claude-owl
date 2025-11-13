@@ -25,7 +25,6 @@ export interface GetMCPServerResponse extends IPCResponse<MCPServer> {}
 export interface AddMCPServerRequest {
   name: string;
   transport: 'stdio' | 'http' | 'sse';
-  scope: 'user' | 'project' | 'local';
 
   // Stdio config
   command?: string;
@@ -54,7 +53,6 @@ export interface UpdateMCPServerResponse extends IPCResponse<MCPServer> {}
  */
 export interface RemoveMCPServerRequest {
   name: string;
-  scope: 'user' | 'project' | 'local';
 }
 
 export interface RemoveMCPServerResponse extends IPCResponse<{ removed: boolean }> {}

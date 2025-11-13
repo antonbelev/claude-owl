@@ -17,7 +17,6 @@ export const MCPServersManager: React.FC = () => {
   const [deleteConfirm, setDeleteConfirm] = useState<MCPServer | null>(null);
   const [showTester, setShowTester] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [scopeFilter, setScopeFilter] = useState<'all' | 'user' | 'project' | 'local'>('all');
 
   /**
    * Handle adding a new server
@@ -59,7 +58,6 @@ export const MCPServersManager: React.FC = () => {
     try {
       await removeServer({
         name: deleteConfirm.name,
-        scope: deleteConfirm.scope as 'user' | 'project' | 'local',
       });
       setSelectedServer(null);
     } catch (err) {
@@ -70,7 +68,7 @@ export const MCPServersManager: React.FC = () => {
   };
 
   /**
-   * Filter servers based on search and scope
+   * Filter servers based on search
    */
   const filteredServers = servers.filter((server) => {
     const matchesSearch =
@@ -78,9 +76,7 @@ export const MCPServersManager: React.FC = () => {
       server.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (server.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
 
-    const matchesScope = scopeFilter === 'all' || server.scope === scopeFilter;
-
-    return matchesSearch && matchesScope;
+    return matchesSearch;
   });
 
   // Loading state
@@ -146,18 +142,6 @@ export const MCPServersManager: React.FC = () => {
           />
         </div>
 
-        <div className="mcp-filters">
-          <select
-            value={scopeFilter}
-            onChange={(e) => setScopeFilter(e.target.value as typeof scopeFilter)}
-            className="mcp-filter-select"
-          >
-            <option value="all">All Scopes</option>
-            <option value="user">User Level</option>
-            <option value="project">Project Level</option>
-            <option value="local">Local</option>
-          </select>
-        </div>
       </div>
 
       {/* Servers List */}
@@ -165,8 +149,8 @@ export const MCPServersManager: React.FC = () => {
         {filteredServers.length === 0 ? (
           <div className="mcp-empty">
             <p>
-              {searchQuery || scopeFilter !== 'all'
-                ? 'No servers match your filters'
+              {searchQuery
+                ? 'No servers match your search'
                 : 'No MCP servers configured yet'}
             </p>
             <button onClick={() => setShowAddForm(true)} className="btn-add-empty">

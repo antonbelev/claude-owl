@@ -10,13 +10,12 @@ import type {
   RemoveMCPServerResponse,
   TestMCPServerRequest,
   TestMCPServerResponse,
-  GetMCPServerToolsRequest,
-  GetMCPServerToolsResponse,
   ValidateMCPConfigRequest,
   ValidateMCPConfigResponse,
   TestAllMCPServersRequest,
   TestAllMCPServersResponse,
   GetMCPPlatformHintsResponse,
+  MCPServerConfig,
 } from '@/shared/types';
 import { MCPService } from '../services/MCPService';
 
@@ -81,20 +80,23 @@ export function registerMCPHandlers() {
         console.log('[MCPHandler] ADD_MCP_SERVER request:', {
           name: request.name,
           transport: request.transport,
-          scope: request.scope,
         });
 
-        const server = await mcpService.addServer({
+        const config: MCPServerConfig = {
           name: request.name,
           transport: request.transport,
-          scope: request.scope,
-          command: request.command,
-          args: request.args,
-          env: request.env,
-          workingDirectory: request.workingDirectory,
-          url: request.url,
-          headers: request.headers,
-        });
+          scope: 'user',
+        };
+
+        // Only add defined optional properties
+        if (request.command !== undefined) config.command = request.command;
+        if (request.args !== undefined) config.args = request.args;
+        if (request.env !== undefined) config.env = request.env;
+        if (request.workingDirectory !== undefined) config.workingDirectory = request.workingDirectory;
+        if (request.url !== undefined) config.url = request.url;
+        if (request.headers !== undefined) config.headers = request.headers;
+
+        const server = await mcpService.addServer(config);
 
         return {
           success: true,
@@ -118,7 +120,7 @@ export function registerMCPHandlers() {
     async (_event, request: RemoveMCPServerRequest): Promise<RemoveMCPServerResponse> => {
       try {
         console.log('[MCPHandler] REMOVE_MCP_SERVER request:', request.name);
-        await mcpService.removeServer(request.name, request.scope);
+        await mcpService.removeServer(request.name, 'user');
         return {
           success: true,
           data: { removed: true },
@@ -164,7 +166,8 @@ export function registerMCPHandlers() {
     async (_event, request: ValidateMCPConfigRequest): Promise<ValidateMCPConfigResponse> => {
       try {
         console.log('[MCPHandler] VALIDATE_MCP_CONFIG request:', request.name);
-        const validation = await mcpService.validateConfig(request.config);
+        // Cast the request config to the expected type (includes name)
+        const validation = await mcpService.validateConfig(request.config as Omit<MCPServerConfig, 'scope'>);
         return {
           success: true,
           data: validation,

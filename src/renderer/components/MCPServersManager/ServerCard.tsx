@@ -96,11 +96,6 @@ export const ServerCard: React.FC<ServerCardProps> = ({
             <span className="detail-value">{server.url}</span>
           </div>
         )}
-
-        <div className="detail-item">
-          <span className="detail-label">Scope:</span>
-          <span className={`detail-value scope-${server.scope}`}>{server.scope}</span>
-        </div>
       </div>
 
       {/* Tools Count */}

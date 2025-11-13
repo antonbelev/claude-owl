@@ -3,3 +3,4 @@ import { MCPServersManager } from '../components/MCPServersManager/MCPServersMan
 
 export const MCPPage: React.FC = () => {
   return <MCPServersManager />;
+};

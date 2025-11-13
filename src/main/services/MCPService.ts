@@ -3,46 +3,42 @@ import path from 'path';
 import { homedir, platform } from 'os';
 import { spawn, ChildProcess } from 'child_process';
 import type { MCPServer, MCPServerConfig, MCPConnectionTestResult } from '@/shared/types';
-import { ClaudeService } from './ClaudeService';
 
 /**
  * Service for managing MCP (Model Context Protocol) servers
  * Handles configuration, validation, testing, and execution
  *
  * Configuration files:
- * - User level: ~/.claude/mcp-servers.json
- * - Project level: .mcp.json
+ * - User level: ~/.claude/mcp-servers.json (global, available to all projects)
+ *
+ * NOTE: Claude Owl is a standalone desktop application with no project context.
+ * Users launch it from Applications folder, not from a specific project.
+ * Therefore, we only support user-level MCP server configurations.
+ * For project-specific MCP servers, users should edit .mcp.json directly in their project.
  */
 export class MCPService {
   private userMcpPath: string;
-  private projectMcpPath: string;
-  private claudeService: ClaudeService;
   private testingServers: Map<string, ChildProcess> = new Map();
 
   constructor() {
     this.userMcpPath = path.join(homedir(), '.claude', 'mcp-servers.json');
-    this.projectMcpPath = path.join(process.cwd(), '.mcp.json');
-    this.claudeService = new ClaudeService();
   }
 
   /**
-   * List all MCP servers from user and project configs
+   * List all MCP servers from user-level config
+   *
+   * Claude Owl is a standalone app and only manages user-level MCP servers.
+   * Project-specific servers should be configured in project's .mcp.json directly.
    */
   async listServers(): Promise<MCPServer[]> {
     try {
       console.log('[MCPService] Listing all MCP servers');
-      const servers: MCPServer[] = [];
 
       // Load user-level servers
       const userServers = await this.loadServersFromFile(this.userMcpPath, 'user');
-      servers.push(...userServers);
 
-      // Load project-level servers
-      const projectServers = await this.loadServersFromFile(this.projectMcpPath, 'project');
-      servers.push(...projectServers);
-
-      console.log(`[MCPService] Found ${servers.length} servers`);
-      return servers;
+      console.log(`[MCPService] Found ${userServers.length} servers`);
+      return userServers;
     } catch (error) {
       console.error('[MCPService] Failed to list servers:', error);
       throw error;
@@ -89,8 +85,8 @@ export class MCPService {
         throw new Error(`Validation failed: ${validation.errors?.map((e) => e.message).join(', ')}`);
       }
 
-      // Get config file path
-      const filePath = config.scope === 'user' ? this.userMcpPath : this.projectMcpPath;
+      // Get config file path (always user-level for Claude Owl standalone app)
+      const filePath = this.userMcpPath;
 
       // Load existing config
       let configData = await this.loadConfigFile(filePath);
@@ -115,13 +111,13 @@ export class MCPService {
   }
 
   /**
-   * Remove an MCP server
+   * Remove an MCP server from user-level config
    */
-  async removeServer(name: string, scope: 'user' | 'project'): Promise<void> {
+  async removeServer(name: string, scope: 'user'): Promise<void> {
     try {
       console.log('[MCPService] Removing server:', { name, scope });
 
-      const filePath = scope === 'user' ? this.userMcpPath : this.projectMcpPath;
+      const filePath = this.userMcpPath;
       const configData = await this.loadConfigFile(filePath);
 
       delete configData.mcpServers[name];
@@ -277,8 +273,8 @@ export class MCPService {
    * Validate MCP server configuration
    */
   async validateConfig(
-    config: MCPServerConfig
-  ): Promise<{ valid: boolean; errors?: Array<{ field: string; message: string }> }> {
+    config: Omit<MCPServerConfig, 'scope'>
+  ): Promise<{ valid: boolean; errors: Array<{ field: string; message: string }> }> {
     try {
       console.log('[MCPService] Validating config:', config.name);
 
@@ -322,7 +318,7 @@ export class MCPService {
 
       return {
         valid: errors.length === 0,
-        errors: errors.length > 0 ? errors : undefined,
+        errors,
       };
     } catch (error) {
       console.error('[MCPService] Validation error:', error);
@@ -365,26 +361,27 @@ export class MCPService {
    */
   private async loadServersFromFile(
     filePath: string,
-    scope: 'user' | 'project'
+    scope: 'user'
   ): Promise<MCPServer[]> {
     try {
       const configData = await this.loadConfigFile(filePath);
       const servers: MCPServer[] = [];
 
       for (const [name, config] of Object.entries(configData.mcpServers || {})) {
+        const serverConfig = config as Record<string, unknown>;
         servers.push({
           name,
-          transport: config.transport || 'stdio',
+          transport: (serverConfig.transport as 'stdio' | 'http' | 'sse') || 'stdio',
           scope,
           filePath,
-          status: 'disconnected',
-          command: config.command,
-          args: config.args,
-          env: config.env,
-          workingDirectory: config.workingDirectory,
-          url: config.url,
-          headers: config.headers,
-        } as MCPServer);
+          status: 'connected',
+          command: serverConfig.command as string | undefined,
+          args: serverConfig.args as string[] | undefined,
+          env: serverConfig.env as Record<string, string> | undefined,
+          workingDirectory: serverConfig.workingDirectory as string | undefined,
+          url: serverConfig.url as string | undefined,
+          headers: serverConfig.headers as Record<string, string> | undefined,
+        });
       }
 
       return servers;

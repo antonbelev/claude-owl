@@ -10,7 +10,7 @@
 }
 
 .connection-tester-modal {
-  background-color: var(--modal-bg, var(--card-bg));
+  background-color: white;
   border-radius: 12px;
   width: 100%;
   max-width: 600px;
@@ -27,13 +27,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 2rem;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .tester-header h2 {
   margin: 0;
   font-size: 1.5rem;
-  color: var(--text-primary);
+  color: #212529;
 }
 
 .btn-close {
@@ -41,12 +41,12 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: var(--text-secondary);
+  color: #6c757d;
   transition: color 0.2s;
 }
 
 .btn-close:hover {
-  color: var(--text-primary);
+  color: #212529;
 }
 
 /* Content */
@@ -69,8 +69,8 @@
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid var(--border-color);
-  border-top-color: var(--color-primary);
+  border: 4px solid #e0e0e0;
+  border-top-color: #007bff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -82,34 +82,34 @@
 }
 
 .tester-loading p {
-  color: var(--text-secondary);
+  color: #6c757d;
   font-size: 1rem;
 }
 
 /* Error State */
 .tester-error {
   padding: 1.5rem;
-  background-color: var(--bg-error-light, #fee);
+  background-color: #fee;
   border-radius: 8px;
-  border-left: 4px solid var(--color-error);
+  border-left: 4px solid #dc3545;
 }
 
 .tester-error h3 {
   margin: 0 0 0.5rem 0;
-  color: var(--color-error);
+  color: #dc3545;
   font-size: 1.1rem;
 }
 
 .error-message {
   margin: 0.5rem 0 1.5rem 0;
-  color: var(--color-error);
+  color: #dc3545;
   font-size: 0.95rem;
   line-height: 1.5;
 }
 
 .btn-retry {
   padding: 0.75rem 1.5rem;
-  background-color: var(--color-error);
+  background-color: #dc3545;
   color: white;
   border: none;
   border-radius: 6px;
@@ -119,7 +119,7 @@
 }
 
 .btn-retry:hover {
-  background-color: var(--color-error-dark, #dc2626);
+  background-color: #c82333;
 }
 
 /* Result Banner */
@@ -135,21 +135,21 @@
 }
 
 .tester-result.result-success {
-  background-color: var(--bg-success-light, #efe);
-  border-left: 4px solid var(--color-success, #10b981);
+  background-color: #efe;
+  border-left: 4px solid #28a745;
 }
 
 .tester-result.result-success h3 {
-  color: var(--color-success, #10b981);
+  color: #28a745;
 }
 
 .tester-result.result-error {
-  background-color: var(--bg-error-light, #fee);
-  border-left: 4px solid var(--color-error);
+  background-color: #fee;
+  border-left: 4px solid #dc3545;
 }
 
 .tester-result.result-error h3 {
-  color: var(--color-error);
+  color: #dc3545;
 }
 
 .error-detail {
@@ -166,7 +166,7 @@
 .tester-steps h4 {
   margin: 0 0 1rem 0;
   font-size: 1rem;
-  color: var(--text-primary);
+  color: #212529;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 600;
@@ -186,7 +186,7 @@
   gap: 1rem;
   padding: 0.75rem 1rem;
   border-radius: 6px;
-  background-color: var(--bg-secondary);
+  background-color: #f8f9fa;
 }
 
 .step-icon {
@@ -198,15 +198,15 @@
 }
 
 .step.step-success .step-icon {
-  color: var(--color-success, #10b981);
+  color: #28a745;
 }
 
 .step.step-error .step-icon {
-  color: var(--color-error);
+  color: #dc3545;
 }
 
 .step.step-pending .step-icon {
-  color: var(--text-secondary);
+  color: #6c757d;
 }
 
 .step-info {
@@ -218,13 +218,13 @@
 
 .step-name {
   font-weight: 500;
-  color: var(--text-primary);
+  color: #212529;
   font-size: 0.95rem;
 }
 
 .step-message {
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  color: #6c757d;
 }
 
 .step-details {
@@ -234,7 +234,7 @@
 
 .step-details summary {
   cursor: pointer;
-  color: var(--color-info, #0ea5e9);
+  color: #17a2b8;
   user-select: none;
 }
 
@@ -245,8 +245,8 @@
 .step-details pre {
   margin: 0.5rem 0 0 0;
   padding: 0.75rem;
-  background-color: var(--code-bg, #1e1e1e);
-  color: var(--code-text, #e0e0e0);
+  background-color: #1e1e1e;
+  color: #e0e0e0;
   border-radius: 4px;
   overflow-x: auto;
   font-size: 0.8rem;
@@ -261,7 +261,7 @@
   gap: 2rem;
   margin-bottom: 2rem;
   padding: 1rem;
-  background-color: var(--bg-secondary);
+  background-color: #f8f9fa;
   border-radius: 6px;
 }
 
@@ -273,14 +273,14 @@
 
 .stat-label {
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  color: #6c757d;
   font-weight: 500;
 }
 
 .stat-value {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #212529;
   font-family: 'Monaco', 'Menlo', monospace;
 }
 
@@ -292,7 +292,7 @@
 .tester-tools h4 {
   margin: 0 0 1rem 0;
   font-size: 1rem;
-  color: var(--text-primary);
+  color: #212529;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 600;
@@ -309,21 +309,21 @@
 
 .tool-item {
   padding: 0.75rem 1rem;
-  background-color: var(--bg-secondary);
+  background-color: #f8f9fa;
   border-radius: 6px;
-  border-left: 3px solid var(--color-info, #0ea5e9);
+  border-left: 3px solid #17a2b8;
 }
 
 .tool-name {
   font-weight: 500;
-  color: var(--text-primary);
+  color: #212529;
   font-family: 'Monaco', 'Menlo', monospace;
   font-size: 0.9rem;
 }
 
 .tool-description {
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  color: #6c757d;
   margin-top: 0.25rem;
 }
 
@@ -335,23 +335,23 @@
 .tester-logs summary {
   cursor: pointer;
   font-weight: 500;
-  color: var(--text-primary);
+  color: #212529;
   user-select: none;
   padding: 0.75rem;
   border-radius: 6px;
-  background-color: var(--bg-secondary);
+  background-color: #f8f9fa;
   transition: background-color 0.2s;
 }
 
 .tester-logs summary:hover {
-  background-color: var(--bg-hover);
+  background-color: #f8f9fa;
 }
 
 .logs-content {
   margin: 0.5rem 0 0 0;
   padding: 1rem;
-  background-color: var(--code-bg, #1e1e1e);
-  color: var(--code-text, #e0e0e0);
+  background-color: #1e1e1e;
+  color: #e0e0e0;
   border-radius: 4px;
   overflow-x: auto;
   font-size: 0.8rem;
@@ -366,29 +366,29 @@
   gap: 1rem;
   justify-content: flex-end;
   padding: 1.5rem 2rem;
-  border-top: 1px solid var(--border-color);
-  background-color: var(--bg-secondary);
+  border-top: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
 }
 
 .btn-secondary {
   padding: 0.75rem 1.5rem;
-  border: 1px solid var(--border-color);
+  border: 1px solid #e0e0e0;
   border-radius: 6px;
-  background-color: var(--input-bg);
-  color: var(--text-primary);
+  background-color: white;
+  color: #212529;
   cursor: pointer;
   font-weight: 500;
   transition: all 0.2s;
 }
 
 .btn-secondary:hover {
-  background-color: var(--bg-hover);
+  background-color: #f8f9fa;
   border-color: var(--border-hover);
 }
 
 .btn-retry-primary {
   padding: 0.75rem 1.5rem;
-  background-color: var(--color-primary);
+  background-color: #007bff;
   color: white;
   border: none;
   border-radius: 6px;
@@ -398,7 +398,7 @@
 }
 
 .btn-retry-primary:hover {
-  background-color: var(--color-primary-hover, #2563eb);
+  background-color: #0056b3;
 }
 
 /* Responsive */

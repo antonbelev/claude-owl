@@ -7,25 +7,28 @@
 /**
  * MCP Server Configuration
  * Supports stdio, HTTP, and SSE transports
+ *
+ * NOTE: Claude Owl is a standalone desktop app with no project context.
+ * Only 'user' scope is supported for global MCP servers available to all projects.
  */
 export interface MCPServerConfig {
   name: string;
   transport: 'stdio' | 'http' | 'sse';
-  scope: 'user' | 'project' | 'local';
+  scope: 'user';
 
   // Stdio-specific fields
-  command?: string;
-  args?: string[];
-  env?: Record<string, string>;
-  workingDirectory?: string;
+  command?: string | undefined;
+  args?: string[] | undefined;
+  env?: Record<string, string> | undefined;
+  workingDirectory?: string | undefined;
 
   // HTTP-specific fields
-  url?: string;
-  headers?: Record<string, string>;
+  url?: string | undefined;
+  headers?: Record<string, string> | undefined;
 
   // Common fields
-  description?: string;
-  tags?: string[];
+  description?: string | undefined;
+  tags?: string[] | undefined;
 }
 
 /**
@@ -39,11 +42,11 @@ export type MCPServerStatus = 'connected' | 'error' | 'auth-required' | 'disable
 export interface MCPServer extends MCPServerConfig {
   filePath: string;
   status: MCPServerStatus;
-  lastError?: string;
-  latency?: number;
-  tools?: MCPTool[];
-  resources?: MCPResource[];
-  prompts?: MCPPrompt[];
+  lastError?: string | undefined;
+  latency?: number | undefined;
+  tools?: MCPTool[] | undefined;
+  resources?: MCPResource[] | undefined;
+  prompts?: MCPPrompt[] | undefined;
 }
 
 /**
@@ -88,17 +91,17 @@ export interface MCPPrompt {
 export interface MCPConnectionTestResult {
   success: boolean;
   steps: MCPConnectionTestStep[];
-  error?: string;
-  tools?: MCPTool[];
-  latency?: number;
-  logs?: string[];
+  error?: string | undefined;
+  tools?: MCPTool[] | undefined;
+  latency?: number | undefined;
+  logs?: string[] | undefined;
 }
 
 export interface MCPConnectionTestStep {
   name: string;
   status: 'success' | 'error' | 'pending';
-  message?: string;
-  details?: string;
+  message?: string | undefined;
+  details?: string | undefined;
 }
 
 /**
@@ -108,7 +111,7 @@ export interface MCPEnvironmentVariable {
   name: string;
   value: string;
   scope: 'user' | 'project';
-  isSecret?: boolean;
+  isSecret?: boolean | undefined;
 }
 
 /**

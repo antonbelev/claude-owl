@@ -7,6 +7,19 @@
 
 ---
 
+## ⚠️ CRITICAL DESIGN CONSTRAINT
+
+**Claude Owl is a STANDALONE desktop application, NOT project-aware.**
+
+Users launch Claude Owl from the Applications folder with no project context. Therefore:
+- ✗ **NOT supported:** Project-level MCP server configs (.mcp.json)
+- ✗ **NOT supported:** Scope selection (user/project/local)
+- ✓ **SUPPORTED ONLY:** User-level global MCP servers (~/.claude/mcp-servers.json)
+
+For project-specific MCP servers, users must edit `.mcp.json` directly in their project.
+
+---
+
 ## Context
 
 Model Context Protocol (MCP) is a standardized protocol that enables Claude Code to connect to external data sources and tools through MCP servers. Currently, users must:

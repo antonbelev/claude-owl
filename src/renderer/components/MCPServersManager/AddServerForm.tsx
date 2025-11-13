@@ -9,7 +9,6 @@ interface AddServerFormProps {
 export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel }) => {
   const [name, setName] = useState('');
   const [transport, setTransport] = useState<'stdio' | 'http' | 'sse'>('stdio');
-  const [scope, setScope] = useState<'user' | 'project' | 'local'>('user');
   const [command, setCommand] = useState('npx');
   const [args, setArgs] = useState('');
   const [url, setUrl] = useState('');
@@ -99,7 +98,6 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
       const config: AddMCPServerRequest = {
         name: name.trim(),
         transport,
-        scope,
       };
 
       // Add transport-specific fields
@@ -294,40 +292,14 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
         </div>
       </div>
 
-      {/* Scope */}
-      <div className="form-group">
-        <label className="form-label">
-          Scope <span className="required">*</span>
-        </label>
-        <div className="radio-group">
-          <label className="radio-label">
-            <input
-              type="radio"
-              value="user"
-              checked={scope === 'user'}
-              onChange={(e) => setScope(e.target.value as typeof scope)}
-            />
-            User (available in all projects)
-          </label>
-          <label className="radio-label">
-            <input
-              type="radio"
-              value="project"
-              checked={scope === 'project'}
-              onChange={(e) => setScope(e.target.value as typeof scope)}
-            />
-            Project (shared via .mcp.json)
-          </label>
-          <label className="radio-label">
-            <input
-              type="radio"
-              value="local"
-              checked={scope === 'local'}
-              onChange={(e) => setScope(e.target.value as typeof scope)}
-            />
-            Local (only this project, private)
-          </label>
-        </div>
+      {/* Note: Servers are always stored in user-level config */}
+      <div className="form-group" style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}>
+        <p style={{ margin: 0, fontSize: '0.9rem', color: '#6c757d' }}>
+          ℹ️ MCP servers are managed globally at the user level (~/.claude/mcp-servers.json) and available to all your projects.
+        </p>
+        <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.85rem', color: '#6c757d' }}>
+          For project-specific MCP servers, edit your project's .mcp.json directly.
+        </p>
       </div>
 
       {/* Buttons */}
