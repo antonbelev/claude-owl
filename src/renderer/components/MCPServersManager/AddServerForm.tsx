@@ -247,7 +247,7 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
         {/* Existing variables */}
         {Object.entries(envVars).length > 0 && (
           <div className="env-vars-list">
-            {Object.entries(envVars).map(([key, value]) => (
+            {Object.entries(envVars).map(([key]) => (
               <div key={key} className="env-var-item">
                 <div className="env-var-display">
                   <span className="env-key">{key}</span>

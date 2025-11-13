@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { MCPConnectionTestResult, MCPConnectionTestStep } from '@/shared/types';
+import type { MCPConnectionTestResult } from '@/shared/types';
 import './ConnectionTester.css';
 
 interface ConnectionTesterProps {

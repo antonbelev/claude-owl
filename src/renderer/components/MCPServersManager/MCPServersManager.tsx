@@ -13,7 +13,6 @@ export const MCPServersManager: React.FC = () => {
     useMCP();
 
   const [showAddForm, setShowAddForm] = useState(false);
-  const [selectedServer, setSelectedServer] = useState<MCPServer | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<MCPServer | null>(null);
   const [showTester, setShowTester] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,10 +41,7 @@ export const MCPServersManager: React.FC = () => {
    * Handle deleting a server
    */
   const handleDeleteServer = (server: MCPServer) => {
-    // Can't delete plugin servers
-    if (server.scope === 'plugin' || server.scope === 'mcp') {
-      return;
-    }
+    // All servers are deletable since they are all user-level
     setDeleteConfirm(server);
   };
 
@@ -59,7 +55,6 @@ export const MCPServersManager: React.FC = () => {
       await removeServer({
         name: deleteConfirm.name,
       });
-      setSelectedServer(null);
     } catch (err) {
       console.error('Failed to delete server:', err);
     } finally {
@@ -166,7 +161,6 @@ export const MCPServersManager: React.FC = () => {
                 isTesting={showTester === server.name}
                 onTest={() => handleTestConnection(server.name)}
                 onDelete={() => handleDeleteServer(server)}
-                onClick={() => setSelectedServer(server)}
               />
             ))}
           </div>
@@ -193,7 +187,7 @@ export const MCPServersManager: React.FC = () => {
           onConfirm={handleConfirmDelete}
           onCancel={() => setDeleteConfirm(null)}
           confirmText="Delete"
-          confirmVariant="danger"
+          isDangerous={true}
         />
       )}
 

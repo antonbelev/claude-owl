@@ -1,5 +1,16 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { IPC_CHANNELS } from '@/shared/types';
+import type {
+  ListMCPServersResponse,
+  AddMCPServerResponse,
+  RemoveMCPServerResponse,
+  TestMCPServerResponse,
+  GetMCPPlatformHintsResponse,
+  AddMCPServerRequest,
+  RemoveMCPServerRequest,
+  TestMCPServerRequest,
+  ValidateMCPConfigRequest,
+} from '@/shared/types';
 
 // Define settings channel strings directly to avoid tree-shaking
 const SETTINGS_CHANNELS = {
@@ -326,23 +337,23 @@ export interface ElectronAPI {
   getHookTemplates: () => Promise<unknown>;
   getHookSettingsPath: (args: unknown) => Promise<unknown>;
   openHookSettingsFile: (args: unknown) => Promise<unknown>;
-  listMCPServers: () => Promise<unknown>;
+  listMCPServers: () => Promise<ListMCPServersResponse>;
   getMCPServer: (args: unknown) => Promise<unknown>;
-  addMCPServer: (args: unknown) => Promise<unknown>;
+  addMCPServer: (args: AddMCPServerRequest) => Promise<AddMCPServerResponse>;
   updateMCPServer: (args: unknown) => Promise<unknown>;
-  removeMCPServer: (args: unknown) => Promise<unknown>;
-  testMCPServer: (args: unknown) => Promise<unknown>;
+  removeMCPServer: (args: RemoveMCPServerRequest) => Promise<RemoveMCPServerResponse>;
+  testMCPServer: (args: TestMCPServerRequest) => Promise<TestMCPServerResponse>;
   testAllMCPServers: (args: unknown) => Promise<unknown>;
   getMCPServerTools: (args: unknown) => Promise<unknown>;
   getMCPTemplates: () => Promise<unknown>;
   searchMCPTemplates: (args: unknown) => Promise<unknown>;
   installMCPFromTemplate: (args: unknown) => Promise<unknown>;
-  validateMCPConfig: (args: unknown) => Promise<unknown>;
+  validateMCPConfig: (args: ValidateMCPConfigRequest) => Promise<unknown>;
   getMCPEnvironmentVariables: () => Promise<unknown>;
   setMCPEnvironmentVariable: (args: unknown) => Promise<unknown>;
   deleteMCPEnvironmentVariable: (args: unknown) => Promise<unknown>;
   toggleMCPServer: (args: unknown) => Promise<unknown>;
-  getMCPPlatformHints: () => Promise<unknown>;
+  getMCPPlatformHints: () => Promise<GetMCPPlatformHintsResponse>;
   listDebugLogs: () => Promise<unknown>;
   getDebugLog: (args: unknown) => Promise<unknown>;
   deleteDebugLog: (args: unknown) => Promise<unknown>;

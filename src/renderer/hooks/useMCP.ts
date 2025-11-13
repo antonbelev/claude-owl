@@ -4,6 +4,11 @@ import type {
   MCPConnectionTestResult,
   AddMCPServerRequest,
   RemoveMCPServerRequest,
+  ListMCPServersResponse,
+  AddMCPServerResponse,
+  RemoveMCPServerResponse,
+  TestMCPServerResponse,
+  GetMCPPlatformHintsResponse,
 } from '@/shared/types';
 
 interface UseMCPOptions {
@@ -30,7 +35,7 @@ export function useMCP(options: UseMCPOptions = {}) {
       setError(null);
       console.log('[useMCP] Loading MCP servers');
 
-      const response = await window.electronAPI.listMCPServers();
+      const response: ListMCPServersResponse = await window.electronAPI.listMCPServers();
 
       if (!response.success) {
         throw new Error(response.error || 'Failed to load servers');
@@ -53,7 +58,7 @@ export function useMCP(options: UseMCPOptions = {}) {
   const loadPlatformHints = useCallback(async () => {
     try {
       console.log('[useMCP] Loading platform hints');
-      const response = await window.electronAPI.getMCPPlatformHints();
+      const response: GetMCPPlatformHintsResponse = await window.electronAPI.getMCPPlatformHints();
 
       if (response.success) {
         setPlatformHints(response.data);
@@ -71,7 +76,7 @@ export function useMCP(options: UseMCPOptions = {}) {
       setError(null);
       console.log('[useMCP] Adding server:', config.name);
 
-      const response = await window.electronAPI.addMCPServer(config);
+      const response: AddMCPServerResponse = await window.electronAPI.addMCPServer(config);
 
       if (!response.success) {
         throw new Error(response.error || 'Failed to add server');
@@ -97,7 +102,7 @@ export function useMCP(options: UseMCPOptions = {}) {
       setError(null);
       console.log('[useMCP] Removing server:', request.name);
 
-      const response = await window.electronAPI.removeMCPServer(request);
+      const response: RemoveMCPServerResponse = await window.electronAPI.removeMCPServer(request);
 
       if (!response.success) {
         throw new Error(response.error || 'Failed to remove server');
@@ -122,7 +127,7 @@ export function useMCP(options: UseMCPOptions = {}) {
       setError(null);
       console.log('[useMCP] Testing connection for:', name);
 
-      const response = await window.electronAPI.testMCPServer({ name, timeout });
+      const response: TestMCPServerResponse = await window.electronAPI.testMCPServer({ name, timeout: timeout ?? 10000 });
 
       if (!response.success) {
         throw new Error(response.error || 'Failed to test connection');
@@ -146,7 +151,7 @@ export function useMCP(options: UseMCPOptions = {}) {
       setError(null);
       console.log('[useMCP] Testing all connections');
 
-      const response = await window.electronAPI.testAllMCPServers({ timeout });
+      const response = (await window.electronAPI.testAllMCPServers({ timeout })) as any;
 
       if (!response.success) {
         throw new Error(response.error || 'Failed to test connections');
@@ -169,7 +174,7 @@ export function useMCP(options: UseMCPOptions = {}) {
     try {
       console.log('[useMCP] Validating config:', name);
 
-      const response = await window.electronAPI.validateMCPConfig({ name, config });
+      const response = (await window.electronAPI.validateMCPConfig({ name, config })) as any;
 
       if (!response.success) {
         throw new Error(response.error || 'Failed to validate config');
@@ -190,7 +195,7 @@ export function useMCP(options: UseMCPOptions = {}) {
     try {
       console.log('[useMCP] Getting tools for:', name);
 
-      const response = await window.electronAPI.getMCPServerTools({ name });
+      const response = (await window.electronAPI.getMCPServerTools({ name })) as any;
 
       if (!response.success) {
         throw new Error(response.error || 'Failed to get tools');
