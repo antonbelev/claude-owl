@@ -20,16 +20,19 @@ export const EffectiveSettingsTab: React.FC<EffectiveSettingsTabProps> = ({ effe
     <div className="effective-settings-tab">
       <div className="tab-description">
         <p>
-          This shows the effective (merged) settings from all levels. Settings are merged in the following order:
-          User → Project → Local → Managed (highest priority).
+          This shows the effective (merged) settings from all levels. Settings are merged in the
+          following order: User → Project → Local → Managed (highest priority).
         </p>
       </div>
 
       <div className="settings-sources">
         <h3>Settings Sources</h3>
         <div className="sources-grid">
-          {sources.map((source) => (
-            <div key={source.level} className={`source-card ${source.exists ? 'exists' : 'missing'}`}>
+          {sources.map(source => (
+            <div
+              key={source.level}
+              className={`source-card ${source.exists ? 'exists' : 'missing'}`}
+            >
               <div className="source-header">
                 <span className="source-level">{source.level}</span>
                 <span className={`source-status ${source.exists ? 'exists' : 'missing'}`}>
@@ -39,7 +42,8 @@ export const EffectiveSettingsTab: React.FC<EffectiveSettingsTabProps> = ({ effe
               <div className="source-path">{source.path}</div>
               {source.exists && (
                 <div className="source-keys">
-                  {Object.keys(source.content).length} setting{Object.keys(source.content).length !== 1 ? 's' : ''}
+                  {Object.keys(source.content).length} setting
+                  {Object.keys(source.content).length !== 1 ? 's' : ''}
                 </div>
               )}
             </div>

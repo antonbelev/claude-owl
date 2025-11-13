@@ -32,7 +32,8 @@ export class PathService {
    * @param projectPath - Project path (required if location is 'project')
    */
   getSkillsPath(location: 'user' | 'project', projectPath?: string): string {
-    const baseDir = location === 'user' ? this.getUserClaudeDir() : this.getProjectClaudeDir(projectPath);
+    const baseDir =
+      location === 'user' ? this.getUserClaudeDir() : this.getProjectClaudeDir(projectPath);
     return path.join(baseDir, 'skills');
   }
 
@@ -48,7 +49,8 @@ export class PathService {
    * Get the path to agents directory
    */
   getAgentsPath(location: 'user' | 'project', projectPath?: string): string {
-    const baseDir = location === 'user' ? this.getUserClaudeDir() : this.getProjectClaudeDir(projectPath);
+    const baseDir =
+      location === 'user' ? this.getUserClaudeDir() : this.getProjectClaudeDir(projectPath);
     return path.join(baseDir, 'agents');
   }
 
@@ -64,7 +66,8 @@ export class PathService {
    * Get the path to commands directory
    */
   getCommandsPath(location: 'user' | 'project', projectPath?: string): string {
-    const baseDir = location === 'user' ? this.getUserClaudeDir() : this.getProjectClaudeDir(projectPath);
+    const baseDir =
+      location === 'user' ? this.getUserClaudeDir() : this.getProjectClaudeDir(projectPath);
     return path.join(baseDir, 'commands');
   }
 
@@ -81,7 +84,8 @@ export class PathService {
    * @param location - 'user' for ~/.claude/settings.json or 'project' for .claude/settings.json
    */
   getSettingsPath(location: 'user' | 'project', projectPath?: string): string {
-    const baseDir = location === 'user' ? this.getUserClaudeDir() : this.getProjectClaudeDir(projectPath);
+    const baseDir =
+      location === 'user' ? this.getUserClaudeDir() : this.getProjectClaudeDir(projectPath);
     return path.join(baseDir, 'settings.json');
   }
 
@@ -90,7 +94,8 @@ export class PathService {
    * This file is typically gitignored
    */
   getLocalSettingsPath(location: 'user' | 'project', projectPath?: string): string {
-    const baseDir = location === 'user' ? this.getUserClaudeDir() : this.getProjectClaudeDir(projectPath);
+    const baseDir =
+      location === 'user' ? this.getUserClaudeDir() : this.getProjectClaudeDir(projectPath);
     return path.join(baseDir, 'settings.local.json');
   }
 
@@ -107,7 +112,8 @@ export class PathService {
    * Get the path to plugins directory
    */
   getPluginsPath(location: 'user' | 'project', projectPath?: string): string {
-    const baseDir = location === 'user' ? this.getUserClaudeDir() : this.getProjectClaudeDir(projectPath);
+    const baseDir =
+      location === 'user' ? this.getUserClaudeDir() : this.getProjectClaudeDir(projectPath);
     return path.join(baseDir, 'plugins');
   }
 

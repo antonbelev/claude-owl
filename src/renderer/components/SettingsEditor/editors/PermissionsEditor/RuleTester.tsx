@@ -54,8 +54,8 @@ export const RuleTester: React.FC = () => {
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="test-tool">Tool</label>
-            <select id="test-tool" value={tool} onChange={(e) => setTool(e.target.value as ToolType)}>
-              {TOOLS.map((t) => (
+            <select id="test-tool" value={tool} onChange={e => setTool(e.target.value as ToolType)}>
+              {TOOLS.map(t => (
                 <option key={t} value={t}>
                   {t}
                 </option>
@@ -65,7 +65,11 @@ export const RuleTester: React.FC = () => {
 
           <div className="form-group">
             <label htmlFor="test-level">Level</label>
-            <select id="test-level" value={level} onChange={(e) => setLevel(e.target.value as PermissionLevel)}>
+            <select
+              id="test-level"
+              value={level}
+              onChange={e => setLevel(e.target.value as PermissionLevel)}
+            >
               <option value="allow">Allow</option>
               <option value="ask">Ask</option>
               <option value="deny">Deny</option>
@@ -79,7 +83,7 @@ export const RuleTester: React.FC = () => {
             id="test-pattern"
             type="text"
             value={pattern}
-            onChange={(e) => setPattern(e.target.value)}
+            onChange={e => setPattern(e.target.value)}
             placeholder="e.g., npm run test"
           />
         </div>
@@ -90,7 +94,7 @@ export const RuleTester: React.FC = () => {
             id="test-input"
             type="text"
             value={testInput}
-            onChange={(e) => setTestInput(e.target.value)}
+            onChange={e => setTestInput(e.target.value)}
             placeholder="e.g., npm run test:unit"
           />
         </div>

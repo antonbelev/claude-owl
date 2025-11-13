@@ -37,7 +37,10 @@ export function HookDetailsViewer({ hook, className }: HookDetailsViewerProps) {
               <p className="card-description" style={{ marginTop: '0.25rem' }}>
                 {hook.configuration.matcher ? (
                   <>
-                    Matches tools: <code style={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>{hook.configuration.matcher}</code>
+                    Matches tools:{' '}
+                    <code style={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                      {hook.configuration.matcher}
+                    </code>
                   </>
                 ) : (
                   'Applies to all tool invocations'
@@ -45,10 +48,10 @@ export function HookDetailsViewer({ hook, className }: HookDetailsViewerProps) {
               </p>
             </div>
             <div className="hook-event-badges">
-              <span className="badge badge-outline">
-                {hook.location}
-              </span>
-              <span className={`badge ${hook.hook.type === 'command' ? 'badge-default' : 'badge-secondary'}`}>
+              <span className="badge badge-outline">{hook.location}</span>
+              <span
+                className={`badge ${hook.hook.type === 'command' ? 'badge-default' : 'badge-secondary'}`}
+              >
                 {hook.hook.type}
               </span>
             </div>
@@ -58,7 +61,9 @@ export function HookDetailsViewer({ hook, className }: HookDetailsViewerProps) {
         <div className="card-content">
           {/* Hook Configuration */}
           <div>
-            <h4 className="card-description" style={{ marginBottom: '0.5rem' }}>Configuration</h4>
+            <h4 className="card-description" style={{ marginBottom: '0.5rem' }}>
+              Configuration
+            </h4>
             <div className="code-block">
               <pre>{JSON.stringify(hook.hook, null, 2)}</pre>
             </div>
@@ -67,18 +72,20 @@ export function HookDetailsViewer({ hook, className }: HookDetailsViewerProps) {
           {/* Command/Prompt Content */}
           {hook.hook.command && (
             <div style={{ marginTop: '1rem' }}>
-              <h4 className="card-description" style={{ marginBottom: '0.5rem' }}>Bash Command</h4>
+              <h4 className="card-description" style={{ marginBottom: '0.5rem' }}>
+                Bash Command
+              </h4>
               <div className="code-block-dark">
-                <code style={{ whiteSpace: 'pre-wrap' }}>
-                  {hook.hook.command}
-                </code>
+                <code style={{ whiteSpace: 'pre-wrap' }}>{hook.hook.command}</code>
               </div>
             </div>
           )}
 
           {hook.hook.prompt && (
             <div style={{ marginTop: '1rem' }}>
-              <h4 className="card-description" style={{ marginBottom: '0.5rem' }}>LLM Prompt</h4>
+              <h4 className="card-description" style={{ marginBottom: '0.5rem' }}>
+                LLM Prompt
+              </h4>
               <div className="code-block" style={{ fontSize: '0.875rem', whiteSpace: 'pre-wrap' }}>
                 {hook.hook.prompt}
               </div>
@@ -88,10 +95,10 @@ export function HookDetailsViewer({ hook, className }: HookDetailsViewerProps) {
           {/* Timeout */}
           {hook.hook.timeout && (
             <div style={{ marginTop: '1rem' }}>
-              <h4 className="card-description" style={{ marginBottom: '0.5rem' }}>Timeout</h4>
-              <p className="card-description">
-                {hook.hook.timeout} seconds
-              </p>
+              <h4 className="card-description" style={{ marginBottom: '0.5rem' }}>
+                Timeout
+              </h4>
+              <p className="card-description">{hook.hook.timeout} seconds</p>
             </div>
           )}
 
@@ -101,7 +108,10 @@ export function HookDetailsViewer({ hook, className }: HookDetailsViewerProps) {
           </div>
 
           {/* Actions */}
-          <div className="template-actions" style={{ borderTop: '1px solid #e5e7eb', marginTop: '0.5rem' }}>
+          <div
+            className="template-actions"
+            style={{ borderTop: '1px solid #e5e7eb', marginTop: '0.5rem' }}
+          >
             <button
               className="button button-outline"
               onClick={handleOpenSettings}

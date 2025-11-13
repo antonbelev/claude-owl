@@ -30,9 +30,7 @@ export const ClaudeStatusCard: React.FC = () => {
       <div className="status-card status-warning" data-testid="claude-status-card">
         <h2>Claude Code Status</h2>
         <p className="warning-message">Claude Code is not installed</p>
-        <p className="help-text">
-          Please install Claude Code CLI to use this application.
-        </p>
+        <p className="help-text">Please install Claude Code CLI to use this application.</p>
         <a
           href="https://code.claude.com/docs/en/quickstart"
           target="_blank"

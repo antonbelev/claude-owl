@@ -10,7 +10,12 @@
  * @see docs/hooks-implementation-plan.md
  */
 
-import type { Hook, HookIssue, HookValidationResult, SecurityScore } from '../../shared/types/hook.types';
+import type {
+  Hook,
+  HookIssue,
+  HookValidationResult,
+  SecurityScore,
+} from '../../shared/types/hook.types';
 
 export class HooksValidator {
   /**
@@ -119,7 +124,7 @@ export class HooksValidator {
 
     // Calculate security score
     const score = this.scoreHook(issues);
-    const valid = !issues.some((issue) => issue.severity === 'error');
+    const valid = !issues.some(issue => issue.severity === 'error');
 
     console.log('[HooksValidator] Validation complete:', {
       valid,
@@ -181,15 +186,15 @@ export class HooksValidator {
    * Calculate security score based on issues
    */
   public scoreHook(issues: HookIssue[]): SecurityScore {
-    const hasErrors = issues.some((issue) => issue.severity === 'error');
-    const hasWarnings = issues.some((issue) => issue.severity === 'warning');
+    const hasErrors = issues.some(issue => issue.severity === 'error');
+    const hasWarnings = issues.some(issue => issue.severity === 'warning');
 
     // Check for critical security issues
     const hasCriticalSecurity = issues.some(
-      (issue) =>
+      issue =>
         issue.code === 'UNQUOTED_VARIABLE' ||
         issue.code === 'PATH_TRAVERSAL' ||
-        issue.code === 'DANGEROUS_COMMAND',
+        issue.code === 'DANGEROUS_COMMAND'
     );
 
     if (hasErrors || hasCriticalSecurity) {

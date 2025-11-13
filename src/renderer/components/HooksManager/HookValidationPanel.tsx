@@ -57,9 +57,7 @@ export function HookValidationPanel({ validation, className }: HookValidationPan
 
         {validation.issues.length > 0 && (
           <div className="validation-issues">
-            <h4 className="card-description">
-              Issues ({validation.issues.length})
-            </h4>
+            <h4 className="card-description">Issues ({validation.issues.length})</h4>
             <div>
               {validation.issues.map((issue, index) => {
                 const severityClass =
@@ -73,23 +71,14 @@ export function HookValidationPanel({ validation, className }: HookValidationPan
                   issue.severity === 'error' ? '✕' : issue.severity === 'warning' ? '⚠' : 'ℹ';
 
                 return (
-                  <div
-                    key={index}
-                    className={`validation-issue ${severityClass}`}
-                  >
+                  <div key={index} className={`validation-issue ${severityClass}`}>
                     <span className="validation-issue-icon">{severityIcon}</span>
                     <div className="validation-issue-content">
                       <p className="validation-issue-message">{issue.message}</p>
                       {issue.suggestion && (
-                        <p className="validation-issue-suggestion">
-                          💡 {issue.suggestion}
-                        </p>
+                        <p className="validation-issue-suggestion">💡 {issue.suggestion}</p>
                       )}
-                      {issue.code && (
-                        <p className="validation-issue-code">
-                          Code: {issue.code}
-                        </p>
-                      )}
+                      {issue.code && <p className="validation-issue-code">Code: {issue.code}</p>}
                     </div>
                   </div>
                 );
@@ -101,9 +90,7 @@ export function HookValidationPanel({ validation, className }: HookValidationPan
         {validation.issues.length === 0 && (
           <div className="validation-success">
             <span>✓</span>
-            <p>
-              All security checks passed
-            </p>
+            <p>All security checks passed</p>
           </div>
         )}
       </div>

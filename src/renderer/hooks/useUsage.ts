@@ -44,7 +44,8 @@ export function useUsage() {
 
     try {
       console.log('[useUsage] Calling window.electronAPI.checkCCUsageInstalled()');
-      const response = (await window.electronAPI.checkCCUsageInstalled()) as CheckCCUsageInstalledResponse;
+      const response =
+        (await window.electronAPI.checkCCUsageInstalled()) as CheckCCUsageInstalledResponse;
       console.log('[useUsage] Response:', response);
 
       if (response.success) {

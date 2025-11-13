@@ -151,11 +151,7 @@ export const LogsList: React.FC<LogsListProps> = ({
           disabled={loading || isSearching}
         />
         {searchInput && (
-          <button
-            className="logs-clear-search"
-            onClick={handleClearSearch}
-            title="Clear search"
-          >
+          <button className="logs-clear-search" onClick={handleClearSearch} title="Clear search">
             ✕
           </button>
         )}
@@ -187,17 +183,21 @@ export const LogsList: React.FC<LogsListProps> = ({
                 Found <strong>{logs.length}</strong> log(s) matching &quot;{searchQuery}&quot;
               </>
             )}
-            {!searchQuery && <><strong>{logs.length}</strong> debug log(s)</>}
+            {!searchQuery && (
+              <>
+                <strong>{logs.length}</strong> debug log(s)
+              </>
+            )}
           </div>
 
-          {logs.map((log) => (
+          {logs.map(log => (
             <div
               key={log.filename}
               className={`logs-list-item ${selectedLog?.filename === log.filename ? 'selected' : ''}`}
               onClick={() => onSelectLog(log)}
               role="button"
               tabIndex={0}
-              onKeyPress={(e) => {
+              onKeyPress={e => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   onSelectLog(log);
                 }

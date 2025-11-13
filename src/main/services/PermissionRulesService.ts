@@ -23,7 +23,9 @@ export class PermissionRulesService {
     const match = trimmed.match(/^(\w+)(?:\((.*)\))?$/);
 
     if (!match) {
-      throw new Error(`Invalid rule format: "${ruleString}". Expected format: "ToolName" or "ToolName(pattern)"`);
+      throw new Error(
+        `Invalid rule format: "${ruleString}". Expected format: "ToolName" or "ToolName(pattern)"`
+      );
     }
 
     const [, tool, pattern] = match;
@@ -78,7 +80,9 @@ export class PermissionRulesService {
     }
 
     if (!requiresPattern && rule.pattern) {
-      warnings.push(`Tool "${rule.tool}" doesn't typically use patterns. The pattern will be ignored.`);
+      warnings.push(
+        `Tool "${rule.tool}" doesn't typically use patterns. The pattern will be ignored.`
+      );
     }
 
     // Validate pattern if provided
@@ -215,7 +219,9 @@ export class PermissionRulesService {
         if (pattern.startsWith('domain:')) {
           const domain = pattern.substring(7);
           matches = testInput.includes(domain);
-          reason = matches ? `URL contains domain "${domain}"` : `URL does not contain domain "${domain}"`;
+          reason = matches
+            ? `URL contains domain "${domain}"`
+            : `URL does not contain domain "${domain}"`;
         } else {
           matches = testInput.includes(pattern);
           reason = matches ? `URL contains "${pattern}"` : `URL does not contain "${pattern}"`;
@@ -261,7 +267,6 @@ export class PermissionRulesService {
       ...rule,
     }));
   }
-
 
   /**
    * Check if a string is a valid tool type

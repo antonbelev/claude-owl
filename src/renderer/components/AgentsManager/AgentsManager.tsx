@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useAgents } from '../../hooks/useAgents';
 import type { Agent, AgentFrontmatter } from '@/shared/types';
+import { ConfirmDialog } from '../common/ConfirmDialog';
+import { PageHeader } from '../common/PageHeader';
 import './AgentsManager.css';
 
 export const AgentsManager: React.FC = () => {
@@ -9,6 +11,7 @@ export const AgentsManager: React.FC = () => {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState<Agent | null>(null);
 
   const handleCreateAgent = () => {
     setEditingAgent(null);
@@ -34,21 +37,24 @@ export const AgentsManager: React.FC = () => {
     setSelectedAgent(null);
   };
 
-  const handleDeleteAgent = async (agent: Agent) => {
-    if (!confirm(`Are you sure you want to delete the agent "${agent.frontmatter.name}"?`)) {
-      return;
-    }
-
+  const handleDeleteAgent = (agent: Agent) => {
     // Plugin agents cannot be deleted
     if (agent.location === 'plugin') {
       alert('Plugin agents cannot be deleted.');
       return;
     }
 
-    const success = await deleteAgent(agent.filePath);
+    setDeleteConfirm(agent);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirm) return;
+
+    const success = await deleteAgent(deleteConfirm.filePath);
     if (success) {
       setSelectedAgent(null);
     }
+    setDeleteConfirm(null);
   };
 
   // Filter agents based on search query
@@ -59,7 +65,7 @@ export const AgentsManager: React.FC = () => {
 
     const query = searchQuery.toLowerCase();
     return agents.filter(
-      (agent) =>
+      agent =>
         agent.frontmatter.name.toLowerCase().includes(query) ||
         agent.frontmatter.description.toLowerCase().includes(query)
     );
@@ -68,9 +74,7 @@ export const AgentsManager: React.FC = () => {
   if (loading) {
     return (
       <div className="agents-manager" data-testid="agents-manager">
-        <div className="agents-header">
-          <h1>Subagents Manager</h1>
-        </div>
+        <PageHeader title="Subagents" description="Custom agents with specialized capabilities and system prompts" />
         <div className="agents-loading">
           <p>Loading subagents...</p>
         </div>
@@ -81,14 +85,19 @@ export const AgentsManager: React.FC = () => {
   if (error) {
     return (
       <div className="agents-manager" data-testid="agents-manager">
-        <div className="agents-header">
-          <h1>Subagents Manager</h1>
-        </div>
+        <PageHeader
+          title="Subagents"
+          description="Custom agents with specialized capabilities and system prompts"
+          actions={[
+            {
+              label: 'Retry',
+              onClick: refetch,
+              variant: 'secondary',
+            },
+          ]}
+        />
         <div className="agents-error">
           <p className="error-message">Error: {error}</p>
-          <button onClick={refetch} className="btn-retry">
-            Retry
-          </button>
         </div>
       </div>
     );
@@ -96,17 +105,17 @@ export const AgentsManager: React.FC = () => {
 
   return (
     <div className="agents-manager" data-testid="agents-manager">
-      <div className="agents-header">
-        <div>
-          <h1>Subagents</h1>
-          <p className="header-description">
-            Custom agents with specialized capabilities and system prompts
-          </p>
-        </div>
-        <button onClick={handleCreateAgent} className="btn-create" data-testid="create-agent-btn">
-          + Create Subagent
-        </button>
-      </div>
+      <PageHeader
+        title="Subagents"
+        description="Custom agents with specialized capabilities and system prompts"
+        actions={[
+          {
+            label: '+ Create Subagent',
+            onClick: handleCreateAgent,
+            variant: 'primary',
+          },
+        ]}
+      />
 
       {agents.length > 0 && (
         <div className="agents-search">
@@ -114,7 +123,7 @@ export const AgentsManager: React.FC = () => {
             type="text"
             placeholder="Search agents by name or description..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
             className="search-input"
           />
           {searchQuery && (
@@ -134,7 +143,10 @@ export const AgentsManager: React.FC = () => {
           <div className="agents-empty">
             <div className="empty-icon">🤖</div>
             <h3>No Subagents Yet</h3>
-            <p>Create specialized subagents to handle specific tasks with custom system prompts and tool access.</p>
+            <p>
+              Create specialized subagents to handle specific tasks with custom system prompts and
+              tool access.
+            </p>
             <button onClick={handleCreateAgent} className="btn-create-empty">
               Create Your First Subagent
             </button>
@@ -150,7 +162,7 @@ export const AgentsManager: React.FC = () => {
           </div>
         ) : (
           <div className="agents-grid">
-            {filteredAgents.map((agent) => (
+            {filteredAgents.map(agent => (
               <AgentCard
                 key={`${agent.location}-${agent.frontmatter.name}`}
                 agent={agent}
@@ -164,11 +176,7 @@ export const AgentsManager: React.FC = () => {
       </div>
 
       {showCreateModal && (
-        <AgentEditModal
-          agent={editingAgent}
-          onClose={handleCloseModal}
-          onSave={saveAgent}
-        />
+        <AgentEditModal agent={editingAgent} onClose={handleCloseModal} onSave={saveAgent} />
       )}
 
       {selectedAgent && (
@@ -177,6 +185,18 @@ export const AgentsManager: React.FC = () => {
           onClose={handleCloseDetail}
           onEdit={handleEditAgent}
           onDelete={handleDeleteAgent}
+        />
+      )}
+
+      {deleteConfirm && (
+        <ConfirmDialog
+          title="Delete Subagent"
+          message={`Are you sure you want to delete the agent "${deleteConfirm.frontmatter.name}"?`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          isDangerous={true}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeleteConfirm(null)}
         />
       )}
     </div>
@@ -191,7 +211,8 @@ interface AgentCardProps {
 }
 
 const AgentCard: React.FC<AgentCardProps> = ({ agent, onView, onEdit, onDelete }) => {
-  const locationBadge = agent.location === 'user' ? 'User' : agent.location === 'project' ? 'Project' : 'Plugin';
+  const locationBadge =
+    agent.location === 'user' ? 'User' : agent.location === 'project' ? 'Project' : 'Plugin';
   const locationClass = `location-badge location-${agent.location}`;
   const canEdit = agent.location !== 'plugin';
 
@@ -257,8 +278,12 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
   const [name, setName] = useState(agent?.frontmatter.name || '');
   const [description, setDescription] = useState(agent?.frontmatter.description || '');
   const [content, setContent] = useState(agent?.content || '');
-  const [location, setLocation] = useState<'user' | 'project'>(agent?.location as 'user' | 'project' || 'user');
-  const [model, setModel] = useState<'sonnet' | 'opus' | 'haiku' | 'inherit' | ''>(agent?.frontmatter.model || '');
+  const [location, setLocation] = useState<'user' | 'project'>(
+    (agent?.location as 'user' | 'project') || 'user'
+  );
+  const [model, setModel] = useState<'sonnet' | 'opus' | 'haiku' | 'inherit' | ''>(
+    agent?.frontmatter.model || ''
+  );
   const [tools, setTools] = useState(agent?.frontmatter.tools?.join(', ') || '');
   const [saving, setSaving] = useState(false);
   const [validationError, setValidationError] = useState('');
@@ -310,7 +335,10 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
     }
 
     if (tools.trim()) {
-      frontmatter.tools = tools.split(',').map(t => t.trim()).filter(Boolean);
+      frontmatter.tools = tools
+        .split(',')
+        .map(t => t.trim())
+        .filter(Boolean);
     }
 
     const agentData: Omit<Agent, 'lastModified'> = {
@@ -333,16 +361,16 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content agent-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content agent-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{isEditing ? 'Edit Subagent' : 'Create New Subagent'}</h2>
-          <button onClick={onClose} className="modal-close">×</button>
+          <button onClick={onClose} className="modal-close">
+            ×
+          </button>
         </div>
 
         <div className="modal-body">
-          {validationError && (
-            <div className="validation-error">{validationError}</div>
-          )}
+          {validationError && <div className="validation-error">{validationError}</div>}
 
           <div className="form-group">
             <label htmlFor="agent-name">
@@ -352,7 +380,7 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
               id="agent-name"
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
               placeholder="my-custom-agent"
               disabled={isEditing} // Can't change name when editing
               className="input-field"
@@ -367,7 +395,7 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
             <textarea
               id="agent-description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={e => setDescription(e.target.value)}
               placeholder="What does this agent do?"
               rows={3}
               className="input-field"
@@ -382,7 +410,7 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
               <select
                 id="agent-location"
                 value={location}
-                onChange={(e) => setLocation(e.target.value as 'user' | 'project')}
+                onChange={e => setLocation(e.target.value as 'user' | 'project')}
                 disabled={isEditing} // Can't change location when editing
                 className="input-field"
               >
@@ -396,7 +424,9 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
               <select
                 id="agent-model"
                 value={model}
-                onChange={(e) => setModel(e.target.value as 'sonnet' | 'opus' | 'haiku' | 'inherit' | '')}
+                onChange={e =>
+                  setModel(e.target.value as 'sonnet' | 'opus' | 'haiku' | 'inherit' | '')
+                }
                 className="input-field"
               >
                 <option value="">Default</option>
@@ -414,11 +444,13 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
               id="agent-tools"
               type="text"
               value={tools}
-              onChange={(e) => setTools(e.target.value)}
+              onChange={e => setTools(e.target.value)}
               placeholder="Read, Write, Bash (comma-separated)"
               className="input-field"
             />
-            <p className="field-help">Comma-separated tool names. Leave empty to allow all tools.</p>
+            <p className="field-help">
+              Comma-separated tool names. Leave empty to allow all tools.
+            </p>
           </div>
 
           <div className="form-group">
@@ -428,7 +460,7 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
             <textarea
               id="agent-content"
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={e => setContent(e.target.value)}
               placeholder="Enter the system prompt for this agent..."
               rows={12}
               className="input-field code-input"
@@ -459,7 +491,12 @@ interface AgentDetailModalProps {
   onDelete: (agent: Agent) => void;
 }
 
-const AgentDetailModal: React.FC<AgentDetailModalProps> = ({ agent, onClose, onEdit, onDelete }) => {
+const AgentDetailModal: React.FC<AgentDetailModalProps> = ({
+  agent,
+  onClose,
+  onEdit,
+  onDelete,
+}) => {
   const canEdit = agent.location !== 'plugin';
 
   // Handle Escape key to close modal
@@ -484,7 +521,7 @@ const AgentDetailModal: React.FC<AgentDetailModalProps> = ({ agent, onClose, onE
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content agent-detail-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content agent-detail-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <div>
             <h2>{agent.frontmatter.name}</h2>
@@ -492,7 +529,9 @@ const AgentDetailModal: React.FC<AgentDetailModalProps> = ({ agent, onClose, onE
               {agent.location.charAt(0).toUpperCase() + agent.location.slice(1)}
             </span>
           </div>
-          <button onClick={onClose} className="modal-close">×</button>
+          <button onClick={onClose} className="modal-close">
+            ×
+          </button>
         </div>
 
         <div className="modal-body">
@@ -513,7 +552,9 @@ const AgentDetailModal: React.FC<AgentDetailModalProps> = ({ agent, onClose, onE
               <h3>Tools</h3>
               <div className="tools-list">
                 {agent.frontmatter.tools.map((tool, idx) => (
-                  <span key={idx} className="tool-badge">{tool}</span>
+                  <span key={idx} className="tool-badge">
+                    {tool}
+                  </span>
                 ))}
               </div>
             </div>

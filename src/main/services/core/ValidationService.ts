@@ -67,7 +67,10 @@ export class ValidationService {
     }
 
     const valid = errors.length === 0;
-    console.log('[ValidationService] JSON validation result:', { valid, errorCount: errors.length });
+    console.log('[ValidationService] JSON validation result:', {
+      valid,
+      errorCount: errors.length,
+    });
 
     return {
       valid,
@@ -89,7 +92,7 @@ export class ValidationService {
     const errors: ValidationError[] = [];
     const data: Record<string, unknown> = {};
 
-    const lines = content.split('\n').filter((line) => line.trim());
+    const lines = content.split('\n').filter(line => line.trim());
 
     for (const line of lines) {
       if (!line.includes(':')) {
@@ -128,8 +131,11 @@ export class ValidationService {
       }
     }
 
-    const valid = errors.filter((e) => e.severity === 'error').length === 0;
-    console.log('[ValidationService] YAML validation result:', { valid, errorCount: errors.length });
+    const valid = errors.filter(e => e.severity === 'error').length === 0;
+    console.log('[ValidationService] YAML validation result:', {
+      valid,
+      errorCount: errors.length,
+    });
 
     return {
       valid,
@@ -202,7 +208,7 @@ export class ValidationService {
       }
     }
 
-    const valid = errors.filter((e) => e.severity === 'error').length === 0;
+    const valid = errors.filter(e => e.severity === 'error').length === 0;
     console.log('[ValidationService] Path validation result:', { valid });
 
     return {
@@ -370,7 +376,7 @@ export class ValidationService {
       });
     }
 
-    const valid = errors.filter((e) => e.severity === 'error').length === 0;
+    const valid = errors.filter(e => e.severity === 'error').length === 0;
 
     return {
       valid,

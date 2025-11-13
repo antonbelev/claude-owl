@@ -25,11 +25,7 @@ export function HooksPage() {
             View and manage Claude Code hooks with security validation
           </p>
         </div>
-        <button
-          className="refresh-button"
-          onClick={() => refetch()}
-          disabled={isRefetching}
-        >
+        <button className="refresh-button" onClick={() => refetch()} disabled={isRefetching}>
           <span className={`refresh-icon ${isRefetching ? 'spinning' : ''}`}>⟳</span>
           Refresh
         </button>
@@ -66,9 +62,7 @@ export function HooksPage() {
             >
               Configured Hooks
               {events && (
-                <span className="tab-badge">
-                  {events.reduce((sum, e) => sum + e.count, 0)}
-                </span>
+                <span className="tab-badge">{events.reduce((sum, e) => sum + e.count, 0)}</span>
               )}
             </button>
             <button
@@ -84,7 +78,14 @@ export function HooksPage() {
             <div className="tab-content">
               {events && events.length > 0 ? (
                 <>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: '1rem',
+                    }}
+                  >
                     <div>
                       <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Hook Events</h2>
                       <p style={{ fontSize: '0.875rem', color: '#666', marginTop: '0.25rem' }}>
@@ -92,7 +93,7 @@ export function HooksPage() {
                       </p>
                     </div>
                     <div style={{ fontSize: '0.875rem', color: '#666' }}>
-                      {events.filter((e) => e.count > 0).length} events with hooks
+                      {events.filter(e => e.count > 0).length} events with hooks
                     </div>
                   </div>
                   <HookEventList events={events} />
@@ -119,8 +120,8 @@ export function HooksPage() {
         <p className="footer-note-title">📝 Phase 1: Read-Only Mode</p>
         <p>
           This is Phase 1 implementation focused on viewing and validation. To modify hooks, use the
-          &quot;Edit in settings.json&quot; button to open the file in your external editor. Template-based
-          editing will be available in Phase 2.
+          &quot;Edit in settings.json&quot; button to open the file in your external editor.
+          Template-based editing will be available in Phase 2.
         </p>
       </div>
     </div>

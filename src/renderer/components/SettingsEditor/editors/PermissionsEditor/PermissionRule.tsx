@@ -30,14 +30,19 @@ const getLevelIcon = (level: PermissionLevel): string => {
   }
 };
 
-export const PermissionRuleItem: React.FC<PermissionRuleItemProps> = ({ rule, onEdit, onDelete, readOnly = false }) => {
+export const PermissionRuleItem: React.FC<PermissionRuleItemProps> = ({
+  rule,
+  onEdit,
+  onDelete,
+  readOnly = false,
+}) => {
   const levelColor = getLevelColor(rule.level);
 
   return (
     <div
       className="permission-rule-item"
       style={{
-        borderLeftColor: levelColor
+        borderLeftColor: levelColor,
       }}
     >
       <div className="rule-content">

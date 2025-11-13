@@ -51,7 +51,7 @@ export const RuleTemplatesModal: React.FC<RuleTemplatesModalProps> = ({ onApply,
 
   return (
     <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content modal-large" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Rule Templates</h2>
           <button onClick={onCancel} className="btn-close">
@@ -74,7 +74,7 @@ export const RuleTemplatesModal: React.FC<RuleTemplatesModalProps> = ({ onApply,
 
           {!loadingTemplates && !error && (
             <div className="templates-grid">
-              {templates.map((template) => (
+              {templates.map(template => (
                 <div key={template.id} className="template-card">
                   <div className="template-header">
                     <span className="template-icon">{template.icon}</span>
@@ -113,7 +113,10 @@ export const RuleTemplatesModal: React.FC<RuleTemplatesModalProps> = ({ onApply,
                     </ul>
                   </div>
 
-                  <button onClick={() => handleApplyTemplate(template.id)} className="btn-primary btn-block">
+                  <button
+                    onClick={() => handleApplyTemplate(template.id)}
+                    className="btn-primary btn-block"
+                  >
                     Apply Template
                   </button>
                 </div>

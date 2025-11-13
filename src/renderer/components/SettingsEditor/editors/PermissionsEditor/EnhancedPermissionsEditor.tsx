@@ -29,7 +29,7 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
     const allRules: PermissionRule[] = [];
 
     // Parse deny rules
-    (permissions.deny || []).forEach((ruleStr) => {
+    (permissions.deny || []).forEach(ruleStr => {
       const parts = ruleStr.match(/^(\w+)(?:\((.*)\))?$/);
       if (parts) {
         const rule: PermissionRule = {
@@ -46,7 +46,7 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
     });
 
     // Parse ask rules
-    (permissions.ask || []).forEach((ruleStr) => {
+    (permissions.ask || []).forEach(ruleStr => {
       const parts = ruleStr.match(/^(\w+)(?:\((.*)\))?$/);
       if (parts) {
         const rule: PermissionRule = {
@@ -63,7 +63,7 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
     });
 
     // Parse allow rules
-    (permissions.allow || []).forEach((ruleStr) => {
+    (permissions.allow || []).forEach(ruleStr => {
       const parts = ruleStr.match(/^(\w+)(?:\((.*)\))?$/);
       if (parts) {
         const rule: PermissionRule = {
@@ -88,7 +88,7 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
     const ask: string[] = [];
     const allow: string[] = [];
 
-    updatedRules.forEach((rule) => {
+    updatedRules.forEach(rule => {
       const ruleStr = rule.pattern ? `${rule.tool}(${rule.pattern})` : rule.tool;
 
       switch (rule.level) {
@@ -123,7 +123,7 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
   };
 
   const handleDeleteRule = (ruleId: string) => {
-    const updatedRules = rules.filter((r) => r.id !== ruleId);
+    const updatedRules = rules.filter(r => r.id !== ruleId);
     setRules(updatedRules);
     syncRulesToPermissions(updatedRules);
   };
@@ -133,7 +133,9 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
 
     if (editingRule) {
       // Update existing rule
-      updatedRules = rules.map((r) => (r.id === editingRule.id ? { ...ruleData, id: editingRule.id } : r));
+      updatedRules = rules.map(r =>
+        r.id === editingRule.id ? { ...ruleData, id: editingRule.id } : r
+      );
     } else {
       // Add new rule
       updatedRules = [...rules, { ...ruleData, id: uuidv4() }];
@@ -152,11 +154,10 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
     setShowTemplates(false);
   };
 
-
   // Group rules by level
-  const denyRules = rules.filter((r) => r.level === 'deny');
-  const askRules = rules.filter((r) => r.level === 'ask');
-  const allowRules = rules.filter((r) => r.level === 'allow');
+  const denyRules = rules.filter(r => r.level === 'deny');
+  const askRules = rules.filter(r => r.level === 'ask');
+  const allowRules = rules.filter(r => r.level === 'allow');
 
   return (
     <div className="enhanced-permissions-editor">
@@ -164,8 +165,8 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
         <div className="editor-intro">
           <h3>Permission Rules</h3>
           <p>
-            Control which tools Claude can use. Rules use patterns like <code>Bash(npm run test)</code> or{' '}
-            <code>Read(./secrets/**)</code>.
+            Control which tools Claude can use. Rules use patterns like{' '}
+            <code>Bash(npm run test)</code> or <code>Read(./secrets/**)</code>.
           </p>
         </div>
 
@@ -195,7 +196,7 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
         </div>
         <div className="rules-list">
           {denyRules.length === 0 && <p className="empty-rules">No deny rules configured</p>}
-          {denyRules.map((rule) => (
+          {denyRules.map(rule => (
             <PermissionRuleItem
               key={rule.id}
               rule={rule}
@@ -215,7 +216,7 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
         </div>
         <div className="rules-list">
           {askRules.length === 0 && <p className="empty-rules">No ask rules configured</p>}
-          {askRules.map((rule) => (
+          {askRules.map(rule => (
             <PermissionRuleItem
               key={rule.id}
               rule={rule}
@@ -235,7 +236,7 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
         </div>
         <div className="rules-list">
           {allowRules.length === 0 && <p className="empty-rules">No allow rules configured</p>}
-          {allowRules.map((rule) => (
+          {allowRules.map(rule => (
             <PermissionRuleItem
               key={rule.id}
               rule={rule}
@@ -257,10 +258,10 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
           <textarea
             id="additionalDirectories"
             value={(permissions.additionalDirectories || []).join('\n')}
-            onChange={(e) =>
+            onChange={e =>
               updatePermissions({
                 ...permissions,
-                additionalDirectories: e.target.value.split('\n').filter((d) => d.trim()),
+                additionalDirectories: e.target.value.split('\n').filter(d => d.trim()),
               })
             }
             placeholder="/path/to/directory&#10;/another/path"
@@ -275,7 +276,7 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
             id="defaultMode"
             type="text"
             value={permissions.defaultMode || ''}
-            onChange={(e) =>
+            onChange={e =>
               updatePermissions({
                 ...permissions,
                 defaultMode: e.target.value,
@@ -284,7 +285,9 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
             placeholder="e.g., acceptEdits"
             disabled={readOnly}
           />
-          <p className="form-help">Initial permission mode (e.g., &quot;acceptEdits&quot;, &quot;bypassPermissions&quot;)</p>
+          <p className="form-help">
+            Initial permission mode (e.g., &quot;acceptEdits&quot;, &quot;bypassPermissions&quot;)
+          </p>
         </div>
 
         <div className="form-group">
@@ -292,7 +295,7 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
             <input
               type="checkbox"
               checked={permissions.disableBypassPermissionsMode || false}
-              onChange={(e) =>
+              onChange={e =>
                 updatePermissions({
                   ...permissions,
                   disableBypassPermissionsMode: e.target.checked,
@@ -315,7 +318,12 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
         />
       )}
 
-      {showTemplates && <RuleTemplatesModal onApply={handleApplyTemplate} onCancel={() => setShowTemplates(false)} />}
+      {showTemplates && (
+        <RuleTemplatesModal
+          onApply={handleApplyTemplate}
+          onCancel={() => setShowTemplates(false)}
+        />
+      )}
     </div>
   );
 };

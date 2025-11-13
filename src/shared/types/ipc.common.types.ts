@@ -40,6 +40,14 @@ export const IPC_CHANNELS = {
   SAVE_COMMAND: 'commands:save',
   DELETE_COMMAND: 'commands:delete',
 
+  // GitHub Import (refactored with lazy loading)
+  GITHUB_BROWSE_URL: 'github:browse-url', // Initial browse from URL
+  GITHUB_NAVIGATE_FOLDER: 'github:navigate-folder', // Navigate to specific folder
+  FETCH_GITHUB_FILES: 'github:fetch-files',
+  SCAN_COMMAND_SECURITY: 'github:scan-security',
+  AUTO_FIX_COMMAND: 'github:auto-fix',
+  IMPORT_GITHUB_COMMANDS: 'github:import-commands',
+
   // Claude CLI
   EXECUTE_CLI: 'cli:execute',
   STOP_CLI: 'cli:stop',

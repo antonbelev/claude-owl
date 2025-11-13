@@ -4,12 +4,14 @@ import fs from 'fs';
 import { registerSystemHandlers } from './ipc/systemHandlers';
 import { registerSkillsHandlers } from './ipc/skillsHandlers';
 import { registerAgentsHandlers } from './ipc/agentsHandlers';
+import { registerCommandsHandlers } from './ipc/commandsHandlers';
 import { registerSettingsHandlers } from './ipc/settingsHandlers';
 import { registerCCUsageHandlers } from './ipc/ccusageHandlers';
 import { registerPluginsHandlers } from './ipc/pluginsHandlers';
 import { registerHooksHandlers } from './ipc/hooksHandlers';
 import { registerStatusHandlers } from './ipc/statusHandlers';
 import { registerDebugLogsHandlers } from './ipc/debugLogsHandlers';
+import { registerGitHubImportHandlers } from './ipc/githubImportHandlers';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -105,7 +107,10 @@ app.whenReady().then(() => {
       try {
         app.dock.setIcon(iconPath);
       } catch (error) {
-        console.warn('Failed to set dock icon:', error instanceof Error ? error.message : String(error));
+        console.warn(
+          'Failed to set dock icon:',
+          error instanceof Error ? error.message : String(error)
+        );
       }
     }
   }
@@ -114,12 +119,14 @@ app.whenReady().then(() => {
   registerSystemHandlers();
   registerSkillsHandlers();
   registerAgentsHandlers();
+  registerCommandsHandlers();
   registerSettingsHandlers();
   registerCCUsageHandlers();
   registerPluginsHandlers();
   registerHooksHandlers();
   registerStatusHandlers();
   registerDebugLogsHandlers();
+  registerGitHubImportHandlers();
 
   createWindow();
 

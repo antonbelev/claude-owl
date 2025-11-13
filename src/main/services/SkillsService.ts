@@ -91,7 +91,7 @@ export class SkillsService {
       try {
         frontmatter['allowed-tools'] = JSON.parse(value);
       } catch {
-        frontmatter['allowed-tools'] = value.split(',').map((s) => s.trim());
+        frontmatter['allowed-tools'] = value.split(',').map(s => s.trim());
       }
     } else {
       (frontmatter as Record<string, string>)[key] = value;
@@ -144,7 +144,7 @@ export class SkillsService {
           // List supporting files (all files except SKILL.md)
           const skillDirPath = path.join(skillsPath, entry.name);
           const allFiles = await fs.readdir(skillDirPath);
-          const supportingFiles = allFiles.filter((f) => f !== 'SKILL.md');
+          const supportingFiles = allFiles.filter(f => f !== 'SKILL.md');
 
           const skillData: Skill = {
             frontmatter: parsed.frontmatter,
@@ -196,7 +196,7 @@ export class SkillsService {
       // List supporting files
       const skillDirPath = path.join(skillsPath, name);
       const allFiles = await fs.readdir(skillDirPath);
-      const supportingFiles = allFiles.filter((f) => f !== 'SKILL.md');
+      const supportingFiles = allFiles.filter(f => f !== 'SKILL.md');
 
       const skillData: Skill = {
         frontmatter: parsed.frontmatter,
@@ -212,7 +212,9 @@ export class SkillsService {
 
       return skillData;
     } catch (error) {
-      throw new Error(`Failed to read skill "${name}": ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to read skill "${name}": ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -276,14 +278,19 @@ export class SkillsService {
       // Remove the entire skill directory
       await fs.rm(skillDirPath, { recursive: true, force: true });
     } catch (error) {
-      throw new Error(`Failed to delete skill "${name}": ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to delete skill "${name}": ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
   /**
    * Validate a skill's frontmatter and content
    */
-  validateSkill(frontmatter: SkillFrontmatter, content: string): { valid: boolean; errors: string[] } {
+  validateSkill(
+    frontmatter: SkillFrontmatter,
+    content: string
+  ): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
 
     // Validate name
@@ -306,7 +313,7 @@ export class SkillsService {
     if (frontmatter['allowed-tools']) {
       if (!Array.isArray(frontmatter['allowed-tools'])) {
         errors.push('allowed-tools must be an array');
-      } else if (frontmatter['allowed-tools'].some((tool) => typeof tool !== 'string')) {
+      } else if (frontmatter['allowed-tools'].some(tool => typeof tool !== 'string')) {
         errors.push('allowed-tools must contain only strings');
       }
     }

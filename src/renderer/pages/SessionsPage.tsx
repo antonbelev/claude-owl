@@ -14,7 +14,10 @@ export const SessionsPage: React.FC = () => {
 
     try {
       // Check if ccusage is installed
-      const installCheck = await window.electronAPI.checkCCUsageInstalled() as { success: boolean; installed: boolean };
+      const installCheck = (await window.electronAPI.checkCCUsageInstalled()) as {
+        success: boolean;
+        installed: boolean;
+      };
 
       if (!installCheck.success || !installCheck.installed) {
         setInstalled(false);
@@ -25,14 +28,21 @@ export const SessionsPage: React.FC = () => {
       setInstalled(true);
 
       // Get version
-      const versionResp = await window.electronAPI.getCCUsageVersion() as { success: boolean; version: string | null };
+      const versionResp = (await window.electronAPI.getCCUsageVersion()) as {
+        success: boolean;
+        version: string | null;
+      };
       if (versionResp.success && versionResp.version) {
         setVersion(versionResp.version);
       }
 
       // Get raw output
       if (window.electronAPI.getCCUsageRawOutput) {
-        const outputResp = await window.electronAPI.getCCUsageRawOutput() as { success: boolean; data?: string; error?: string };
+        const outputResp = (await window.electronAPI.getCCUsageRawOutput()) as {
+          success: boolean;
+          data?: string;
+          error?: string;
+        };
         if (outputResp.success && outputResp.data) {
           setRawOutput(outputResp.data);
         } else {
@@ -77,8 +87,8 @@ export const SessionsPage: React.FC = () => {
           <div className="not-installed-icon">📊</div>
           <h2>ccusage Not Installed</h2>
           <p>
-            To view your token usage and costs, you need to install <code>ccusage</code>, a CLI tool that
-            analyzes your Claude Code usage.
+            To view your token usage and costs, you need to install <code>ccusage</code>, a CLI tool
+            that analyzes your Claude Code usage.
           </p>
 
           <div className="installation-steps">
@@ -99,7 +109,7 @@ export const SessionsPage: React.FC = () => {
           <div className="installation-links">
             <a
               href="https://github.com/ryoppippi/ccusage"
-              onClick={(e) => {
+              onClick={e => {
                 e.preventDefault();
                 window.electronAPI?.openExternal('https://github.com/ryoppippi/ccusage');
               }}

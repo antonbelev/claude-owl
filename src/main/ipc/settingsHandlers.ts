@@ -400,5 +400,4 @@ export function registerSettingsHandlers() {
       }
     }
   );
-
 }

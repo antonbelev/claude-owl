@@ -61,7 +61,7 @@ export function registerHooksHandlers(): void {
           error: error instanceof Error ? error.message : 'Failed to get hooks',
         };
       }
-    },
+    }
   );
 
   /**
@@ -103,7 +103,7 @@ export function registerHooksHandlers(): void {
         const path = hooksService.getSettingsPath(request.location, request.projectPath);
         const exists = await hooksService.checkSettingsExists(
           request.location,
-          request.projectPath,
+          request.projectPath
         );
 
         console.log('[HooksHandlers] Settings path retrieved:', { path, exists });
@@ -120,7 +120,7 @@ export function registerHooksHandlers(): void {
           error: error instanceof Error ? error.message : 'Failed to get settings path',
         };
       }
-    },
+    }
   );
 
   /**
@@ -150,7 +150,7 @@ export function registerHooksHandlers(): void {
           error: error instanceof Error ? error.message : 'Failed to open settings file',
         };
       }
-    },
+    }
   );
 
   console.log('[HooksHandlers] Hooks IPC handlers registered successfully');

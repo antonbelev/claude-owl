@@ -16,9 +16,11 @@ export const AboutPage: React.FC = () => {
     localStorage.setItem('showUnderDevelopment', JSON.stringify(newValue));
 
     // Dispatch custom event to notify other components in the same window
-    window.dispatchEvent(new CustomEvent('showUnderDevelopmentChanged', {
-      detail: { showUnderDevelopment: newValue }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('showUnderDevelopmentChanged', {
+        detail: { showUnderDevelopment: newValue },
+      })
+    );
   };
 
   const openGitHub = (url: string) => {
@@ -39,11 +41,7 @@ export const AboutPage: React.FC = () => {
         {/* Logo and Version */}
         <div className="about-header">
           <div className="about-logo-section">
-            <img
-              src={logoImage}
-              alt="Claude Owl Logo"
-              className="about-logo"
-            />
+            <img src={logoImage} alt="Claude Owl Logo" className="about-logo" />
           </div>
           <div className="about-version-section">
             <h2>Claude Owl [Beta]</h2>
@@ -60,9 +58,7 @@ export const AboutPage: React.FC = () => {
           <div className="links-grid">
             <a
               className="about-link"
-              onClick={() =>
-                openGitHub('https://github.com/antonbelev/claude-owl')
-              }
+              onClick={() => openGitHub('https://github.com/antonbelev/claude-owl')}
             >
               <span className="link-icon">🔗</span>
               <span>View on GitHub</span>
@@ -157,10 +153,18 @@ export const AboutPage: React.FC = () => {
             The following features are currently under development and may not be fully functional:
           </p>
           <ul className="development-list">
-            <li><strong>Plugins</strong> - Plugin management system</li>
-            <li><strong>Commands</strong> - Custom slash commands editor</li>
-            <li><strong>MCP Servers</strong> - Model Context Protocol server configuration</li>
-            <li><strong>Test Runner</strong> - Built-in test execution interface</li>
+            <li>
+              <strong>Plugins</strong> - Plugin management system
+            </li>
+            <li>
+              <strong>Commands</strong> - Custom slash commands editor
+            </li>
+            <li>
+              <strong>MCP Servers</strong> - Model Context Protocol server configuration
+            </li>
+            <li>
+              <strong>Test Runner</strong> - Built-in test execution interface
+            </li>
           </ul>
         </div>
 

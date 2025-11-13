@@ -20,7 +20,7 @@ const allNavItems: NavItem[] = [
   { path: '/agents', label: 'Subagents', icon: '🤖' },
   { path: '/skills', label: 'Skills', icon: '⚡' },
   { path: '/plugins', label: 'Plugins', icon: '🔌', underDevelopment: true },
-  { path: '/commands', label: 'Commands', icon: '⌘', underDevelopment: true },
+  { path: '/commands', label: 'Slash Commands', icon: '⌘' },
   { path: '/hooks', label: 'Hooks', icon: '🪝' },
   { path: '/mcp', label: 'MCP Servers', icon: '🔗', underDevelopment: true },
   { path: '/sessions', label: 'Sessions', icon: '📝' },
@@ -46,9 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
     return () => window.removeEventListener('showUnderDevelopmentChanged', handleDevelopmentToggle);
   }, []);
 
-  const navItems = allNavItems.filter(
-    (item) => !item.underDevelopment || showUnderDevelopment
-  );
+  const navItems = allNavItems.filter(item => !item.underDevelopment || showUnderDevelopment);
   return (
     <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       {/* Header with logo */}
@@ -59,13 +57,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
 
       {/* Navigation items */}
       <nav className="sidebar-nav">
-        {navItems.map((item) => (
+        {navItems.map(item => (
           <NavLink
             key={item.path}
             to={item.path}
-            className={({ isActive }) =>
-              `sidebar-nav-item ${isActive ? 'active' : ''}`
-            }
+            className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}
             title={isCollapsed ? item.label : undefined}
           >
             <span className="nav-icon">{item.icon}</span>

@@ -7,7 +7,11 @@ interface PermissionsEditorProps {
   readOnly?: boolean;
 }
 
-export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({ permissions, updatePermissions, readOnly = false }) => {
+export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({
+  permissions,
+  updatePermissions,
+  readOnly = false,
+}) => {
   const [newAllowRule, setNewAllowRule] = useState('');
   const [newDenyRule, setNewDenyRule] = useState('');
   const [newAskRule, setNewAskRule] = useState('');
@@ -60,8 +64,8 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({ permission
     <div className="permissions-editor">
       <div className="editor-intro">
         <p>
-          Permissions control which tools Claude can use. Rules use patterns like <code>Read(./secrets/**)</code> or{' '}
-          <code>Bash(curl:*)</code>.
+          Permissions control which tools Claude can use. Rules use patterns like{' '}
+          <code>Read(./secrets/**)</code> or <code>Bash(curl:*)</code>.
         </p>
       </div>
 
@@ -75,7 +79,11 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({ permission
             <div key={index} className="rule-item">
               <code>{rule}</code>
               {!readOnly && (
-                <button onClick={() => removeRule('allow', index)} className="btn-remove" title="Remove rule">
+                <button
+                  onClick={() => removeRule('allow', index)}
+                  className="btn-remove"
+                  title="Remove rule"
+                >
                   ×
                 </button>
               )}
@@ -88,13 +96,13 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({ permission
             <input
               type="text"
               value={newAllowRule}
-              onChange={(e) => setNewAllowRule(e.target.value)}
-              onKeyPress={(e) => {
+              onChange={e => setNewAllowRule(e.target.value)}
+              onKeyPress={e => {
                 if (e.key === 'Enter') {
                   addRule('allow', newAllowRule);
                 }
               }}
-              placeholder='e.g., Read(./src/**), Bash(git:*)'
+              placeholder="e.g., Read(./src/**), Bash(git:*)"
             />
             <button onClick={() => addRule('allow', newAllowRule)} className="btn-add">
               Add Allow Rule
@@ -113,7 +121,11 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({ permission
             <div key={index} className="rule-item">
               <code>{rule}</code>
               {!readOnly && (
-                <button onClick={() => removeRule('deny', index)} className="btn-remove" title="Remove rule">
+                <button
+                  onClick={() => removeRule('deny', index)}
+                  className="btn-remove"
+                  title="Remove rule"
+                >
                   ×
                 </button>
               )}
@@ -126,13 +138,13 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({ permission
             <input
               type="text"
               value={newDenyRule}
-              onChange={(e) => setNewDenyRule(e.target.value)}
-              onKeyPress={(e) => {
+              onChange={e => setNewDenyRule(e.target.value)}
+              onKeyPress={e => {
                 if (e.key === 'Enter') {
                   addRule('deny', newDenyRule);
                 }
               }}
-              placeholder='e.g., Read(./.env), Bash(curl:*)'
+              placeholder="e.g., Read(./.env), Bash(curl:*)"
             />
             <button onClick={() => addRule('deny', newDenyRule)} className="btn-add">
               Add Deny Rule
@@ -144,14 +156,20 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({ permission
       {/* Ask Rules */}
       <div className="editor-section">
         <h3>Ask Rules</h3>
-        <p className="section-help">Tools and commands that require confirmation before execution</p>
+        <p className="section-help">
+          Tools and commands that require confirmation before execution
+        </p>
 
         <div className="rules-list">
           {(permissions.ask || []).map((rule, index) => (
             <div key={index} className="rule-item">
               <code>{rule}</code>
               {!readOnly && (
-                <button onClick={() => removeRule('ask', index)} className="btn-remove" title="Remove rule">
+                <button
+                  onClick={() => removeRule('ask', index)}
+                  className="btn-remove"
+                  title="Remove rule"
+                >
                   ×
                 </button>
               )}
@@ -164,13 +182,13 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({ permission
             <input
               type="text"
               value={newAskRule}
-              onChange={(e) => setNewAskRule(e.target.value)}
-              onKeyPress={(e) => {
+              onChange={e => setNewAskRule(e.target.value)}
+              onKeyPress={e => {
                 if (e.key === 'Enter') {
                   addRule('ask', newAskRule);
                 }
               }}
-              placeholder='e.g., Write(**), Bash(rm:*)'
+              placeholder="e.g., Write(**), Bash(rm:*)"
             />
             <button onClick={() => addRule('ask', newAskRule)} className="btn-add">
               Add Ask Rule
@@ -189,7 +207,11 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({ permission
             <div key={index} className="rule-item">
               <code>{dir}</code>
               {!readOnly && (
-                <button onClick={() => removeDirectory(index)} className="btn-remove" title="Remove directory">
+                <button
+                  onClick={() => removeDirectory(index)}
+                  className="btn-remove"
+                  title="Remove directory"
+                >
                   ×
                 </button>
               )}
@@ -202,13 +224,13 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({ permission
             <input
               type="text"
               value={newDirectory}
-              onChange={(e) => setNewDirectory(e.target.value)}
-              onKeyPress={(e) => {
+              onChange={e => setNewDirectory(e.target.value)}
+              onKeyPress={e => {
                 if (e.key === 'Enter') {
                   addDirectory(newDirectory);
                 }
               }}
-              placeholder='/path/to/directory'
+              placeholder="/path/to/directory"
             />
             <button onClick={() => addDirectory(newDirectory)} className="btn-add">
               Add Directory
@@ -226,13 +248,13 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({ permission
             id="defaultMode"
             type="text"
             value={permissions.defaultMode || ''}
-            onChange={(e) =>
+            onChange={e =>
               updatePermissions({
                 ...permissions,
                 defaultMode: e.target.value,
               })
             }
-            placeholder='e.g., acceptEdits'
+            placeholder="e.g., acceptEdits"
             disabled={readOnly}
           />
           <p className="form-help">Initial permission mode (e.g., &quot;acceptEdits&quot;)</p>
@@ -243,7 +265,7 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({ permission
             <input
               type="checkbox"
               checked={permissions.disableBypassPermissionsMode || false}
-              onChange={(e) =>
+              onChange={e =>
                 updatePermissions({
                   ...permissions,
                   disableBypassPermissionsMode: e.target.checked,

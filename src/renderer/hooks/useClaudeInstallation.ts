@@ -34,7 +34,8 @@ export function useClaudeInstallation() {
     }
 
     try {
-      const response = await window.electronAPI.checkClaudeInstalled() as CheckClaudeInstalledResponse;
+      const response =
+        (await window.electronAPI.checkClaudeInstalled()) as CheckClaudeInstalledResponse;
 
       if (response.success) {
         setStatus({

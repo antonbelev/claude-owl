@@ -52,7 +52,7 @@ export function HookEventList({ events, className }: HookEventListProps) {
   return (
     <div className={className}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-        {events.map((eventSummary) => {
+        {events.map(eventSummary => {
           const isExpanded = expandedEvents.has(eventSummary.event);
           const hasHooks = eventSummary.count > 0;
 
@@ -65,16 +65,10 @@ export function HookEventList({ events, className }: HookEventListProps) {
                 <div className="hook-event-card">
                   <div className="hook-event-info">
                     <div className="hook-event-name">
-                      <h3>
-                        {eventSummary.info.name}
-                      </h3>
-                      <span className={`expand-icon ${isExpanded ? 'expanded' : ''}`}>
-                        ➤
-                      </span>
+                      <h3>{eventSummary.info.name}</h3>
+                      <span className={`expand-icon ${isExpanded ? 'expanded' : ''}`}>➤</span>
                     </div>
-                    <p className="card-description">
-                      {eventSummary.info.description}
-                    </p>
+                    <p className="card-description">{eventSummary.info.description}</p>
                   </div>
 
                   <div className="hook-event-badges">
@@ -84,7 +78,9 @@ export function HookEventList({ events, className }: HookEventListProps) {
                       </span>
                     )}
                     <span className={`badge ${hasHooks ? 'badge-default' : 'badge-secondary'}`}>
-                      {hasHooks ? `${eventSummary.count} hook${eventSummary.count > 1 ? 's' : ''}` : 'No hooks'}
+                      {hasHooks
+                        ? `${eventSummary.count} hook${eventSummary.count > 1 ? 's' : ''}`
+                        : 'No hooks'}
                     </span>
                   </div>
                 </div>
@@ -94,9 +90,7 @@ export function HookEventList({ events, className }: HookEventListProps) {
                     Triggers: {eventSummary.info.whenTriggers}
                   </span>
                   {eventSummary.info.supportsPromptHooks && (
-                    <span className="badge badge-outline">
-                      Supports prompt hooks
-                    </span>
+                    <span className="badge badge-outline">Supports prompt hooks</span>
                   )}
                 </div>
               </button>
@@ -107,7 +101,9 @@ export function HookEventList({ events, className }: HookEventListProps) {
                   <div className="hook-event-meta">
                     <p>
                       <span style={{ fontWeight: 500 }}>Matcher required:</span>{' '}
-                      {eventSummary.info.requiresMatcher ? 'Yes (specify tools)' : 'No (applies to all)'}
+                      {eventSummary.info.requiresMatcher
+                        ? 'Yes (specify tools)'
+                        : 'No (applies to all)'}
                     </p>
                     <p>
                       <span style={{ fontWeight: 500 }}>Available context:</span>{' '}
@@ -118,9 +114,7 @@ export function HookEventList({ events, className }: HookEventListProps) {
                   {/* Hooks List */}
                   {hasHooks ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      <h4 className="card-description">
-                        Configured Hooks ({eventSummary.count})
-                      </h4>
+                      <h4 className="card-description">Configured Hooks ({eventSummary.count})</h4>
                       {eventSummary.hooks.map((hook, index) => (
                         <HookDetailsViewer key={index} hook={hook} />
                       ))}

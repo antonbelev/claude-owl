@@ -60,7 +60,7 @@ export function HookTemplateGallery() {
   if (isLoading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {[1, 2, 3].map((i) => (
+        {[1, 2, 3].map(i => (
           <div key={i} className="skeleton" style={{ height: '100px' }} />
         ))}
       </div>
@@ -70,9 +70,7 @@ export function HookTemplateGallery() {
   if (isError || !templates) {
     return (
       <div className="error-card">
-        <p className="error-message">
-          Failed to load templates
-        </p>
+        <p className="error-message">Failed to load templates</p>
       </div>
     );
   }
@@ -86,13 +84,11 @@ export function HookTemplateGallery() {
             Pre-built, security-reviewed hooks for common use cases
           </p>
         </div>
-        <span className="badge badge-outline">
-          {templates.length} templates
-        </span>
+        <span className="badge badge-outline">{templates.length} templates</span>
       </div>
 
       <div className="template-grid">
-        {templates.map((template) => {
+        {templates.map(template => {
           const categoryIcon = CATEGORY_ICONS[template.category] || '📦';
           const categoryColor = CATEGORY_COLORS[template.category] || 'badge-secondary';
           const isExpanded = expandedIds.has(template.id);
@@ -102,9 +98,18 @@ export function HookTemplateGallery() {
               <div className="card-header">
                 <div className="template-card-header">
                   <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        marginBottom: '0.5rem',
+                      }}
+                    >
                       <h3 className="card-title">{template.name}</h3>
-                      <span className={`badge ${template.securityLevel === 'green' ? 'badge-green' : 'badge-yellow'}`}>
+                      <span
+                        className={`badge ${template.securityLevel === 'green' ? 'badge-green' : 'badge-yellow'}`}
+                      >
                         {template.securityLevel === 'green' ? '✓ Safe' : '⚠ Review'}
                       </span>
                     </div>
@@ -116,9 +121,7 @@ export function HookTemplateGallery() {
                 </div>
 
                 <div className="hook-event-badges">
-                  <span className="badge badge-outline">
-                    {template.event}
-                  </span>
+                  <span className="badge badge-outline">{template.event}</span>
                   <span className="badge badge-outline" style={{ textTransform: 'capitalize' }}>
                     {template.category}
                   </span>
@@ -133,11 +136,18 @@ export function HookTemplateGallery() {
                     style={{ marginBottom: '0.5rem' }}
                     onClick={() => toggleExpand(template.id)}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                      <span className="card-description" style={{ fontWeight: 500 }}>Configuration</span>
-                      <span className={`expand-icon ${isExpanded ? 'expanded' : ''}`}>
-                        ➤
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                      }}
+                    >
+                      <span className="card-description" style={{ fontWeight: 500 }}>
+                        Configuration
                       </span>
+                      <span className={`expand-icon ${isExpanded ? 'expanded' : ''}`}>➤</span>
                     </div>
                   </button>
 
@@ -152,7 +162,12 @@ export function HookTemplateGallery() {
                 {template.scriptPath && (
                   <div className="card-description">
                     <span style={{ fontWeight: 500 }}>Script path:</span>{' '}
-                    <code className="code-block" style={{ display: 'inline', padding: '0.125rem 0.25rem' }}>{template.scriptPath}</code>
+                    <code
+                      className="code-block"
+                      style={{ display: 'inline', padding: '0.125rem 0.25rem' }}
+                    >
+                      {template.scriptPath}
+                    </code>
                   </div>
                 )}
 

@@ -9,10 +9,18 @@ interface SettingsHierarchyTabProps {
   level: ConfigLevel;
 }
 
-type EditorSection = 'core' | 'permissions' | 'environment' | 'sandbox' | 'hooks' | 'plugins' | 'raw';
+type EditorSection =
+  | 'core'
+  | 'permissions'
+  | 'environment'
+  | 'sandbox'
+  | 'hooks'
+  | 'plugins'
+  | 'raw';
 
 export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ level }) => {
-  const { settings, loading, error, hasChanges, updateSettings, save, discard, validate } = useLevelSettings(level);
+  const { settings, loading, error, hasChanges, updateSettings, save, discard, validate } =
+    useLevelSettings(level);
   const [activeSection, setActiveSection] = useState<EditorSection>('core');
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -88,11 +96,13 @@ export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ leve
           <div className="empty-icon">🔒</div>
           <h3>No Managed Settings</h3>
           <p>
-            Your organization hasn&apos;t configured any managed policies. Managed settings are typically set by IT
-            departments in enterprise environments to enforce security and compliance rules.
+            Your organization hasn&apos;t configured any managed policies. Managed settings are
+            typically set by IT departments in enterprise environments to enforce security and
+            compliance rules.
           </p>
           <p className="empty-hint">
-            If you&apos;re part of an organization and expect to see managed settings here, contact your IT administrator.
+            If you&apos;re part of an organization and expect to see managed settings here, contact
+            your IT administrator.
           </p>
         </div>
       </div>
@@ -102,12 +112,18 @@ export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ leve
   const renderSectionContent = () => {
     switch (activeSection) {
       case 'core':
-        return <CoreConfigEditor settings={settings} updateSettings={updateSettings} readOnly={isReadOnly} />;
+        return (
+          <CoreConfigEditor
+            settings={settings}
+            updateSettings={updateSettings}
+            readOnly={isReadOnly}
+          />
+        );
       case 'permissions':
         return (
           <EnhancedPermissionsEditor
             permissions={settings.permissions || {}}
-            updatePermissions={(permissions) => updateSettings({ permissions })}
+            updatePermissions={permissions => updateSettings({ permissions })}
             readOnly={isReadOnly}
           />
         );
@@ -115,7 +131,7 @@ export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ leve
         return (
           <EnvironmentEditor
             env={settings.env || {}}
-            updateEnv={(env) => updateSettings({ env })}
+            updateEnv={env => updateSettings({ env })}
             readOnly={isReadOnly}
           />
         );
@@ -141,7 +157,7 @@ export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ leve
             </div>
             <textarea
               value={rawJsonText}
-              onChange={(e) => {
+              onChange={e => {
                 const newValue = e.target.value;
                 setRawJsonText(newValue);
 

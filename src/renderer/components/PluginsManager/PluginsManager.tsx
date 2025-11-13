@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { usePlugins } from '../../hooks/usePlugins';
 import type { MarketplacePlugin, InstalledPlugin, Marketplace } from '@/shared/types';
+import { ConfirmDialog } from '../common/ConfirmDialog';
 import './PluginsManager.css';
 
 type TabView = 'browse' | 'installed' | 'marketplaces';
@@ -30,7 +31,10 @@ export const PluginsManager: React.FC = () => {
   const [filterHasAgents, setFilterHasAgents] = useState(false);
   const [filterHasSkills, setFilterHasSkills] = useState(false);
   const [showAddMarketplaceModal, setShowAddMarketplaceModal] = useState(false);
-  const [selectedPlugin, setSelectedPlugin] = useState<MarketplacePlugin | InstalledPlugin | null>(null);
+  const [selectedPlugin, setSelectedPlugin] = useState<MarketplacePlugin | InstalledPlugin | null>(
+    null
+  );
+  const [uninstallConfirm, setUninstallConfirm] = useState<InstalledPlugin | null>(null);
 
   // Get unique categories
   const categories = useMemo(() => {
@@ -49,10 +53,11 @@ export const PluginsManager: React.FC = () => {
     // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      plugins = plugins.filter(p =>
-        p.name.toLowerCase().includes(query) ||
-        p.description?.toLowerCase().includes(query) ||
-        p.keywords?.some((k: string) => k.toLowerCase().includes(query))
+      plugins = plugins.filter(
+        p =>
+          p.name.toLowerCase().includes(query) ||
+          p.description?.toLowerCase().includes(query) ||
+          p.keywords?.some((k: string) => k.toLowerCase().includes(query))
       );
     }
 
@@ -69,17 +74,17 @@ export const PluginsManager: React.FC = () => {
     // Component filters
     if (filterHasCommands) {
       plugins = plugins.filter(p =>
-        'componentCounts' in p ? p.componentCounts?.commands ?? 0 > 0 : false
+        'componentCounts' in p ? (p.componentCounts?.commands ?? 0 > 0) : false
       );
     }
     if (filterHasAgents) {
       plugins = plugins.filter(p =>
-        'componentCounts' in p ? p.componentCounts?.agents ?? 0 > 0 : false
+        'componentCounts' in p ? (p.componentCounts?.agents ?? 0 > 0) : false
       );
     }
     if (filterHasSkills) {
       plugins = plugins.filter(p =>
-        'componentCounts' in p ? p.componentCounts?.skills ?? 0 > 0 : false
+        'componentCounts' in p ? (p.componentCounts?.skills ?? 0 > 0) : false
       );
     }
 
@@ -103,14 +108,18 @@ export const PluginsManager: React.FC = () => {
     }
   };
 
-  const handleUninstallPlugin = async (plugin: InstalledPlugin) => {
-    if (!confirm(`Are you sure you want to uninstall "${plugin.name}"?`)) {
-      return;
-    }
-    const success = await uninstallPlugin(plugin.id);
+  const handleUninstallPlugin = (plugin: InstalledPlugin) => {
+    setUninstallConfirm(plugin);
+  };
+
+  const handleConfirmUninstall = async () => {
+    if (!uninstallConfirm) return;
+
+    const success = await uninstallPlugin(uninstallConfirm.id);
     if (success) {
       setSelectedPlugin(null);
     }
+    setUninstallConfirm(null);
   };
 
   const handleTogglePlugin = async (plugin: InstalledPlugin, enabled: boolean) => {
@@ -160,9 +169,7 @@ export const PluginsManager: React.FC = () => {
       <div className="plugins-header">
         <div>
           <h1>Plugins</h1>
-          <p className="header-description">
-            Browse and manage plugins from marketplaces
-          </p>
+          <p className="header-description">Browse and manage plugins from marketplaces</p>
         </div>
         {activeTab === 'marketplaces' && (
           <button onClick={() => setShowAddMarketplaceModal(true)} className="btn-create">
@@ -204,11 +211,15 @@ export const PluginsManager: React.FC = () => {
               type="text"
               placeholder="Search plugins by name, description, or keywords..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               className="search-input"
             />
             {searchQuery && (
-              <button onClick={() => setSearchQuery('')} className="search-clear" title="Clear search">
+              <button
+                onClick={() => setSearchQuery('')}
+                className="search-clear"
+                title="Clear search"
+              >
                 ✕
               </button>
             )}
@@ -217,23 +228,27 @@ export const PluginsManager: React.FC = () => {
           <div className="filters">
             <select
               value={selectedMarketplace}
-              onChange={(e) => setSelectedMarketplace(e.target.value)}
+              onChange={e => setSelectedMarketplace(e.target.value)}
               className="filter-select"
             >
               <option value="all">All Marketplaces</option>
               {marketplaces.map(m => (
-                <option key={m.name} value={m.name}>{m.name}</option>
+                <option key={m.name} value={m.name}>
+                  {m.name}
+                </option>
               ))}
             </select>
 
             <select
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              onChange={e => setSelectedCategory(e.target.value)}
               className="filter-select"
             >
               <option value="all">All Categories</option>
               {categories.map(c => (
-                <option key={c} value={c}>{c}</option>
+                <option key={c} value={c}>
+                  {c}
+                </option>
               ))}
             </select>
 
@@ -243,7 +258,7 @@ export const PluginsManager: React.FC = () => {
                   <input
                     type="checkbox"
                     checked={filterHasCommands}
-                    onChange={(e) => setFilterHasCommands(e.target.checked)}
+                    onChange={e => setFilterHasCommands(e.target.checked)}
                   />
                   Has Commands
                 </label>
@@ -251,7 +266,7 @@ export const PluginsManager: React.FC = () => {
                   <input
                     type="checkbox"
                     checked={filterHasAgents}
-                    onChange={(e) => setFilterHasAgents(e.target.checked)}
+                    onChange={e => setFilterHasAgents(e.target.checked)}
                   />
                   Has Agents
                 </label>
@@ -259,7 +274,7 @@ export const PluginsManager: React.FC = () => {
                   <input
                     type="checkbox"
                     checked={filterHasSkills}
-                    onChange={(e) => setFilterHasSkills(e.target.checked)}
+                    onChange={e => setFilterHasSkills(e.target.checked)}
                   />
                   Has Skills
                 </label>
@@ -283,8 +298,12 @@ export const PluginsManager: React.FC = () => {
               </button>
             </div>
 
-            {(searchQuery || selectedMarketplace !== 'all' || selectedCategory !== 'all' ||
-              filterHasCommands || filterHasAgents || filterHasSkills) && (
+            {(searchQuery ||
+              selectedMarketplace !== 'all' ||
+              selectedCategory !== 'all' ||
+              filterHasCommands ||
+              filterHasAgents ||
+              filterHasSkills) && (
               <button onClick={clearFilters} className="btn-clear-filters">
                 Clear Filters
               </button>
@@ -296,10 +315,7 @@ export const PluginsManager: React.FC = () => {
       {/* Content */}
       <div className="plugins-content">
         {activeTab === 'marketplaces' ? (
-          <MarketplacesView
-            marketplaces={marketplaces}
-            onRemove={removeMarketplace}
-          />
+          <MarketplacesView marketplaces={marketplaces} onRemove={removeMarketplace} />
         ) : filteredPlugins.length === 0 ? (
           <div className="plugins-empty">
             <div className="empty-icon">🔌</div>
@@ -308,8 +324,8 @@ export const PluginsManager: React.FC = () => {
               {searchQuery || selectedMarketplace !== 'all' || selectedCategory !== 'all'
                 ? 'No plugins match your search criteria.'
                 : activeTab === 'installed'
-                ? 'You haven\'t installed any plugins yet.'
-                : 'No plugins available in the marketplace.'}
+                  ? "You haven't installed any plugins yet."
+                  : 'No plugins available in the marketplace.'}
             </p>
             {(searchQuery || selectedMarketplace !== 'all' || selectedCategory !== 'all') && (
               <button onClick={clearFilters} className="btn-create-empty">
@@ -319,7 +335,7 @@ export const PluginsManager: React.FC = () => {
           </div>
         ) : (
           <div className={viewMode === 'grid' ? 'plugins-grid' : 'plugins-list'}>
-            {filteredPlugins.map((plugin) => (
+            {filteredPlugins.map(plugin => (
               <PluginCard
                 key={'id' in plugin ? plugin.id : `${plugin.name}@${plugin.marketplace}`}
                 plugin={plugin}
@@ -351,6 +367,18 @@ export const PluginsManager: React.FC = () => {
           onToggle={handleTogglePlugin}
         />
       )}
+
+      {uninstallConfirm && (
+        <ConfirmDialog
+          title="Uninstall Plugin"
+          message={`Are you sure you want to uninstall "${uninstallConfirm.name}"?`}
+          confirmText="Uninstall"
+          cancelText="Cancel"
+          isDangerous={true}
+          onConfirm={handleConfirmUninstall}
+          onCancel={() => setUninstallConfirm(null)}
+        />
+      )}
     </div>
   );
 };
@@ -362,11 +390,16 @@ interface MarketplacesViewProps {
 }
 
 const MarketplacesView: React.FC<MarketplacesViewProps> = ({ marketplaces, onRemove }) => {
-  const handleRemove = async (marketplace: Marketplace) => {
-    if (!confirm(`Are you sure you want to remove the marketplace "${marketplace.name}"?`)) {
-      return;
-    }
-    await onRemove(marketplace.name);
+  const [removeConfirm, setRemoveConfirm] = useState<Marketplace | null>(null);
+
+  const handleRemove = (marketplace: Marketplace) => {
+    setRemoveConfirm(marketplace);
+  };
+
+  const handleConfirmRemove = async () => {
+    if (!removeConfirm) return;
+    await onRemove(removeConfirm.name);
+    setRemoveConfirm(null);
   };
 
   if (marketplaces.length === 0) {
@@ -381,7 +414,7 @@ const MarketplacesView: React.FC<MarketplacesViewProps> = ({ marketplaces, onRem
 
   return (
     <div className="marketplaces-list">
-      {marketplaces.map((marketplace) => (
+      {marketplaces.map(marketplace => (
         <div key={marketplace.name} className="marketplace-card">
           <div className="marketplace-header">
             <div>
@@ -390,7 +423,9 @@ const MarketplacesView: React.FC<MarketplacesViewProps> = ({ marketplaces, onRem
                 <p className="marketplace-description">{marketplace.description}</p>
               )}
             </div>
-            <span className={`marketplace-status ${marketplace.available ? 'available' : 'unavailable'}`}>
+            <span
+              className={`marketplace-status ${marketplace.available ? 'available' : 'unavailable'}`}
+            >
               {marketplace.available ? '✓ Available' : '✗ Unavailable'}
             </span>
           </div>
@@ -427,6 +462,18 @@ const MarketplacesView: React.FC<MarketplacesViewProps> = ({ marketplaces, onRem
           </div>
         </div>
       ))}
+
+      {removeConfirm && (
+        <ConfirmDialog
+          title="Remove Marketplace"
+          message={`Are you sure you want to remove the marketplace "${removeConfirm.name}"?`}
+          confirmText="Remove"
+          cancelText="Cancel"
+          isDangerous={true}
+          onConfirm={handleConfirmRemove}
+          onCancel={() => setRemoveConfirm(null)}
+        />
+      )}
     </div>
   );
 };
@@ -447,7 +494,7 @@ const PluginCard: React.FC<PluginCardProps> = ({
   onView,
   onInstall,
   onUninstall,
-  onToggle
+  onToggle,
 }) => {
   const isInstalled = 'id' in plugin;
   const marketplaceBadge = plugin.marketplace;
@@ -487,7 +534,9 @@ const PluginCard: React.FC<PluginCardProps> = ({
           <span className="marketplace-badge">{marketplaceBadge}</span>
           {plugin.category && <span className="category-badge">{plugin.category}</span>}
           {isInstalled && (
-            <span className={`status-badge ${(plugin as InstalledPlugin).enabled ? 'enabled' : 'disabled'}`}>
+            <span
+              className={`status-badge ${(plugin as InstalledPlugin).enabled ? 'enabled' : 'disabled'}`}
+            >
               {(plugin as InstalledPlugin).enabled ? 'Enabled' : 'Disabled'}
             </span>
           )}
@@ -572,10 +621,12 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({ onClose, onAd
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Add Marketplace</h2>
-          <button onClick={onClose} className="btn-close">×</button>
+          <button onClick={onClose} className="btn-close">
+            ×
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-body">
@@ -589,7 +640,7 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({ onClose, onAd
               id="marketplace-name"
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
               placeholder="my-marketplace"
               className="input-field"
               required
@@ -604,7 +655,7 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({ onClose, onAd
               id="marketplace-source"
               type="text"
               value={source}
-              onChange={(e) => setSource(e.target.value)}
+              onChange={e => setSource(e.target.value)}
               placeholder="https://github.com/user/repo or /path/to/local/marketplace"
               className="input-field"
               required
@@ -640,19 +691,21 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
   onClose,
   onInstall,
   onUninstall,
-  onToggle
+  onToggle,
 }) => {
   const isInstalled = 'id' in plugin;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content modal-large" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <div>
             <h2>{plugin.name}</h2>
             {plugin.version && <span className="plugin-version-large">v{plugin.version}</span>}
           </div>
-          <button onClick={onClose} className="btn-close">×</button>
+          <button onClick={onClose} className="btn-close">
+            ×
+          </button>
         </div>
 
         <div className="modal-body plugin-detail">
@@ -666,7 +719,9 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
               <h3>Keywords</h3>
               <div className="keyword-list">
                 {plugin.keywords.map((kw: string, idx: number) => (
-                  <span key={idx} className="keyword-badge">{kw}</span>
+                  <span key={idx} className="keyword-badge">
+                    {kw}
+                  </span>
                 ))}
               </div>
             </div>
@@ -694,7 +749,12 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
               {plugin.repository && (
                 <div className="detail-item">
                   <span className="detail-label">Repository:</span>
-                  <a href={plugin.repository} className="detail-link" target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={plugin.repository}
+                    className="detail-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {plugin.repository}
                   </a>
                 </div>
@@ -702,7 +762,12 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
               {plugin.homepage && (
                 <div className="detail-item">
                   <span className="detail-label">Homepage:</span>
-                  <a href={plugin.homepage} className="detail-link" target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={plugin.homepage}
+                    className="detail-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {plugin.homepage}
                   </a>
                 </div>
@@ -715,23 +780,33 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
               <h3>Components</h3>
               <div className="component-stats">
                 <div className="stat-item">
-                  <span className="stat-value">{(plugin as InstalledPlugin).componentCounts!.commands}</span>
+                  <span className="stat-value">
+                    {(plugin as InstalledPlugin).componentCounts!.commands}
+                  </span>
                   <span className="stat-label">Commands</span>
                 </div>
                 <div className="stat-item">
-                  <span className="stat-value">{(plugin as InstalledPlugin).componentCounts!.agents}</span>
+                  <span className="stat-value">
+                    {(plugin as InstalledPlugin).componentCounts!.agents}
+                  </span>
                   <span className="stat-label">Agents</span>
                 </div>
                 <div className="stat-item">
-                  <span className="stat-value">{(plugin as InstalledPlugin).componentCounts!.skills}</span>
+                  <span className="stat-value">
+                    {(plugin as InstalledPlugin).componentCounts!.skills}
+                  </span>
                   <span className="stat-label">Skills</span>
                 </div>
                 <div className="stat-item">
-                  <span className="stat-value">{(plugin as InstalledPlugin).componentCounts!.hooks}</span>
+                  <span className="stat-value">
+                    {(plugin as InstalledPlugin).componentCounts!.hooks}
+                  </span>
                   <span className="stat-label">Hooks</span>
                 </div>
                 <div className="stat-item">
-                  <span className="stat-value">{(plugin as InstalledPlugin).componentCounts!.mcpServers}</span>
+                  <span className="stat-value">
+                    {(plugin as InstalledPlugin).componentCounts!.mcpServers}
+                  </span>
                   <span className="stat-label">MCP Servers</span>
                 </div>
               </div>
@@ -754,7 +829,9 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
                 </div>
                 <div className="detail-item">
                   <span className="detail-label">Status:</span>
-                  <span className={`status-badge ${(plugin as InstalledPlugin).enabled ? 'enabled' : 'disabled'}`}>
+                  <span
+                    className={`status-badge ${(plugin as InstalledPlugin).enabled ? 'enabled' : 'disabled'}`}
+                  >
                     {(plugin as InstalledPlugin).enabled ? 'Enabled' : 'Disabled'}
                   </span>
                 </div>
@@ -766,14 +843,13 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
         <div className="modal-footer">
           {isInstalled ? (
             <>
-              <button
-                onClick={() => onUninstall(plugin as InstalledPlugin)}
-                className="btn-danger"
-              >
+              <button onClick={() => onUninstall(plugin as InstalledPlugin)} className="btn-danger">
                 Uninstall
               </button>
               <button
-                onClick={() => onToggle(plugin as InstalledPlugin, !(plugin as InstalledPlugin).enabled)}
+                onClick={() =>
+                  onToggle(plugin as InstalledPlugin, !(plugin as InstalledPlugin).enabled)
+                }
                 className="btn-primary"
               >
                 {(plugin as InstalledPlugin).enabled ? 'Disable' : 'Enable'}

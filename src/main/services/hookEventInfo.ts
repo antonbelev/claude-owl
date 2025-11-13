@@ -133,5 +133,5 @@ export function getHookEventInfo(event: HookEvent): HookEventInfo {
  * Get all hook events information (in order)
  */
 export function getAllHookEventsInfo(): HookEventInfo[] {
-  return HOOK_EVENT_TYPES.map((event) => HOOK_EVENTS_INFO[event]);
+  return HOOK_EVENT_TYPES.map(event => HOOK_EVENTS_INFO[event]);
 }

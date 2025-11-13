@@ -13,36 +13,33 @@ export function registerStatusHandlers() {
 
   try {
     // Get service status
-    ipcMain.handle(
-      STATUS_CHANNEL,
-      async (): Promise<GetServiceStatusResponse> => {
-        console.log('[StatusHandlers] GET_SERVICE_STATUS request received');
+    ipcMain.handle(STATUS_CHANNEL, async (): Promise<GetServiceStatusResponse> => {
+      console.log('[StatusHandlers] GET_SERVICE_STATUS request received');
 
-        try {
-          const status = await statusService.getServiceStatus();
+      try {
+        const status = await statusService.getServiceStatus();
 
-          console.log('[StatusHandlers] Service status retrieved successfully:', {
-            level: status.level,
-            incidentCount: status.recentIncidents.length,
-          });
+        console.log('[StatusHandlers] Service status retrieved successfully:', {
+          level: status.level,
+          incidentCount: status.recentIncidents.length,
+        });
 
-          return {
-            success: true,
-            data: status,
-          };
-        } catch (error) {
-          console.error('[StatusHandlers] Failed to get service status:', {
-            error: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack : undefined,
-          });
+        return {
+          success: true,
+          data: status,
+        };
+      } catch (error) {
+        console.error('[StatusHandlers] Failed to get service status:', {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        });
 
-          return {
-            success: false,
-            error: error instanceof Error ? error.message : 'Failed to fetch service status',
-          };
-        }
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to fetch service status',
+        };
       }
-    );
+    });
 
     console.log('[StatusHandlers] Status IPC handlers registered successfully');
   } catch (error) {

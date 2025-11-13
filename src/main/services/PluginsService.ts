@@ -33,7 +33,7 @@ export class PluginsService {
       claudeUserDir: this.claudeUserDir,
       pluginsDir: this.pluginsDir,
       marketplacesFile: this.marketplacesFile,
-      installedPluginsFile: this.installedPluginsFile
+      installedPluginsFile: this.installedPluginsFile,
     });
   }
 
@@ -45,7 +45,10 @@ export class PluginsService {
     try {
       const content = await fs.readFile(this.marketplacesFile, 'utf-8');
       const data = JSON.parse(content);
-      console.log('[PluginsService] getMarketplaces - file content:', JSON.stringify(data, null, 2));
+      console.log(
+        '[PluginsService] getMarketplaces - file content:',
+        JSON.stringify(data, null, 2)
+      );
       const marketplaces: Marketplace[] = [];
 
       // The file format is { "marketplace-name": { source: { source, repo }, installLocation, lastUpdated } }
@@ -108,7 +111,10 @@ export class PluginsService {
   /**
    * Add a new marketplace
    */
-  async addMarketplace(name: string, source: string): Promise<{ success: boolean; error?: string }> {
+  async addMarketplace(
+    name: string,
+    source: string
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       // Validate marketplace by fetching manifest
       await this.fetchMarketplaceManifest(source);
@@ -128,11 +134,7 @@ export class PluginsService {
 
       // Save updated marketplaces
       await fs.mkdir(this.claudeUserDir, { recursive: true });
-      await fs.writeFile(
-        this.marketplacesFile,
-        JSON.stringify({ marketplaces }, null, 2),
-        'utf-8'
-      );
+      await fs.writeFile(this.marketplacesFile, JSON.stringify({ marketplaces }, null, 2), 'utf-8');
 
       return { success: true };
     } catch (error) {
@@ -158,11 +160,7 @@ export class PluginsService {
 
       delete marketplaces[name];
 
-      await fs.writeFile(
-        this.marketplacesFile,
-        JSON.stringify({ marketplaces }, null, 2),
-        'utf-8'
-      );
+      await fs.writeFile(this.marketplacesFile, JSON.stringify({ marketplaces }, null, 2), 'utf-8');
 
       return { success: true };
     } catch (error) {
@@ -179,7 +177,7 @@ export class PluginsService {
   async getAvailablePlugins(): Promise<MarketplacePlugin[]> {
     const marketplaces = await this.getMarketplaces();
     const installedPlugins = await this.getInstalledPlugins();
-    const installedMap = new Map(installedPlugins.map((p) => [p.id, p]));
+    const installedMap = new Map(installedPlugins.map(p => [p.id, p]));
 
     const allPlugins: MarketplacePlugin[] = [];
 
@@ -223,7 +221,10 @@ export class PluginsService {
     try {
       const content = await fs.readFile(this.installedPluginsFile, 'utf-8');
       const data = JSON.parse(content);
-      console.log('[PluginsService] getInstalledPlugins - file content:', JSON.stringify(data, null, 2));
+      console.log(
+        '[PluginsService] getInstalledPlugins - file content:',
+        JSON.stringify(data, null, 2)
+      );
       const plugins: InstalledPlugin[] = [];
 
       for (const [id, pluginData] of Object.entries(data.plugins || {})) {
@@ -246,7 +247,7 @@ export class PluginsService {
           const componentCounts = await this.countPluginComponents(installPath);
 
           // Extract marketplace name from ID (format: "pluginName@marketplace")
-          const marketplace: string = id.includes('@') ? (id.split('@')[1] || 'unknown') : 'unknown';
+          const marketplace: string = id.includes('@') ? id.split('@')[1] || 'unknown' : 'unknown';
 
           plugins.push({
             ...metadata,
@@ -276,21 +277,18 @@ export class PluginsService {
   /**
    * Install a plugin from marketplace
    */
-  async installPlugin(
-    pluginName: string,
-    marketplaceName: string
-  ): Promise<PluginInstallResult> {
+  async installPlugin(pluginName: string, marketplaceName: string): Promise<PluginInstallResult> {
     try {
       // Get marketplace source
       const marketplaces = await this.getMarketplaces();
-      const marketplace = marketplaces.find((m) => m.name === marketplaceName);
+      const marketplace = marketplaces.find(m => m.name === marketplaceName);
       if (!marketplace) {
         return { success: false, error: 'Marketplace not found' };
       }
 
       // Get plugin from marketplace
       const manifest = await this.fetchMarketplaceManifest(marketplace.source);
-      const pluginEntry = manifest?.plugins?.find((p) => p.name === pluginName);
+      const pluginEntry = manifest?.plugins?.find(p => p.name === pluginName);
       if (!pluginEntry) {
         return { success: false, error: 'Plugin not found in marketplace' };
       }
@@ -335,7 +333,7 @@ export class PluginsService {
   async uninstallPlugin(pluginId: string): Promise<{ success: boolean; error?: string }> {
     try {
       const plugins = await this.getInstalledPlugins();
-      const plugin = plugins.find((p) => p.id === pluginId);
+      const plugin = plugins.find(p => p.id === pluginId);
       if (!plugin) {
         return { success: false, error: 'Plugin not found' };
       }
@@ -358,7 +356,10 @@ export class PluginsService {
   /**
    * Enable/disable a plugin
    */
-  async togglePlugin(pluginId: string, enabled: boolean): Promise<{ success: boolean; error?: string }> {
+  async togglePlugin(
+    pluginId: string,
+    enabled: boolean
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const content = await fs.readFile(this.installedPluginsFile, 'utf-8');
       const data = JSON.parse(content);
@@ -402,7 +403,7 @@ export class PluginsService {
 
       if (!response.ok) return null;
 
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
 
       const info: GitHubRepoInfo = {
         owner,
@@ -430,7 +431,9 @@ export class PluginsService {
   /**
    * Calculate plugin health score
    */
-  async calculateHealthScore(plugin: MarketplacePlugin | InstalledPlugin): Promise<PluginHealthScore> {
+  async calculateHealthScore(
+    plugin: MarketplacePlugin | InstalledPlugin
+  ): Promise<PluginHealthScore> {
     const factors = {
       recentlyUpdated: false,
       hasDocumentation: !!plugin.description && plugin.description.length > 20,
@@ -476,13 +479,13 @@ export class PluginsService {
           const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/.claude-plugin/marketplace.json`;
           const response = await fetch(rawUrl);
           if (response.ok) {
-            return await response.json() as MarketplaceManifest;
+            return (await response.json()) as MarketplaceManifest;
           }
           // Try master branch
           const masterUrl = `https://raw.githubusercontent.com/${owner}/${repo}/master/.claude-plugin/marketplace.json`;
           const masterResponse = await fetch(masterUrl);
           if (masterResponse.ok) {
-            return await masterResponse.json() as MarketplaceManifest;
+            return (await masterResponse.json()) as MarketplaceManifest;
           }
         }
       }
@@ -491,7 +494,7 @@ export class PluginsService {
       if (source.startsWith('http://') || source.startsWith('https://')) {
         const response = await fetch(source);
         if (response.ok) {
-          return await response.json() as MarketplaceManifest;
+          return (await response.json()) as MarketplaceManifest;
         }
       }
 
@@ -584,7 +587,7 @@ export class PluginsService {
     try {
       const commandsDir = path.join(pluginPath, 'commands');
       const commandFiles = await fs.readdir(commandsDir);
-      counts.commands = commandFiles.filter((f) => f.endsWith('.md')).length;
+      counts.commands = commandFiles.filter(f => f.endsWith('.md')).length;
     } catch {
       // Commands directory doesn't exist, keep default count of 0
     }
@@ -592,7 +595,7 @@ export class PluginsService {
     try {
       const agentsDir = path.join(pluginPath, 'agents');
       const agentFiles = await fs.readdir(agentsDir);
-      counts.agents = agentFiles.filter((f) => f.endsWith('.md')).length;
+      counts.agents = agentFiles.filter(f => f.endsWith('.md')).length;
     } catch {
       // Agents directory doesn't exist, keep default count of 0
     }
@@ -600,7 +603,7 @@ export class PluginsService {
     try {
       const skillsDir = path.join(pluginPath, 'skills');
       const skillDirs = await fs.readdir(skillsDir, { withFileTypes: true });
-      counts.skills = skillDirs.filter((d) => d.isDirectory()).length;
+      counts.skills = skillDirs.filter(d => d.isDirectory()).length;
     } catch {
       // Skills directory doesn't exist, keep default count of 0
     }

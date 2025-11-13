@@ -93,54 +93,60 @@ export function useAgents() {
   /**
    * Save an agent (create or update)
    */
-  const saveAgent = useCallback(async (agent: Omit<Agent, 'lastModified'>): Promise<boolean> => {
-    if (!window.electronAPI) {
-      return false;
-    }
-
-    try {
-      const request: SaveAgentRequest = { agent };
-      const response = (await window.electronAPI.saveAgent(request)) as SaveAgentResponse;
-
-      if (response.success) {
-        // Reload agents list
-        await loadAgents();
-        return true;
-      } else {
-        console.error('Failed to save agent:', response.error);
+  const saveAgent = useCallback(
+    async (agent: Omit<Agent, 'lastModified'>): Promise<boolean> => {
+      if (!window.electronAPI) {
         return false;
       }
-    } catch (error) {
-      console.error('Failed to save agent:', error);
-      return false;
-    }
-  }, [loadAgents]);
+
+      try {
+        const request: SaveAgentRequest = { agent };
+        const response = (await window.electronAPI.saveAgent(request)) as SaveAgentResponse;
+
+        if (response.success) {
+          // Reload agents list
+          await loadAgents();
+          return true;
+        } else {
+          console.error('Failed to save agent:', response.error);
+          return false;
+        }
+      } catch (error) {
+        console.error('Failed to save agent:', error);
+        return false;
+      }
+    },
+    [loadAgents]
+  );
 
   /**
    * Delete an agent
    */
-  const deleteAgent = useCallback(async (filePath: string): Promise<boolean> => {
-    if (!window.electronAPI) {
-      return false;
-    }
-
-    try {
-      const request: DeleteAgentRequest = { filePath };
-      const response = (await window.electronAPI.deleteAgent(request)) as DeleteAgentResponse;
-
-      if (response.success) {
-        // Reload agents list
-        await loadAgents();
-        return true;
-      } else {
-        console.error('Failed to delete agent:', response.error);
+  const deleteAgent = useCallback(
+    async (filePath: string): Promise<boolean> => {
+      if (!window.electronAPI) {
         return false;
       }
-    } catch (error) {
-      console.error('Failed to delete agent:', error);
-      return false;
-    }
-  }, [loadAgents]);
+
+      try {
+        const request: DeleteAgentRequest = { filePath };
+        const response = (await window.electronAPI.deleteAgent(request)) as DeleteAgentResponse;
+
+        if (response.success) {
+          // Reload agents list
+          await loadAgents();
+          return true;
+        } else {
+          console.error('Failed to delete agent:', response.error);
+          return false;
+        }
+      } catch (error) {
+        console.error('Failed to delete agent:', error);
+        return false;
+      }
+    },
+    [loadAgents]
+  );
 
   // Load agents on mount
   useEffect(() => {
@@ -163,9 +169,7 @@ export function useAgents() {
 export function useFilteredAgents(location?: 'user' | 'project' | 'plugin') {
   const { agents, loading, error, ...methods } = useAgents();
 
-  const filteredAgents = location
-    ? agents.filter(agent => agent.location === location)
-    : agents;
+  const filteredAgents = location ? agents.filter(agent => agent.location === location) : agents;
 
   return {
     agents: filteredAgents,

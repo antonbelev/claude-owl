@@ -7,7 +7,11 @@ interface CoreConfigEditorProps {
   readOnly?: boolean;
 }
 
-export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({ settings, updateSettings, readOnly = false }) => {
+export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
+  settings,
+  updateSettings,
+  readOnly = false,
+}) => {
   return (
     <div className="core-config-editor">
       <div className="editor-section">
@@ -18,7 +22,7 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({ settings, up
             id="model"
             type="text"
             value={settings.model || ''}
-            onChange={(e) => updateSettings({ model: e.target.value })}
+            onChange={e => updateSettings({ model: e.target.value })}
             placeholder="e.g., claude-sonnet-4-5-20250929"
             disabled={readOnly}
           />
@@ -33,7 +37,7 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({ settings, up
           <textarea
             id="outputStyle"
             value={settings.outputStyle || ''}
-            onChange={(e) => updateSettings({ outputStyle: e.target.value })}
+            onChange={e => updateSettings({ outputStyle: e.target.value })}
             placeholder="Custom system prompt to append"
             disabled={readOnly}
             rows={4}
@@ -50,7 +54,7 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({ settings, up
             id="apiKeyHelper"
             type="text"
             value={settings.apiKeyHelper || ''}
-            onChange={(e) => updateSettings({ apiKeyHelper: e.target.value })}
+            onChange={e => updateSettings({ apiKeyHelper: e.target.value })}
             placeholder="Path to script for generating credentials"
             disabled={readOnly}
           />
@@ -62,7 +66,7 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({ settings, up
           <select
             id="forceLoginMethod"
             value={settings.forceLoginMethod || ''}
-            onChange={(e) => {
+            onChange={e => {
               const value = e.target.value;
               if (value === '') {
                 // Remove the property entirely instead of setting to undefined
@@ -89,7 +93,7 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({ settings, up
             id="forceLoginOrgUUID"
             type="text"
             value={settings.forceLoginOrgUUID || ''}
-            onChange={(e) => updateSettings({ forceLoginOrgUUID: e.target.value })}
+            onChange={e => updateSettings({ forceLoginOrgUUID: e.target.value })}
             placeholder="Organization UUID"
             disabled={readOnly}
           />
@@ -105,7 +109,7 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({ settings, up
             id="cleanupPeriodDays"
             type="number"
             value={settings.cleanupPeriodDays || 30}
-            onChange={(e) => updateSettings({ cleanupPeriodDays: parseInt(e.target.value) || 30 })}
+            onChange={e => updateSettings({ cleanupPeriodDays: parseInt(e.target.value) || 30 })}
             min="1"
             disabled={readOnly}
           />
@@ -117,7 +121,7 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({ settings, up
           <textarea
             id="companyAnnouncements"
             value={settings.companyAnnouncements || ''}
-            onChange={(e) => updateSettings({ companyAnnouncements: e.target.value })}
+            onChange={e => updateSettings({ companyAnnouncements: e.target.value })}
             placeholder="Startup notifications"
             disabled={readOnly}
             rows={3}
@@ -133,12 +137,14 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({ settings, up
             <input
               type="checkbox"
               checked={settings.includeCoAuthoredBy !== false}
-              onChange={(e) => updateSettings({ includeCoAuthoredBy: e.target.checked })}
+              onChange={e => updateSettings({ includeCoAuthoredBy: e.target.checked })}
               disabled={readOnly}
             />
             Include Claude co-authored attribution in commits
           </label>
-          <p className="form-help">Add &quot;Co-Authored-By: Claude&quot; to git commits (default: true)</p>
+          <p className="form-help">
+            Add &quot;Co-Authored-By: Claude&quot; to git commits (default: true)
+          </p>
         </div>
       </div>
 
@@ -149,12 +155,14 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({ settings, up
             <input
               type="checkbox"
               checked={settings.enableAllProjectMcpServers || false}
-              onChange={(e) => updateSettings({ enableAllProjectMcpServers: e.target.checked })}
+              onChange={e => updateSettings({ enableAllProjectMcpServers: e.target.checked })}
               disabled={readOnly}
             />
             Auto-approve all project MCP servers
           </label>
-          <p className="form-help">Automatically enable all MCP servers defined in project .mcp.json</p>
+          <p className="form-help">
+            Automatically enable all MCP servers defined in project .mcp.json
+          </p>
         </div>
 
         <div className="form-group">
@@ -162,7 +170,7 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({ settings, up
             <input
               type="checkbox"
               checked={settings.disableAllHooks || false}
-              onChange={(e) => updateSettings({ disableAllHooks: e.target.checked })}
+              onChange={e => updateSettings({ disableAllHooks: e.target.checked })}
               disabled={readOnly}
             />
             Disable all hooks

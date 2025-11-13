@@ -129,9 +129,7 @@ export const ServiceStatusCard: React.FC = () => {
                       marginBottom: index < incident.updates.length - 1 ? '0.375rem' : 0,
                       paddingBottom: index < incident.updates.length - 1 ? '0.375rem' : 0,
                       borderBottom:
-                        index < incident.updates.length - 1
-                          ? '1px solid #e5e7eb'
-                          : 'none',
+                        index < incident.updates.length - 1 ? '1px solid #e5e7eb' : 'none',
                     }}
                   >
                     <div style={{ color: '#4b5563', fontWeight: 500, marginBottom: '0.125rem' }}>
@@ -223,9 +221,7 @@ export const ServiceStatusCard: React.FC = () => {
           }}
         />
         <div>
-          <div style={{ fontWeight: 600, color: '#333', fontSize: '1rem' }}>
-            {indicator.label}
-          </div>
+          <div style={{ fontWeight: 600, color: '#333', fontSize: '1rem' }}>{indicator.label}</div>
           <div style={{ fontSize: '0.875rem', color: '#666', marginTop: '0.125rem' }}>
             {status.message}
           </div>
@@ -259,9 +255,7 @@ export const ServiceStatusCard: React.FC = () => {
                 border: '1px solid #3b82f6',
               }}
             >
-              {showAllIncidents
-                ? 'Show Less'
-                : `Show ${status.recentIncidents.length - 2} More`}
+              {showAllIncidents ? 'Show Less' : `Show ${status.recentIncidents.length - 2} More`}
             </button>
           )}
         </div>
@@ -290,7 +284,9 @@ export const ServiceStatusCard: React.FC = () => {
       </div>
 
       {/* Last Checked */}
-      <div style={{ fontSize: '0.75rem', color: '#999', marginTop: '0.75rem', textAlign: 'center' }}>
+      <div
+        style={{ fontSize: '0.75rem', color: '#999', marginTop: '0.75rem', textAlign: 'center' }}
+      >
         Last checked: {formatTimestamp(status.lastChecked)}
       </div>
     </div>

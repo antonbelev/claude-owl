@@ -5,44 +5,7 @@
   margin: 0 auto;
 }
 
-/* Header Section */
-.agents-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 2px solid #e0e0e0;
-}
-
-.agents-header h1 {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 0.5rem 0;
-}
-
-.header-description {
-  font-size: 0.95rem;
-  color: #6c757d;
-  margin: 0;
-}
-
-.btn-create {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-create:hover {
-  background: #0056b3;
-}
+/* Header Section - now uses PageHeader component (see PageHeader.css) */
 
 /* Search Bar */
 .agents-search {

@@ -4,36 +4,7 @@
   margin: 0 auto;
 }
 
-.skills-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #e0e0e0;
-}
-
-.skills-header h1 {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #1a1a1a;
-}
-
-.btn-create {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-create:hover {
-  background: #0056b3;
-}
+/* Header styles now use PageHeader component - see PageHeader.css */
 
 .skills-loading,
 .skills-error,

@@ -35,16 +35,20 @@ export class StatusService {
       // Filter incidents from the last 3 days
       const threeDaysAgo = new Date();
       threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-      const recentIncidents = incidents.filter((incident) => {
+      const recentIncidents = incidents.filter(incident => {
         const incidentDate = new Date(incident.publishedAt);
         return incidentDate >= threeDaysAgo;
       });
 
-      console.log('[StatusService] Found', recentIncidents.length, 'recent incidents (last 3 days)');
+      console.log(
+        '[StatusService] Found',
+        recentIncidents.length,
+        'recent incidents (last 3 days)'
+      );
 
       // For status level determination, only consider unresolved incidents
       // Resolved incidents are historical and don't affect current status
-      const unresolvedIncidents = recentIncidents.filter((incident) => !incident.resolved);
+      const unresolvedIncidents = recentIncidents.filter(incident => !incident.resolved);
       console.log('[StatusService] Unresolved incidents:', unresolvedIncidents.length);
 
       // Determine overall status level based on unresolved incidents only
@@ -86,10 +90,10 @@ export class StatusService {
     return new Promise((resolve, reject) => {
       console.log('[StatusService] Making HTTPS request to RSS feed');
       https
-        .get(url, (res) => {
+        .get(url, res => {
           let data = '';
 
-          res.on('data', (chunk) => {
+          res.on('data', chunk => {
             data += chunk;
           });
 
@@ -98,7 +102,7 @@ export class StatusService {
             resolve(data);
           });
         })
-        .on('error', (err) => {
+        .on('error', err => {
           console.error('[StatusService] HTTPS request failed:', err.message);
           reject(err);
         });
@@ -164,7 +168,8 @@ export class StatusService {
 
     // Try pattern 1: <strong>Status</strong> - message <br> <small>timestamp</small>
     // This handles: <strong>Resolved</strong> - Between 17:20... <br><small>Nov 7, 22:47 UTC</small>
-    const pattern1 = /<strong>([^<]+)<\/strong>\s*-?\s*([^<]*?)(?:<br\s*\/?>|<p>)\s*<small>([^<]+)<\/small>/gi;
+    const pattern1 =
+      /<strong>([^<]+)<\/strong>\s*-?\s*([^<]*?)(?:<br\s*\/?>|<p>)\s*<small>([^<]+)<\/small>/gi;
     const matches1 = Array.from(html.matchAll(pattern1));
 
     if (matches1.length > 0) {
@@ -191,7 +196,11 @@ export class StatusService {
       for (const m of strongMatches) {
         const status = m[1]?.trim();
 
-        if (status && (status.toLowerCase().includes('resolved') || status.toLowerCase().includes('investigating'))) {
+        if (
+          status &&
+          (status.toLowerCase().includes('resolved') ||
+            status.toLowerCase().includes('investigating'))
+        ) {
           // Found a status marker, extract surrounding text
           const afterStatus = html.substring((m.index || 0) + m[0].length);
 
@@ -272,7 +281,7 @@ export class StatusService {
     }
 
     // Check for unresolved incidents
-    const unresolvedIncidents = incidents.filter((inc) => !inc.resolved);
+    const unresolvedIncidents = incidents.filter(inc => !inc.resolved);
 
     if (unresolvedIncidents.length === 0) {
       // All recent incidents are resolved

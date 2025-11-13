@@ -22,10 +22,11 @@ export interface GetSettingsPathRequest {
   projectPath?: string;
 }
 
-export interface GetSettingsPathResponse extends IPCResponse<{
-  path: string;
-  exists: boolean;
-}> {}
+export interface GetSettingsPathResponse
+  extends IPCResponse<{
+    path: string;
+    exists: boolean;
+  }> {}
 
 export interface OpenSettingsFileRequest {
   location: 'user' | 'project';

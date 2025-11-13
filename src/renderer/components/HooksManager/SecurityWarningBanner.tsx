@@ -29,7 +29,9 @@ export function SecurityWarningBanner() {
             </div>
 
             <div className="security-warning-box">
-              <p style={{ fontWeight: 600, marginBottom: '0.25rem' }}>Before creating or enabling hooks:</p>
+              <p style={{ fontWeight: 600, marginBottom: '0.25rem' }}>
+                Before creating or enabling hooks:
+              </p>
               <ul>
                 <li>Always review hook code carefully</li>
                 <li>Only use hooks from trusted sources</li>

@@ -64,7 +64,11 @@ export class FileSystemService {
    * Write data as JSON to file
    * @throws Error if write fails
    */
-  async writeJSON<T = unknown>(filePath: string, data: T, options?: { pretty?: boolean }): Promise<void> {
+  async writeJSON<T = unknown>(
+    filePath: string,
+    data: T,
+    options?: { pretty?: boolean }
+  ): Promise<void> {
     console.log('[FileSystemService] Writing JSON:', filePath);
     try {
       const content = options?.pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data);
@@ -123,7 +127,9 @@ export class FileSystemService {
    * Expects format: ---\nYAML\n---\nContent
    * @throws Error if file doesn't exist or format is invalid
    */
-  async readMarkdownWithFrontmatter<T = Record<string, unknown>>(filePath: string): Promise<ParsedMarkdown<T>> {
+  async readMarkdownWithFrontmatter<T = Record<string, unknown>>(
+    filePath: string
+  ): Promise<ParsedMarkdown<T>> {
     console.log('[FileSystemService] Reading markdown with frontmatter:', filePath);
     try {
       const raw = await readFile(filePath, 'utf-8');
@@ -240,7 +246,11 @@ export class FileSystemService {
     console.log('[FileSystemService] Listing directory:', dirPath);
     try {
       const files = await readdir(dirPath);
-      console.log('[FileSystemService] Directory listed successfully:', dirPath, `(${files.length} items)`);
+      console.log(
+        '[FileSystemService] Directory listed successfully:',
+        dirPath,
+        `(${files.length} items)`
+      );
       return files;
     } catch (error) {
       console.error('[FileSystemService] Failed to list directory:', {
@@ -294,7 +304,7 @@ export class FileSystemService {
   private parseYAML<T = Record<string, unknown>>(yamlStr: string): T {
     const obj: Record<string, unknown> = {};
 
-    const lines = yamlStr.split('\n').filter((line) => line.trim());
+    const lines = yamlStr.split('\n').filter(line => line.trim());
     for (const line of lines) {
       const parts = line.split(':');
       const key = parts[0];

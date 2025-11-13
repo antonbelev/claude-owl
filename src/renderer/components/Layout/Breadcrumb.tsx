@@ -20,7 +20,7 @@ export const Breadcrumb: React.FC = () => {
       agents: 'Subagents',
       skills: 'Skills',
       plugins: 'Plugins',
-      commands: 'Commands',
+      commands: 'Slash Commands',
       hooks: 'Hooks',
       mcp: 'MCP Servers',
       sessions: 'Sessions',
@@ -28,7 +28,7 @@ export const Breadcrumb: React.FC = () => {
     };
 
     let currentPath = '';
-    pathSegments.forEach((segment) => {
+    pathSegments.forEach(segment => {
       currentPath += `/${segment}`;
       items.push({
         label: labelMap[segment] || segment,

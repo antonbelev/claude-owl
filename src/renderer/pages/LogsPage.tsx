@@ -66,7 +66,13 @@ export const LogsPage: React.FC = () => {
             </div>
           )}
 
-          {selectedLog && <LogViewer log={selectedLog} onClose={() => setSelectedLog(null)} onDelete={handleDeleteLog} />}
+          {selectedLog && (
+            <LogViewer
+              log={selectedLog}
+              onClose={() => setSelectedLog(null)}
+              onDelete={handleDeleteLog}
+            />
+          )}
         </div>
       </div>
     </div>

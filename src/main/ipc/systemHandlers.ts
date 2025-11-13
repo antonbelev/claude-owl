@@ -17,24 +17,27 @@ export function registerSystemHandlers() {
   });
 
   // Check if Claude is installed
-  ipcMain.handle(IPC_CHANNELS.CHECK_CLAUDE_INSTALLED, async (): Promise<CheckClaudeInstalledResponse> => {
-    try {
-      const info = await claudeService.checkInstallation();
+  ipcMain.handle(
+    IPC_CHANNELS.CHECK_CLAUDE_INSTALLED,
+    async (): Promise<CheckClaudeInstalledResponse> => {
+      try {
+        const info = await claudeService.checkInstallation();
 
-      return {
-        success: true,
-        installed: info.installed,
-        ...(info.version && { version: info.version }),
-        ...(info.path && { path: info.path }),
-      };
-    } catch (error) {
-      return {
-        success: false,
-        installed: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
+        return {
+          success: true,
+          installed: info.installed,
+          ...(info.version && { version: info.version }),
+          ...(info.path && { path: info.path }),
+        };
+      } catch (error) {
+        return {
+          success: false,
+          installed: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        };
+      }
     }
-  });
+  );
 
   // Open external URL in default browser
   ipcMain.handle('system:open-external', async (_event, url: string) => {

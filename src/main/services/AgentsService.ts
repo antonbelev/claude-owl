@@ -88,7 +88,10 @@ export class AgentsService {
   ): void {
     if (key === 'tools') {
       // Parse comma-separated tools list
-      frontmatter.tools = value.split(',').map((s) => s.trim()).filter(Boolean);
+      frontmatter.tools = value
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
     } else if (key === 'model') {
       // Validate model value
       const validModels = ['sonnet', 'opus', 'haiku', 'inherit'];
@@ -195,7 +198,9 @@ export class AgentsService {
         lastModified: stat.mtime,
       };
     } catch (error) {
-      throw new Error(`Failed to read agent: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to read agent: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -246,14 +251,19 @@ export class AgentsService {
     try {
       await fs.unlink(filePath);
     } catch (error) {
-      throw new Error(`Failed to delete agent: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to delete agent: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
   /**
    * Validate an agent's frontmatter and content
    */
-  validateAgent(frontmatter: AgentFrontmatter, content: string): { valid: boolean; errors: string[] } {
+  validateAgent(
+    frontmatter: AgentFrontmatter,
+    content: string
+  ): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
 
     // Validate name
@@ -284,7 +294,7 @@ export class AgentsService {
     if (frontmatter.tools) {
       if (!Array.isArray(frontmatter.tools)) {
         errors.push('Tools must be an array');
-      } else if (frontmatter.tools.some((tool) => typeof tool !== 'string')) {
+      } else if (frontmatter.tools.some(tool => typeof tool !== 'string')) {
         errors.push('Tools must contain only strings');
       }
     }

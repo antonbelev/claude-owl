@@ -20,12 +20,13 @@ export interface GetSettingsRequest {
   level: 'user' | 'project' | 'local' | 'managed';
 }
 
-export interface GetSettingsResponse extends IPCResponse<{
-  level: 'user' | 'project' | 'local' | 'managed';
-  path: string;
-  exists: boolean;
-  content: ClaudeSettings;
-}> {}
+export interface GetSettingsResponse
+  extends IPCResponse<{
+    level: 'user' | 'project' | 'local' | 'managed';
+    path: string;
+    exists: boolean;
+    content: ClaudeSettings;
+  }> {}
 
 export interface SaveSettingsRequest {
   level: 'user' | 'project' | 'local';
@@ -38,11 +39,12 @@ export interface ValidateSettingsRequest {
   settings: ClaudeSettings;
 }
 
-export interface ValidateSettingsResponse extends IPCResponse<{
-  valid: boolean;
-  errors: Array<{ path: string; message: string; severity: 'error' | 'warning' | 'info' }>;
-  warnings: Array<{ path: string; message: string; severity: 'error' | 'warning' | 'info' }>;
-}> {}
+export interface ValidateSettingsResponse
+  extends IPCResponse<{
+    valid: boolean;
+    errors: Array<{ path: string; message: string; severity: 'error' | 'warning' | 'info' }>;
+    warnings: Array<{ path: string; message: string; severity: 'error' | 'warning' | 'info' }>;
+  }> {}
 
 export interface GetEffectiveSettingsResponse extends IPCResponse<EffectiveConfig> {}
 
@@ -50,9 +52,10 @@ export interface SettingsFileExistsRequest {
   level: 'user' | 'project' | 'local' | 'managed';
 }
 
-export interface SettingsFileExistsResponse extends IPCResponse<{
-  exists: boolean;
-}> {}
+export interface SettingsFileExistsResponse
+  extends IPCResponse<{
+    exists: boolean;
+  }> {}
 
 export interface EnsureSettingsFileRequest {
   level: 'user' | 'project' | 'local';

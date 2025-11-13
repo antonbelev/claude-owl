@@ -6,7 +6,11 @@ interface EnvironmentEditorProps {
   readOnly?: boolean;
 }
 
-export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({ env, updateEnv, readOnly = false }) => {
+export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
+  env,
+  updateEnv,
+  readOnly = false,
+}) => {
   const [newKey, setNewKey] = useState('');
   const [newValue, setNewValue] = useState('');
   const [showValues, setShowValues] = useState<Record<string, boolean>>({});
@@ -37,7 +41,7 @@ export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({ env, updat
   };
 
   const toggleShowValue = (key: string) => {
-    setShowValues((prev) => ({
+    setShowValues(prev => ({
       ...prev,
       [key]: !prev[key],
     }));
@@ -49,8 +53,9 @@ export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({ env, updat
     <div className="environment-editor">
       <div className="editor-intro">
         <p>
-          Environment variables are available to Claude and can be used to configure models, API keys, and other
-          settings. Common variables include <code>ANTHROPIC_API_KEY</code>, <code>ANTHROPIC_MODEL</code>, etc.
+          Environment variables are available to Claude and can be used to configure models, API
+          keys, and other settings. Common variables include <code>ANTHROPIC_API_KEY</code>,{' '}
+          <code>ANTHROPIC_MODEL</code>, etc.
         </p>
       </div>
 
@@ -79,7 +84,7 @@ export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({ env, updat
                     <input
                       type={showValues[key] ? 'text' : 'password'}
                       value={value}
-                      onChange={(e) => updateVariable(key, e.target.value)}
+                      onChange={e => updateVariable(key, e.target.value)}
                       className="env-input"
                     />
                   )}
@@ -93,7 +98,11 @@ export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({ env, updat
                     {showValues[key] ? '👁️' : '👁️‍🗨️'}
                   </button>
                   {!readOnly && (
-                    <button onClick={() => removeVariable(key)} className="btn-icon btn-remove" title="Remove variable">
+                    <button
+                      onClick={() => removeVariable(key)}
+                      className="btn-icon btn-remove"
+                      title="Remove variable"
+                    >
                       ×
                     </button>
                   )}
@@ -115,13 +124,13 @@ export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({ env, updat
                   id="envKey"
                   type="text"
                   value={newKey}
-                  onChange={(e) => setNewKey(e.target.value)}
-                  onKeyPress={(e) => {
+                  onChange={e => setNewKey(e.target.value)}
+                  onKeyPress={e => {
                     if (e.key === 'Enter') {
                       document.getElementById('envValue')?.focus();
                     }
                   }}
-                  placeholder='VARIABLE_NAME'
+                  placeholder="VARIABLE_NAME"
                   className="env-key-input"
                 />
               </div>
@@ -131,13 +140,13 @@ export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({ env, updat
                   id="envValue"
                   type="text"
                   value={newValue}
-                  onChange={(e) => setNewValue(e.target.value)}
-                  onKeyPress={(e) => {
+                  onChange={e => setNewValue(e.target.value)}
+                  onKeyPress={e => {
                     if (e.key === 'Enter') {
                       addVariable();
                     }
                   }}
-                  placeholder='variable value'
+                  placeholder="variable value"
                   className="env-value-input"
                 />
               </div>

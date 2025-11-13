@@ -180,7 +180,9 @@ export class SettingsService {
         } else if (this.isObjectKey(key)) {
           // Objects: deep merge
           result[key] = this.mergeObjects(
-            typeof existingValue === 'object' && existingValue !== null ? (existingValue as Record<string, unknown>) : {},
+            typeof existingValue === 'object' && existingValue !== null
+              ? (existingValue as Record<string, unknown>)
+              : {},
             typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : {}
           );
         } else {
@@ -236,7 +238,10 @@ export class SettingsService {
   /**
    * Deep merge two objects
    */
-  private mergeObjects(obj1: Record<string, unknown>, obj2: Record<string, unknown>): Record<string, unknown> {
+  private mergeObjects(
+    obj1: Record<string, unknown>,
+    obj2: Record<string, unknown>
+  ): Record<string, unknown> {
     const result: Record<string, unknown> = { ...obj1 };
 
     for (const [key, value] of Object.entries(obj2)) {
@@ -254,7 +259,10 @@ export class SettingsService {
         existingValue !== null
       ) {
         // Recursive merge for nested objects
-        result[key] = this.mergeObjects(existingValue as Record<string, unknown>, value as Record<string, unknown>);
+        result[key] = this.mergeObjects(
+          existingValue as Record<string, unknown>,
+          value as Record<string, unknown>
+        );
       } else if (Array.isArray(value) && Array.isArray(existingValue)) {
         // Merge arrays
         result[key] = this.mergeArrays(existingValue, value);
@@ -334,7 +342,7 @@ export class SettingsService {
       // Warn about conflicting permissions
       if (allow && deny) {
         const denySet = new Set(deny);
-        const conflicts = allow.filter((item) => denySet.has(item));
+        const conflicts = allow.filter(item => denySet.has(item));
 
         if (conflicts.length > 0) {
           warnings.push({
@@ -360,7 +368,11 @@ export class SettingsService {
 
       if (network) {
         if (network.httpProxyPort !== undefined) {
-          if (typeof network.httpProxyPort !== 'number' || network.httpProxyPort < 1 || network.httpProxyPort > 65535) {
+          if (
+            typeof network.httpProxyPort !== 'number' ||
+            network.httpProxyPort < 1 ||
+            network.httpProxyPort > 65535
+          ) {
             errors.push({
               path: 'sandbox.network.httpProxyPort',
               message: 'Must be a valid port number (1-65535)',
@@ -370,7 +382,11 @@ export class SettingsService {
         }
 
         if (network.socksProxyPort !== undefined) {
-          if (typeof network.socksProxyPort !== 'number' || network.socksProxyPort < 1 || network.socksProxyPort > 65535) {
+          if (
+            typeof network.socksProxyPort !== 'number' ||
+            network.socksProxyPort < 1 ||
+            network.socksProxyPort > 65535
+          ) {
             errors.push({
               path: 'sandbox.network.socksProxyPort',
               message: 'Must be a valid port number (1-65535)',
@@ -395,7 +411,8 @@ export class SettingsService {
           if (!/^[A-Z_][A-Z0-9_]*$/i.test(key)) {
             warnings.push({
               path: `env.${key}`,
-              message: 'Environment variable names should contain only letters, numbers, and underscores',
+              message:
+                'Environment variable names should contain only letters, numbers, and underscores',
               severity: 'warning',
             });
           }
@@ -593,7 +610,9 @@ export class SettingsService {
     const validation = this.validateSettings(backupSettings);
     if (!validation.valid) {
       console.error(`[SettingsService] Backup validation failed:`, validation.errors);
-      throw new Error(`Backup file contains invalid settings: ${validation.errors.map(e => e.message).join(', ')}`);
+      throw new Error(
+        `Backup file contains invalid settings: ${validation.errors.map(e => e.message).join(', ')}`
+      );
     }
 
     // Create a backup of current settings before restoring

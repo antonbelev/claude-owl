@@ -9,7 +9,16 @@ interface RuleEditorModalProps {
   onCancel: () => void;
 }
 
-const TOOLS: ToolType[] = ['Bash', 'Read', 'Edit', 'Write', 'WebFetch', 'WebSearch', 'NotebookEdit', 'SlashCommand'];
+const TOOLS: ToolType[] = [
+  'Bash',
+  'Read',
+  'Edit',
+  'Write',
+  'WebFetch',
+  'WebSearch',
+  'NotebookEdit',
+  'SlashCommand',
+];
 
 export const RuleEditorModal: React.FC<RuleEditorModalProps> = ({ rule, onSave, onCancel }) => {
   const { validateRule, validatePattern } = usePermissionRules();
@@ -18,7 +27,12 @@ export const RuleEditorModal: React.FC<RuleEditorModalProps> = ({ rule, onSave, 
   const [pattern, setPattern] = useState(rule?.pattern || '');
   const [level, setLevel] = useState<PermissionLevel>(rule?.level || 'allow');
   const [description, setDescription] = useState(rule?.description || '');
-  const [validationResult, setValidationResult] = useState<{ valid: boolean; error?: string; warnings?: string[]; examples?: string[] } | null>(null);
+  const [validationResult, setValidationResult] = useState<{
+    valid: boolean;
+    error?: string;
+    warnings?: string[];
+    examples?: string[];
+  } | null>(null);
 
   const requiresPattern = !TOOLS_WITHOUT_PATTERNS.includes(tool);
   const helpText = TOOL_PATTERN_HELP[tool];
@@ -86,7 +100,7 @@ export const RuleEditorModal: React.FC<RuleEditorModalProps> = ({ rule, onSave, 
 
   return (
     <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{rule ? 'Edit Permission Rule' : 'Create Permission Rule'}</h2>
           <button onClick={onCancel} className="btn-close">
@@ -138,18 +152,14 @@ export const RuleEditorModal: React.FC<RuleEditorModalProps> = ({ rule, onSave, 
           {/* Tool Type */}
           <div className="form-group">
             <label htmlFor="tool">Tool Type</label>
-            <select id="tool" value={tool} onChange={(e) => setTool(e.target.value as ToolType)}>
-              {TOOLS.map((t) => (
+            <select id="tool" value={tool} onChange={e => setTool(e.target.value as ToolType)}>
+              {TOOLS.map(t => (
                 <option key={t} value={t}>
                   {t}
                 </option>
               ))}
             </select>
-            {helpText && (
-              <p className="form-help">
-                ℹ️ {helpText}
-              </p>
-            )}
+            {helpText && <p className="form-help">ℹ️ {helpText}</p>}
           </div>
 
           {/* Pattern */}
@@ -161,21 +171,23 @@ export const RuleEditorModal: React.FC<RuleEditorModalProps> = ({ rule, onSave, 
               id="pattern"
               type="text"
               value={pattern}
-              onChange={(e) => setPattern(e.target.value)}
+              onChange={e => setPattern(e.target.value)}
               placeholder={
                 tool === 'Bash'
                   ? 'e.g., npm run test'
                   : tool === 'Read' || tool === 'Edit' || tool === 'Write'
-                  ? 'e.g., ./src/**/*.ts'
-                  : tool === 'WebFetch'
-                  ? 'e.g., domain:anthropic.com'
-                  : 'Pattern...'
+                    ? 'e.g., ./src/**/*.ts'
+                    : tool === 'WebFetch'
+                      ? 'e.g., domain:anthropic.com'
+                      : 'Pattern...'
               }
             />
 
             {/* Validation Feedback */}
             {validationResult && (
-              <div className={`validation-feedback ${validationResult.valid ? 'valid' : 'invalid'}`}>
+              <div
+                className={`validation-feedback ${validationResult.valid ? 'valid' : 'invalid'}`}
+              >
                 {validationResult.valid && <span className="validation-icon">✅</span>}
                 {!validationResult.valid && validationResult.error && (
                   <span className="validation-error">❌ {validationResult.error}</span>
@@ -212,7 +224,7 @@ export const RuleEditorModal: React.FC<RuleEditorModalProps> = ({ rule, onSave, 
               id="description"
               type="text"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={e => setDescription(e.target.value)}
               placeholder="Brief note about this rule..."
             />
           </div>

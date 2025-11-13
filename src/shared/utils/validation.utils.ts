@@ -23,14 +23,14 @@ export function isValidSkillName(name: string): boolean {
  */
 export function hasDangerousShellPattern(command: string): boolean {
   const dangerousPatterns = [
-    /rm\s+-rf/,           // rm -rf
-    />\s*\/dev\//,        // redirect to /dev/
-    /\$\(.*\)/,           // command substitution without quotes
-    /`.*`/,               // backtick command substitution
-    /\|\s*bash/,          // pipe to bash
-    /\|\s*sh/,            // pipe to sh
-    /;\s*rm/,             // chained rm command
-    /&&\s*rm/,            // AND'd rm command
+    /rm\s+-rf/, // rm -rf
+    />\s*\/dev\//, // redirect to /dev/
+    /\$\(.*\)/, // command substitution without quotes
+    /`.*`/, // backtick command substitution
+    /\|\s*bash/, // pipe to bash
+    /\|\s*sh/, // pipe to sh
+    /;\s*rm/, // chained rm command
+    /&&\s*rm/, // AND'd rm command
   ];
 
   return dangerousPatterns.some(pattern => pattern.test(command));

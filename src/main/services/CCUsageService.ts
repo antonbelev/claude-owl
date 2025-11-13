@@ -39,13 +39,7 @@ export class CCUsageService {
 
     // On macOS, add common binary paths that might not be in Electron's PATH
     if (process.platform === 'darwin') {
-      const paths = [
-        env.PATH || '',
-        '/usr/local/bin',
-        '/opt/homebrew/bin',
-        '/usr/bin',
-        '/bin',
-      ];
+      const paths = [env.PATH || '', '/usr/local/bin', '/opt/homebrew/bin', '/usr/bin', '/bin'];
       env.PATH = paths.filter(p => p).join(':');
     }
 
@@ -70,7 +64,9 @@ export class CCUsageService {
       process.stdout.write(`[CCUsage] isInstalled result: ${installed}\n`);
       return installed;
     } catch (error) {
-      process.stderr.write(`[CCUsage] Error checking installation: ${error instanceof Error ? error.message : error}\n`);
+      process.stderr.write(
+        `[CCUsage] Error checking installation: ${error instanceof Error ? error.message : error}\n`
+      );
       if (error instanceof Error && 'stderr' in error) {
         process.stderr.write(`[CCUsage] stderr: ${(error as any).stderr}\n`);
       }
@@ -105,8 +101,12 @@ export class CCUsageService {
       process.stdout.write(`[CCUsage] Got ${stdout.length} chars of output\n`);
       return stdout;
     } catch (error) {
-      process.stderr.write(`[CCUsage] Error running ccusage: ${error instanceof Error ? error.message : error}\n`);
-      throw new Error(`Failed to run ccusage: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      process.stderr.write(
+        `[CCUsage] Error running ccusage: ${error instanceof Error ? error.message : error}\n`
+      );
+      throw new Error(
+        `Failed to run ccusage: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -120,8 +120,12 @@ export class CCUsageService {
       process.stdout.write(`[CCUsage] Parsed ${result.days.length} days\n`);
       return result;
     } catch (error) {
-      process.stderr.write(`[CCUsage] Error getting usage report: ${error instanceof Error ? error.message : error}\n`);
-      throw new Error(`Failed to run ccusage: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      process.stderr.write(
+        `[CCUsage] Error getting usage report: ${error instanceof Error ? error.message : error}\n`
+      );
+      throw new Error(
+        `Failed to run ccusage: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -203,7 +207,10 @@ export class CCUsageService {
   /**
    * Parse a single table row
    */
-  private parseTableRow(line: string, currentDay: UsageDay | null): (UsageDay & { isNewDay: boolean }) | null {
+  private parseTableRow(
+    line: string,
+    currentDay: UsageDay | null
+  ): (UsageDay & { isNewDay: boolean }) | null {
     try {
       // Split by │ and clean up
       const parts = line.split('│').map(p => p.trim());

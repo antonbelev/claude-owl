@@ -102,7 +102,7 @@ export class HooksService {
     const allEvents = getAllHookEventsInfo();
 
     // Build summaries for each event
-    const summaries: HookEventSummary[] = allEvents.map((eventInfo) => {
+    const summaries: HookEventSummary[] = allEvents.map(eventInfo => {
       const event = eventInfo.event;
       const hooks: HookWithMetadata[] = [];
 
@@ -141,8 +141,8 @@ export class HooksService {
       });
 
       // Calculate summary metrics
-      const hasIssues = hooks.some((h) => h.validation.issues.length > 0);
-      const worstScore = this.calculateWorstScore(hooks.map((h) => h.validation.score));
+      const hasIssues = hooks.some(h => h.validation.issues.length > 0);
+      const worstScore = this.calculateWorstScore(hooks.map(h => h.validation.score));
 
       return {
         event,
@@ -156,7 +156,7 @@ export class HooksService {
 
     console.log('[HooksService] Hooks metadata built:', {
       totalEvents: summaries.length,
-      eventsWithHooks: summaries.filter((s) => s.count > 0).length,
+      eventsWithHooks: summaries.filter(s => s.count > 0).length,
       totalHooks: summaries.reduce((sum, s) => sum + s.count, 0),
     });
 

@@ -82,7 +82,7 @@ export function useSettingsPath(location: 'user' | 'project', projectPath?: stri
         ? { location, projectPath }
         : { location };
       const response = (await window.electronAPI.getHookSettingsPath(
-        request,
+        request
       )) as GetSettingsPathResponse;
 
       if (!response.success || !response.data) {
@@ -110,7 +110,7 @@ export function useOpenSettingsFile() {
         ? { location, projectPath }
         : { location };
       const response = (await window.electronAPI.openHookSettingsFile(
-        request,
+        request
       )) as OpenSettingsFileResponse;
 
       if (!response.success) {

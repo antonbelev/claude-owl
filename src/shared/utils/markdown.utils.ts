@@ -111,8 +111,10 @@ function parseSimpleYAML<T>(yaml: string): T {
  */
 function parseValue(value: string): string | number | boolean {
   // Remove quotes if present
-  if ((value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))) {
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
     return value.slice(1, -1);
   }
 

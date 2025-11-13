@@ -67,20 +67,23 @@ export function registerPluginsHandlers(): void {
   });
 
   // Remove marketplace
-  ipcMain.handle(PLUGINS_CHANNELS.REMOVE_MARKETPLACE, async (_, request: RemoveMarketplaceRequest) => {
-    console.log('[PluginsHandlers] REMOVE_MARKETPLACE request:', request);
-    try {
-      const result = await pluginsService.removeMarketplace(request.name);
-      console.log('[PluginsHandlers] REMOVE_MARKETPLACE success:', { name: request.name });
-      return result;
-    } catch (error) {
-      console.error('[PluginsHandlers] REMOVE_MARKETPLACE failed:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to remove marketplace',
-      };
+  ipcMain.handle(
+    PLUGINS_CHANNELS.REMOVE_MARKETPLACE,
+    async (_, request: RemoveMarketplaceRequest) => {
+      console.log('[PluginsHandlers] REMOVE_MARKETPLACE request:', request);
+      try {
+        const result = await pluginsService.removeMarketplace(request.name);
+        console.log('[PluginsHandlers] REMOVE_MARKETPLACE success:', { name: request.name });
+        return result;
+      } catch (error) {
+        console.error('[PluginsHandlers] REMOVE_MARKETPLACE failed:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to remove marketplace',
+        };
+      }
     }
-  });
+  );
 
   // Get available plugins from all marketplaces
   ipcMain.handle(PLUGINS_CHANNELS.GET_AVAILABLE_PLUGINS, async () => {
@@ -122,7 +125,10 @@ export function registerPluginsHandlers(): void {
         request.pluginName,
         request.marketplaceName
       );
-      console.log('[PluginsHandlers] INSTALL_PLUGIN result:', { success: result.success, plugin: result.plugin?.id });
+      console.log('[PluginsHandlers] INSTALL_PLUGIN result:', {
+        success: result.success,
+        plugin: result.plugin?.id,
+      });
       return { success: result.success, data: result, error: result.error };
     } catch (error) {
       console.error('[PluginsHandlers] INSTALL_PLUGIN failed:', error);
@@ -154,7 +160,10 @@ export function registerPluginsHandlers(): void {
     console.log('[PluginsHandlers] TOGGLE_PLUGIN request:', request);
     try {
       const result = await pluginsService.togglePlugin(request.pluginId, request.enabled);
-      console.log('[PluginsHandlers] TOGGLE_PLUGIN success:', { pluginId: request.pluginId, enabled: request.enabled });
+      console.log('[PluginsHandlers] TOGGLE_PLUGIN success:', {
+        pluginId: request.pluginId,
+        enabled: request.enabled,
+      });
       return result;
     } catch (error) {
       console.error('[PluginsHandlers] TOGGLE_PLUGIN failed:', error);
@@ -166,20 +175,23 @@ export function registerPluginsHandlers(): void {
   });
 
   // Get GitHub repository information
-  ipcMain.handle(PLUGINS_CHANNELS.GET_GITHUB_REPO_INFO, async (_, request: GetGitHubRepoInfoRequest) => {
-    console.log('[PluginsHandlers] GET_GITHUB_REPO_INFO request:', request);
-    try {
-      const info = await pluginsService.getGitHubRepoInfo(request.repoUrl);
-      console.log('[PluginsHandlers] GET_GITHUB_REPO_INFO success');
-      return { success: true, data: info };
-    } catch (error) {
-      console.error('[PluginsHandlers] GET_GITHUB_REPO_INFO failed:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to get GitHub repo info',
-      };
+  ipcMain.handle(
+    PLUGINS_CHANNELS.GET_GITHUB_REPO_INFO,
+    async (_, request: GetGitHubRepoInfoRequest) => {
+      console.log('[PluginsHandlers] GET_GITHUB_REPO_INFO request:', request);
+      try {
+        const info = await pluginsService.getGitHubRepoInfo(request.repoUrl);
+        console.log('[PluginsHandlers] GET_GITHUB_REPO_INFO success');
+        return { success: true, data: info };
+      } catch (error) {
+        console.error('[PluginsHandlers] GET_GITHUB_REPO_INFO failed:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to get GitHub repo info',
+        };
+      }
     }
-  });
+  );
 
   // Get plugin health score
   ipcMain.handle(PLUGINS_CHANNELS.GET_PLUGIN_HEALTH, async (_, request: GetPluginHealthRequest) => {

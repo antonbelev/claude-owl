@@ -48,7 +48,8 @@ export function useSettings() {
     }
 
     try {
-      const response = (await window.electronAPI.getEffectiveSettings()) as GetEffectiveSettingsResponse;
+      const response =
+        (await window.electronAPI.getEffectiveSettings()) as GetEffectiveSettingsResponse;
 
       if (response.success && response.data) {
         setState({
@@ -99,70 +100,76 @@ export function useSettings() {
   /**
    * Save settings to a specific level
    */
-  const saveSettings = useCallback(async (level: Exclude<ConfigLevel, 'managed'>, settings: ClaudeSettings): Promise<boolean> => {
-    setState(prev => ({ ...prev, saving: true, error: null }));
+  const saveSettings = useCallback(
+    async (level: Exclude<ConfigLevel, 'managed'>, settings: ClaudeSettings): Promise<boolean> => {
+      setState(prev => ({ ...prev, saving: true, error: null }));
 
-    if (!window.electronAPI) {
-      setState(prev => ({
-        ...prev,
-        saving: false,
-        error: 'Not running in Electron',
-      }));
-      return false;
-    }
-
-    try {
-      const response = (await window.electronAPI.saveSettings({
-        level,
-        settings,
-      })) as SaveSettingsResponse;
-
-      if (response.success) {
-        setState(prev => ({ ...prev, saving: false }));
-        // Reload effective settings after save
-        await loadEffectiveSettings();
-        return true;
-      } else {
+      if (!window.electronAPI) {
         setState(prev => ({
           ...prev,
           saving: false,
-          error: response.error ?? 'Failed to save settings',
+          error: 'Not running in Electron',
         }));
         return false;
       }
-    } catch (error) {
-      setState(prev => ({
-        ...prev,
-        saving: false,
-        error: error instanceof Error ? error.message : 'Failed to save settings',
-      }));
-      return false;
-    }
-  }, [loadEffectiveSettings]);
+
+      try {
+        const response = (await window.electronAPI.saveSettings({
+          level,
+          settings,
+        })) as SaveSettingsResponse;
+
+        if (response.success) {
+          setState(prev => ({ ...prev, saving: false }));
+          // Reload effective settings after save
+          await loadEffectiveSettings();
+          return true;
+        } else {
+          setState(prev => ({
+            ...prev,
+            saving: false,
+            error: response.error ?? 'Failed to save settings',
+          }));
+          return false;
+        }
+      } catch (error) {
+        setState(prev => ({
+          ...prev,
+          saving: false,
+          error: error instanceof Error ? error.message : 'Failed to save settings',
+        }));
+        return false;
+      }
+    },
+    [loadEffectiveSettings]
+  );
 
   /**
    * Validate settings
    */
-  const validateSettings = useCallback(async (settings: ClaudeSettings): Promise<SettingsValidationResult | null> => {
-    if (!window.electronAPI) {
-      return null;
-    }
-
-    try {
-      const response = (await window.electronAPI.validateSettings({
-        settings,
-      })) as ValidateSettingsResponse;
-
-      if (response.success && response.data) {
-        return response.data;
+  const validateSettings = useCallback(
+    async (settings: ClaudeSettings): Promise<SettingsValidationResult | null> => {
+      if (!window.electronAPI) {
+        return null;
       }
 
-      return null;
-    } catch (error) {
-      console.error('Failed to validate settings:', error);
-      return null;
-    }
-  }, []);
+      try {
+        const response = (await window.electronAPI.validateSettings({
+          settings,
+        })) as ValidateSettingsResponse;
+
+        if (response.success && response.data) {
+          return response.data;
+        }
+
+        return null;
+      } catch (error) {
+        console.error('Failed to validate settings:', error);
+        return null;
+      }
+    },
+    []
+  );
 
   /**
    * Check if a settings file exists
@@ -173,7 +180,10 @@ export function useSettings() {
     }
 
     try {
-      const response = (await window.electronAPI.settingsFileExists({ level })) as { success: boolean; data?: { exists: boolean } };
+      const response = (await window.electronAPI.settingsFileExists({ level })) as {
+        success: boolean;
+        data?: { exists: boolean };
+      };
       return response.success && response.data?.exists === true;
     } catch (error) {
       console.error(`Failed to check if ${level} settings exists:`, error);
@@ -184,43 +194,53 @@ export function useSettings() {
   /**
    * Ensure a settings file exists (creates if it doesn't)
    */
-  const ensureSettingsFile = useCallback(async (level: Exclude<ConfigLevel, 'managed'>): Promise<boolean> => {
-    if (!window.electronAPI) {
-      return false;
-    }
+  const ensureSettingsFile = useCallback(
+    async (level: Exclude<ConfigLevel, 'managed'>): Promise<boolean> => {
+      if (!window.electronAPI) {
+        return false;
+      }
 
-    try {
-      const response = (await window.electronAPI.ensureSettingsFile({ level })) as { success: boolean };
-      return response.success;
-    } catch (error) {
-      console.error(`Failed to ensure ${level} settings file:`, error);
-      return false;
-    }
-  }, []);
+      try {
+        const response = (await window.electronAPI.ensureSettingsFile({ level })) as {
+          success: boolean;
+        };
+        return response.success;
+      } catch (error) {
+        console.error(`Failed to ensure ${level} settings file:`, error);
+        return false;
+      }
+    },
+    []
+  );
 
   /**
    * Delete a settings file
    */
-  const deleteSettings = useCallback(async (level: Exclude<ConfigLevel, 'managed'>): Promise<boolean> => {
-    if (!window.electronAPI) {
-      return false;
-    }
-
-    try {
-      const response = (await window.electronAPI.deleteSettings({ level })) as { success: boolean };
-
-      if (response.success) {
-        // Reload effective settings after delete
-        await loadEffectiveSettings();
-        return true;
+  const deleteSettings = useCallback(
+    async (level: Exclude<ConfigLevel, 'managed'>): Promise<boolean> => {
+      if (!window.electronAPI) {
+        return false;
       }
 
-      return false;
-    } catch (error) {
-      console.error(`Failed to delete ${level} settings:`, error);
-      return false;
-    }
-  }, [loadEffectiveSettings]);
+      try {
+        const response = (await window.electronAPI.deleteSettings({ level })) as {
+          success: boolean;
+        };
+
+        if (response.success) {
+          // Reload effective settings after delete
+          await loadEffectiveSettings();
+          return true;
+        }
+
+        return false;
+      } catch (error) {
+        console.error(`Failed to delete ${level} settings:`, error);
+        return false;
+      }
+    },
+    [loadEffectiveSettings]
+  );
 
   /**
    * Create a backup of settings file
@@ -231,7 +251,10 @@ export function useSettings() {
     }
 
     try {
-      const response = (await window.electronAPI.createBackup({ level })) as { success: boolean; data?: { backupPath: string } };
+      const response = (await window.electronAPI.createBackup({ level })) as {
+        success: boolean;
+        data?: { backupPath: string };
+      };
 
       if (response.success && response.data) {
         return response.data.backupPath;
@@ -247,29 +270,32 @@ export function useSettings() {
   /**
    * Restore settings from a backup file
    */
-  const restoreBackup = useCallback(async (backupPath: string, level: Exclude<ConfigLevel, 'managed'>): Promise<boolean> => {
-    if (!window.electronAPI) {
-      return false;
-    }
-
-    try {
-      const response = (await window.electronAPI.restoreBackup({
-        backupPath,
-        level,
-      })) as { success: boolean };
-
-      if (response.success) {
-        // Reload effective settings after restore
-        await loadEffectiveSettings();
-        return true;
+  const restoreBackup = useCallback(
+    async (backupPath: string, level: Exclude<ConfigLevel, 'managed'>): Promise<boolean> => {
+      if (!window.electronAPI) {
+        return false;
       }
 
-      return false;
-    } catch (error) {
-      console.error(`Failed to restore backup:`, error);
-      return false;
-    }
-  }, [loadEffectiveSettings]);
+      try {
+        const response = (await window.electronAPI.restoreBackup({
+          backupPath,
+          level,
+        })) as { success: boolean };
+
+        if (response.success) {
+          // Reload effective settings after restore
+          await loadEffectiveSettings();
+          return true;
+        }
+
+        return false;
+      } catch (error) {
+        console.error(`Failed to restore backup:`, error);
+        return false;
+      }
+    },
+    [loadEffectiveSettings]
+  );
 
   // Load settings on mount
   useEffect(() => {
@@ -335,13 +361,16 @@ export function useLevelSettings(level: ConfigLevel) {
   /**
    * Update settings (in memory only)
    */
-  const updateSettings = useCallback((newSettings: Partial<ClaudeSettings>) => {
-    setSettings(prev => {
-      const updated = { ...prev, ...newSettings };
-      setHasChanges(JSON.stringify(updated) !== JSON.stringify(originalSettings));
-      return updated;
-    });
-  }, [originalSettings]);
+  const updateSettings = useCallback(
+    (newSettings: Partial<ClaudeSettings>) => {
+      setSettings(prev => {
+        const updated = { ...prev, ...newSettings };
+        setHasChanges(JSON.stringify(updated) !== JSON.stringify(originalSettings));
+        return updated;
+      });
+    },
+    [originalSettings]
+  );
 
   /**
    * Save settings to file

@@ -1,5 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Skill, ListSkillsResponse, SaveSkillResponse, DeleteSkillResponse } from '@/shared/types';
+import type {
+  Skill,
+  ListSkillsResponse,
+  SaveSkillResponse,
+  DeleteSkillResponse,
+} from '@/shared/types';
 
 export interface UseSkillsResult {
   skills: Skill[];

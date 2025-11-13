@@ -27,113 +27,128 @@ export function usePermissionRules() {
   /**
    * Parse a rule string into a structured PermissionRule object
    */
-  const parseRule = useCallback(async (ruleString: string): Promise<Omit<PermissionRule, 'id' | 'level'> | null> => {
-    if (!window.electronAPI) {
-      return null;
-    }
-
-    try {
-      const response = (await window.electronAPI.parseRule({ ruleString })) as {
-        success: boolean;
-        data?: PermissionRule;
-        error?: string;
-      };
-
-      if (response.success && response.data) {
-        const { id: _id, level: _level, ...rest } = response.data;
-        return rest;
+  const parseRule = useCallback(
+    async (ruleString: string): Promise<Omit<PermissionRule, 'id' | 'level'> | null> => {
+      if (!window.electronAPI) {
+        return null;
       }
 
-      return null;
-    } catch (error) {
-      console.error('Failed to parse rule:', error);
-      return null;
-    }
-  }, []);
+      try {
+        const response = (await window.electronAPI.parseRule({ ruleString })) as {
+          success: boolean;
+          data?: PermissionRule;
+          error?: string;
+        };
+
+        if (response.success && response.data) {
+          const { id: _id, level: _level, ...rest } = response.data;
+          return rest;
+        }
+
+        return null;
+      } catch (error) {
+        console.error('Failed to parse rule:', error);
+        return null;
+      }
+    },
+    []
+  );
 
   /**
    * Format a PermissionRule object back to a string
    */
-  const formatRule = useCallback(async (rule: Omit<PermissionRule, 'id'>): Promise<string | null> => {
-    if (!window.electronAPI) {
-      return null;
-    }
-
-    try {
-      const response = (await window.electronAPI.formatRule({ rule })) as {
-        success: boolean;
-        data?: { ruleString: string };
-        error?: string;
-      };
-
-      if (response.success && response.data) {
-        return response.data.ruleString;
+  const formatRule = useCallback(
+    async (rule: Omit<PermissionRule, 'id'>): Promise<string | null> => {
+      if (!window.electronAPI) {
+        return null;
       }
 
-      return null;
-    } catch (error) {
-      console.error('Failed to format rule:', error);
-      return null;
-    }
-  }, []);
+      try {
+        const response = (await window.electronAPI.formatRule({ rule })) as {
+          success: boolean;
+          data?: { ruleString: string };
+          error?: string;
+        };
+
+        if (response.success && response.data) {
+          return response.data.ruleString;
+        }
+
+        return null;
+      } catch (error) {
+        console.error('Failed to format rule:', error);
+        return null;
+      }
+    },
+    []
+  );
 
   /**
    * Validate a permission rule
    */
-  const validateRule = useCallback(async (rule: Omit<PermissionRule, 'id'>): Promise<RuleValidationResult | null> => {
-    if (!window.electronAPI) {
-      return null;
-    }
-
-    try {
-      const response = (await window.electronAPI.validateRule({ rule })) as {
-        success: boolean;
-        data?: RuleValidationResult;
-        error?: string;
-      };
-
-      if (response.success && response.data) {
-        return response.data;
+  const validateRule = useCallback(
+    async (rule: Omit<PermissionRule, 'id'>): Promise<RuleValidationResult | null> => {
+      if (!window.electronAPI) {
+        return null;
       }
 
-      return null;
-    } catch (error) {
-      console.error('Failed to validate rule:', error);
-      return null;
-    }
-  }, []);
+      try {
+        const response = (await window.electronAPI.validateRule({ rule })) as {
+          success: boolean;
+          data?: RuleValidationResult;
+          error?: string;
+        };
+
+        if (response.success && response.data) {
+          return response.data;
+        }
+
+        return null;
+      } catch (error) {
+        console.error('Failed to validate rule:', error);
+        return null;
+      }
+    },
+    []
+  );
 
   /**
    * Validate a pattern for a specific tool
    */
-  const validatePattern = useCallback(async (tool: ToolType, pattern: string): Promise<RuleValidationResult | null> => {
-    if (!window.electronAPI) {
-      return null;
-    }
-
-    try {
-      const response = (await window.electronAPI.validatePattern({ tool, pattern })) as {
-        success: boolean;
-        data?: RuleValidationResult;
-        error?: string;
-      };
-
-      if (response.success && response.data) {
-        return response.data;
+  const validatePattern = useCallback(
+    async (tool: ToolType, pattern: string): Promise<RuleValidationResult | null> => {
+      if (!window.electronAPI) {
+        return null;
       }
 
-      return null;
-    } catch (error) {
-      console.error('Failed to validate pattern:', error);
-      return null;
-    }
-  }, []);
+      try {
+        const response = (await window.electronAPI.validatePattern({ tool, pattern })) as {
+          success: boolean;
+          data?: RuleValidationResult;
+          error?: string;
+        };
+
+        if (response.success && response.data) {
+          return response.data;
+        }
+
+        return null;
+      } catch (error) {
+        console.error('Failed to validate pattern:', error);
+        return null;
+      }
+    },
+    []
+  );
 
   /**
    * Test a rule against an input string
    */
   const testRule = useCallback(
-    async (rule: Omit<PermissionRule, 'id'>, testInput: string): Promise<RuleMatchResult | null> => {
+    async (
+      rule: Omit<PermissionRule, 'id'>,
+      testInput: string
+    ): Promise<RuleMatchResult | null> => {
       if (!window.electronAPI) {
         return null;
       }
@@ -205,28 +220,31 @@ export function usePermissionRules() {
   /**
    * Apply a template and get the generated rules
    */
-  const applyTemplate = useCallback(async (templateId: string): Promise<PermissionRule[] | null> => {
-    if (!window.electronAPI) {
-      return null;
-    }
-
-    try {
-      const response = (await window.electronAPI.applyTemplate({ templateId })) as {
-        success: boolean;
-        data?: { rules: PermissionRule[] };
-        error?: string;
-      };
-
-      if (response.success && response.data) {
-        return response.data.rules;
+  const applyTemplate = useCallback(
+    async (templateId: string): Promise<PermissionRule[] | null> => {
+      if (!window.electronAPI) {
+        return null;
       }
 
-      return null;
-    } catch (error) {
-      console.error('Failed to apply template:', error);
-      return null;
-    }
-  }, []);
+      try {
+        const response = (await window.electronAPI.applyTemplate({ templateId })) as {
+          success: boolean;
+          data?: { rules: PermissionRule[] };
+          error?: string;
+        };
+
+        if (response.success && response.data) {
+          return response.data.rules;
+        }
+
+        return null;
+      } catch (error) {
+        console.error('Failed to apply template:', error);
+        return null;
+      }
+    },
+    []
+  );
 
   return {
     ...state,

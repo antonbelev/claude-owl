@@ -298,19 +298,19 @@ export function getHookTemplates(): HookTemplate[] {
  * Get template by ID
  */
 export function getHookTemplateById(id: string): HookTemplate | undefined {
-  return HOOK_TEMPLATES.find((template) => template.id === id);
+  return HOOK_TEMPLATES.find(template => template.id === id);
 }
 
 /**
  * Get templates by category
  */
 export function getHookTemplatesByCategory(category: string): HookTemplate[] {
-  return HOOK_TEMPLATES.filter((template) => template.category === category);
+  return HOOK_TEMPLATES.filter(template => template.category === category);
 }
 
 /**
  * Get templates by event
  */
 export function getHookTemplatesByEvent(event: string): HookTemplate[] {
-  return HOOK_TEMPLATES.filter((template) => template.event === event);
+  return HOOK_TEMPLATES.filter(template => template.event === event);
 }

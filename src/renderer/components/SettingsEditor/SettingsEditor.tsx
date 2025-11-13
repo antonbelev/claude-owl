@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { ConfigLevel } from '@/shared/types';
 import { SettingsHierarchyTab } from './SettingsHierarchyTab';
+import { PageHeader } from '../common/PageHeader';
 import './SettingsEditor.css';
 
 type TabType = 'user' | 'managed';
@@ -12,30 +13,27 @@ export const SettingsEditor: React.FC = () => {
     return <SettingsHierarchyTab level={activeTab as ConfigLevel} />;
   };
 
+  const handleDocsClick = () => {
+    if (window.electronAPI?.openExternal) {
+      window.electronAPI.openExternal('https://code.claude.com/docs/en/settings');
+    } else {
+      window.open('https://code.claude.com/docs/en/settings', '_blank');
+    }
+  };
+
   return (
     <div className="settings-editor" data-testid="settings-editor">
-      <div className="settings-header">
-        <div className="header-content">
-          <div>
-            <h1>Settings</h1>
-            <p className="settings-subtitle">
-              Configure your global Claude Code preferences, environment variables, and permissions
-            </p>
-          </div>
-          <button
-            onClick={() => {
-              if (window.electronAPI?.openExternal) {
-                window.electronAPI.openExternal('https://code.claude.com/docs/en/settings');
-              } else {
-                window.open('https://code.claude.com/docs/en/settings', '_blank');
-              }
-            }}
-            className="btn-docs"
-          >
-            📖 Documentation
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="Settings"
+        description="Configure your global Claude Code preferences, environment variables, and permissions"
+        actions={[
+          {
+            label: '📖 Documentation',
+            onClick: handleDocsClick,
+            variant: 'docs',
+          },
+        ]}
+      />
 
       <div className="settings-tabs">
         <button

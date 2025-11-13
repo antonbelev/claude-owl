@@ -59,34 +59,31 @@ export function useDebugLogs(): UseDebugLogsResult {
     }
   }, []);
 
-  const getLog = useCallback(
-    async (filename: string): Promise<DebugLog | null> => {
-      if (!window.electronAPI) {
-        setError('Not running in Electron');
+  const getLog = useCallback(async (filename: string): Promise<DebugLog | null> => {
+    if (!window.electronAPI) {
+      setError('Not running in Electron');
+      return null;
+    }
+
+    try {
+      const response = (await window.electronAPI.getDebugLog({
+        filename,
+      })) as GetDebugLogResponse;
+
+      if (response.success && response.data) {
+        console.log('[useDebugLogs] Successfully loaded log:', filename);
+        return response.data;
+      } else {
+        setError(response.error ?? 'Failed to load debug log');
         return null;
       }
-
-      try {
-        const response = (await window.electronAPI.getDebugLog({
-          filename,
-        })) as GetDebugLogResponse;
-
-        if (response.success && response.data) {
-          console.log('[useDebugLogs] Successfully loaded log:', filename);
-          return response.data;
-        } else {
-          setError(response.error ?? 'Failed to load debug log');
-          return null;
-        }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to load debug log';
-        setError(errorMessage);
-        console.error('[useDebugLogs] Error loading log:', err);
-        return null;
-      }
-    },
-    []
-  );
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load debug log';
+      setError(errorMessage);
+      console.error('[useDebugLogs] Error loading log:', err);
+      return null;
+    }
+  }, []);
 
   const deleteLog = useCallback(
     async (filename: string): Promise<boolean> => {

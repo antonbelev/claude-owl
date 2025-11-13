@@ -3,7 +3,12 @@
  * Centralized exports for core application services
  */
 
-export { FileSystemService, type ParsedMarkdown, type FileStats, fileSystemService } from './FileSystemService';
+export {
+  FileSystemService,
+  type ParsedMarkdown,
+  type FileStats,
+  fileSystemService,
+} from './FileSystemService';
 export { PathService, pathService } from './PathService';
 export {
   ValidationService,

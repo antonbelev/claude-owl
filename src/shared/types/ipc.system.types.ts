@@ -14,11 +14,12 @@ export interface ExecuteCLIRequest {
   cwd?: string;
 }
 
-export interface ExecuteCLIResponse extends IPCResponse<{
-  stdout?: string;
-  stderr?: string;
-  exitCode?: number;
-}> {}
+export interface ExecuteCLIResponse
+  extends IPCResponse<{
+    stdout?: string;
+    stderr?: string;
+    exitCode?: number;
+  }> {}
 
 /**
  * System request/response types
