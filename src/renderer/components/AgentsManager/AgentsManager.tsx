@@ -74,7 +74,10 @@ export const AgentsManager: React.FC = () => {
   if (loading) {
     return (
       <div className="agents-manager" data-testid="agents-manager">
-        <PageHeader title="Subagents" description="Custom agents with specialized capabilities and system prompts" />
+        <PageHeader
+          title="Subagents"
+          description="Custom agents with specialized capabilities and system prompts"
+        />
         <div className="agents-loading">
           <p>Loading subagents...</p>
         </div>

@@ -71,10 +71,7 @@ export class AutoFixEngine {
 
     // Reconstruct content
     if (changesApplied.length > 0 || quoteFixed !== commandContent) {
-      const reconstructed = this.reconstructMarkdown(
-        frontmatter,
-        quoteFixed
-      );
+      const reconstructed = this.reconstructMarkdown(frontmatter, quoteFixed);
       fixed = reconstructed;
     }
 
@@ -96,9 +93,10 @@ export class AutoFixEngine {
   /**
    * Parse frontmatter with exact end position
    */
-  private static parseFrontmatterFull(
-    content: string
-  ): { frontmatter: Record<string, any>; commandContent: string } {
+  private static parseFrontmatterFull(content: string): {
+    frontmatter: Record<string, any>;
+    commandContent: string;
+  } {
     const lines = content.split('\n');
     const frontmatter: Record<string, any> = {};
     let inFrontmatter = false;
@@ -118,7 +116,10 @@ export class AutoFixEngine {
         const [key, ...valueParts] = line.split(':');
         if (!key) continue;
 
-        const value = valueParts.join(':').trim().replace(/^['"]|['"]$/g, '');
+        const value = valueParts
+          .join(':')
+          .trim()
+          .replace(/^['"]|['"]$/g, '');
 
         // Handle arrays
         if (value.startsWith('[') && value.endsWith(']')) {
@@ -145,19 +146,19 @@ export class AutoFixEngine {
     let fixed = content;
 
     // Pattern: !`...` with unquoted variables
-    fixed = fixed.replace(/!`([^`]*?)\$(\d+|ARGUMENTS)([^`]*?)`/g, (match, before, varNum, after) => {
-      // Check if variable is already quoted
-      if (before.includes(`"$${varNum}`) || before.includes(`'$${varNum}`)) {
-        return match;
-      }
+    fixed = fixed.replace(
+      /!`([^`]*?)\$(\d+|ARGUMENTS)([^`]*?)`/g,
+      (match, before, varNum, after) => {
+        // Check if variable is already quoted
+        if (before.includes(`"$${varNum}`) || before.includes(`'$${varNum}`)) {
+          return match;
+        }
 
-      // Quote the variable
-      const fixedBefore = before.replace(
-        new RegExp(`\\$$${varNum}\\b`, 'g'),
-        `"$${varNum}"`
-      );
-      return `!\`${fixedBefore}$${varNum}${after}\``;
-    });
+        // Quote the variable
+        const fixedBefore = before.replace(new RegExp(`\\$$${varNum}\\b`, 'g'), `"$${varNum}"`);
+        return `!\`${fixedBefore}$${varNum}${after}\``;
+      }
+    );
 
     return fixed;
   }
@@ -165,9 +166,10 @@ export class AutoFixEngine {
   /**
    * Restrict Bash(*) to specific commands detected in the content
    */
-  private static restrictBashWildcard(
-    frontmatter: Record<string, any>
-  ): { tools: string[]; changed: boolean } {
+  private static restrictBashWildcard(frontmatter: Record<string, any>): {
+    tools: string[];
+    changed: boolean;
+  } {
     const tools = frontmatter['allowed-tools'] || [];
     const bashWildcardIndex = tools.findIndex((t: string) => t === 'Bash(*)');
 
@@ -188,9 +190,10 @@ export class AutoFixEngine {
   /**
    * Restrict Write(*) and Edit(*) to specific paths
    */
-  private static restrictWriteEditWildcards(
-    frontmatter: Record<string, any>
-  ): { tools: string[]; changed: boolean } {
+  private static restrictWriteEditWildcards(frontmatter: Record<string, any>): {
+    tools: string[];
+    changed: boolean;
+  } {
     const tools = frontmatter['allowed-tools'] || [];
     let changed = false;
 

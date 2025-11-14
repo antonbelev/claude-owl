@@ -196,10 +196,7 @@ export class GitHubService {
       }
 
       // Calculate parent path for breadcrumbs
-      const parentPath =
-        folderPath === ''
-          ? null
-          : folderPath.split('/').slice(0, -1).join('/');
+      const parentPath = folderPath === '' ? null : folderPath.split('/').slice(0, -1).join('/');
 
       console.log('[GitHubService] Folder contents loaded:', {
         fileCount: files.length,
@@ -253,10 +250,7 @@ export class GitHubService {
   /**
    * Fetch specific files from GitHub repository
    */
-  static async fetchFiles(
-    repoUrl: string,
-    filePaths: string[]
-  ): Promise<DiscoveredCommand[]> {
+  static async fetchFiles(repoUrl: string, filePaths: string[]): Promise<DiscoveredCommand[]> {
     console.log('[GitHubService] Fetching files:', {
       repoUrl,
       fileCount: filePaths.length,
@@ -394,9 +388,7 @@ export class GitHubService {
       }
 
       // Filter for .md files (slash commands are markdown files)
-      const mdFiles = contents.filter(
-        item => item.type === 'file' && item.name.endsWith('.md')
-      );
+      const mdFiles = contents.filter(item => item.type === 'file' && item.name.endsWith('.md'));
 
       console.log(
         `[GitHubService] Found ${mdFiles.length} markdown files in ${dir}:`,
@@ -463,10 +455,7 @@ export class GitHubService {
       if (response.ok) {
         const repo = (await response.json()) as { private: boolean };
         const isPublic = !repo.private;
-        console.log(
-          '[GitHubService] Repository is',
-          isPublic ? 'public' : 'private'
-        );
+        console.log('[GitHubService] Repository is', isPublic ? 'public' : 'private');
         return isPublic;
       }
 

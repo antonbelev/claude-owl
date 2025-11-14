@@ -56,7 +56,10 @@ export function FolderNavigator({ initialContents, onSelectionChange }: FolderNa
         setError(
           `The file "${fileName}" does not exist in this folder. It may have been moved or deleted.`
         );
-        console.warn('[FolderNavigator] Pre-selected file not found:', currentContents.preSelectedFile);
+        console.warn(
+          '[FolderNavigator] Pre-selected file not found:',
+          currentContents.preSelectedFile
+        );
       }
     }
   }, [currentContents.preSelectedFile, currentContents.files]);
@@ -192,8 +195,8 @@ export function FolderNavigator({ initialContents, onSelectionChange }: FolderNa
         <div className="file-count">
           {currentContents.mdFileCount > 0 && (
             <span>
-              {currentContents.mdFileCount} command file{currentContents.mdFileCount !== 1 ? 's' : ''} in
-              this folder
+              {currentContents.mdFileCount} command file
+              {currentContents.mdFileCount !== 1 ? 's' : ''} in this folder
             </span>
           )}
           {folders.length > 0 && (
@@ -217,8 +220,14 @@ export function FolderNavigator({ initialContents, onSelectionChange }: FolderNa
 
       {/* Select All Button (only show if there are .md files) */}
       {currentContents.mdFileCount > 0 && (
-        <button className="select-all-btn" onClick={handleSelectAllInFolder} disabled={isNavigating}>
-          {selectedInCurrentFolder === mdFiles.length ? '☐ Deselect All' : '☑ Select All in Folder'}
+        <button
+          className="select-all-btn"
+          onClick={handleSelectAllInFolder}
+          disabled={isNavigating}
+        >
+          {selectedInCurrentFolder === mdFiles.length
+            ? '☐ Deselect All'
+            : '☑ Select All in Folder'}
         </button>
       )}
 

@@ -104,7 +104,10 @@ export const CommandsManager: React.FC = () => {
   if (loading) {
     return (
       <div className="commands-manager" data-testid="commands-manager">
-        <PageHeader title="Slash Commands" description="Custom slash commands that extend Claude Code functionality" />
+        <PageHeader
+          title="Slash Commands"
+          description="Custom slash commands that extend Claude Code functionality"
+        />
         <div className="commands-loading">
           <p>Loading commands...</p>
         </div>
@@ -248,7 +251,7 @@ export const CommandsManager: React.FC = () => {
         <div className="command-editor-overlay">
           <CommandEditor
             command={editingCommand || undefined}
-            onSave={async (commandData) => {
+            onSave={async commandData => {
               if (editingCommand) {
                 // Update existing command
                 const updateOptions: {
@@ -417,7 +420,6 @@ const CommandCard: React.FC<CommandCardProps> = ({ command, onView, onEdit, onDe
     </div>
   );
 };
-
 
 interface CommandDetailModalProps {
   command: CommandWithMetadata;

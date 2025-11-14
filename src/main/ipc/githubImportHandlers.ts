@@ -42,10 +42,7 @@ export function registerGitHubImportHandlers() {
 /**
  * Handler: Browse from GitHub URL (initial entry point)
  */
-async function handleBrowseUrl(
-  _: Electron.IpcMainInvokeEvent,
-  request: unknown
-): Promise<unknown> {
+async function handleBrowseUrl(_: Electron.IpcMainInvokeEvent, request: unknown): Promise<unknown> {
   console.log('[GitHubImportHandlers] Browse from URL:', request);
 
   try {
@@ -112,12 +109,7 @@ async function handleNavigateFolder(
       };
     }
 
-    const folderContents = await GitHubService.navigateToFolder(
-      owner,
-      repo,
-      branch,
-      folderPath
-    );
+    const folderContents = await GitHubService.navigateToFolder(owner, repo, branch, folderPath);
 
     if (!folderContents) {
       return {
@@ -331,8 +323,7 @@ function addImportMetadata(content: string, repoUrl: string): string {
     // Content has frontmatter, add importedFrom
     const frontmatter = frontmatterMatch[1];
     const updatedFrontmatter =
-      frontmatter +
-      `\nimportedFrom: "${repoUrl}"\nimportedAt: "${new Date().toISOString()}"`;
+      frontmatter + `\nimportedFrom: "${repoUrl}"\nimportedAt: "${new Date().toISOString()}"`;
     return content.replace(/^---\n[\s\S]*?\n---/, `---\n${updatedFrontmatter}\n---`);
   } else {
     // No frontmatter, add one

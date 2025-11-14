@@ -59,7 +59,8 @@ export function CommandReviewStep({
     if (unquotedVarPattern.test(currentContent)) {
       securityWarnings.push({
         severity: 'high',
-        message: 'Unquoted variables in bash execution can be dangerous. Consider quoting variables.',
+        message:
+          'Unquoted variables in bash execution can be dangerous. Consider quoting variables.',
       });
     }
 
@@ -76,7 +77,8 @@ export function CommandReviewStep({
   if ((currentFrontmatter['allowed-tools'] || []).includes('Bash(*)')) {
     securityWarnings.push({
       severity: 'high',
-      message: 'Bash(*) allows ANY bash command execution. Consider restricting to specific commands.',
+      message:
+        'Bash(*) allows ANY bash command execution. Consider restricting to specific commands.',
     });
   }
 
@@ -86,7 +88,8 @@ export function CommandReviewStep({
   ) {
     securityWarnings.push({
       severity: 'high',
-      message: 'Write(*) or Edit(*) allows modifying ANY file. Consider restricting to specific paths.',
+      message:
+        'Write(*) or Edit(*) allows modifying ANY file. Consider restricting to specific paths.',
     });
   }
 
@@ -99,15 +102,12 @@ export function CommandReviewStep({
     }
   }, [currentFrontmatter, currentContent, onConfirm]);
 
-  const handleRawSave = useCallback(
-    (newFrontmatter: CommandFrontmatter, newContent: string) => {
-      // Update the current state with edited values from raw editor
-      setCurrentFrontmatter(newFrontmatter);
-      setCurrentContent(newContent);
-      setShowRawEditor(false);
-    },
-    []
-  );
+  const handleRawSave = useCallback((newFrontmatter: CommandFrontmatter, newContent: string) => {
+    // Update the current state with edited values from raw editor
+    setCurrentFrontmatter(newFrontmatter);
+    setCurrentContent(newContent);
+    setShowRawEditor(false);
+  }, []);
 
   return (
     <div className="command-review-step">
@@ -117,7 +117,10 @@ export function CommandReviewStep({
 
           <div className="summary-item">
             <div className="summary-label">Command Name</div>
-            <div className="summary-value">/{namespace ? `${namespace}:` : ''}{name}</div>
+            <div className="summary-value">
+              /{namespace ? `${namespace}:` : ''}
+              {name}
+            </div>
           </div>
 
           <div className="summary-item">
@@ -182,11 +185,7 @@ export function CommandReviewStep({
         <button onClick={onBack} className="btn-secondary" disabled={isSaving || isLoading}>
           Back
         </button>
-        <button
-          onClick={handleConfirm}
-          className="btn-primary"
-          disabled={isSaving || isLoading}
-        >
+        <button onClick={handleConfirm} className="btn-primary" disabled={isSaving || isLoading}>
           {isSaving ? 'Creating...' : 'Create Command'}
         </button>
       </div>

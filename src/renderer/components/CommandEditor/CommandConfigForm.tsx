@@ -74,7 +74,7 @@ export function CommandConfigForm({
               id="command-name"
               type="text"
               value={name}
-              onChange={(e) => onNameChange(e.target.value)}
+              onChange={e => onNameChange(e.target.value)}
               placeholder="my-command"
               className="form-input"
             />
@@ -91,7 +91,7 @@ export function CommandConfigForm({
           <textarea
             id="description"
             value={description}
-            onChange={(e) => onDescriptionChange(e.target.value)}
+            onChange={e => onDescriptionChange(e.target.value)}
             placeholder="Brief description of what this command does"
             className="form-textarea"
             rows={3}
@@ -107,13 +107,11 @@ export function CommandConfigForm({
             id="argument-hint"
             type="text"
             value={argumentHint}
-            onChange={(e) => onArgumentHintChange(e.target.value)}
-            placeholder='[branch-name] [message]'
+            onChange={e => onArgumentHintChange(e.target.value)}
+            placeholder="[branch-name] [message]"
             className="form-input"
           />
-          <div className="field-hint">
-            Optional hint showing what arguments the command expects
-          </div>
+          <div className="field-hint">Optional hint showing what arguments the command expects</div>
         </div>
       </div>
 
@@ -160,7 +158,7 @@ export function CommandConfigForm({
             id="namespace"
             type="text"
             value={namespace}
-            onChange={(e) => onNamespaceChange(e.target.value)}
+            onChange={e => onNamespaceChange(e.target.value)}
             placeholder="workflows, tools, git"
             className="form-input"
           />
@@ -174,10 +172,7 @@ export function CommandConfigForm({
       {/* Tools Section */}
       <div className="form-section">
         <h3>Allowed Tools</h3>
-        <CommandToolSelector
-          selectedTools={allowedTools}
-          onChange={onToolsChange}
-        />
+        <CommandToolSelector selectedTools={allowedTools} onChange={onToolsChange} />
         <div className="field-hint">
           Select which Claude Code tools this command is allowed to use. The more specific, the
           safer.
@@ -212,9 +207,7 @@ export function CommandConfigForm({
             <button
               className="helper-btn"
               onClick={() => {
-                const textarea = document.getElementById(
-                  'command-content'
-                ) as HTMLTextAreaElement;
+                const textarea = document.getElementById('command-content') as HTMLTextAreaElement;
                 if (textarea) {
                   const start = textarea.selectionStart;
                   const newContent =
@@ -233,9 +226,7 @@ export function CommandConfigForm({
             <button
               className="helper-btn"
               onClick={() => {
-                const textarea = document.getElementById(
-                  'command-content'
-                ) as HTMLTextAreaElement;
+                const textarea = document.getElementById('command-content') as HTMLTextAreaElement;
                 if (textarea) {
                   const start = textarea.selectionStart;
                   const newContent = content.substring(0, start) + '$1' + content.substring(start);
@@ -253,9 +244,7 @@ export function CommandConfigForm({
             <button
               className="helper-btn"
               onClick={() => {
-                const textarea = document.getElementById(
-                  'command-content'
-                ) as HTMLTextAreaElement;
+                const textarea = document.getElementById('command-content') as HTMLTextAreaElement;
                 if (textarea) {
                   const start = textarea.selectionStart;
                   const newContent = content.substring(0, start) + '$2' + content.substring(start);
@@ -273,9 +262,7 @@ export function CommandConfigForm({
             <button
               className="helper-btn"
               onClick={() => {
-                const textarea = document.getElementById(
-                  'command-content'
-                ) as HTMLTextAreaElement;
+                const textarea = document.getElementById('command-content') as HTMLTextAreaElement;
                 if (textarea) {
                   const start = textarea.selectionStart;
                   const newContent = content.substring(0, start) + '$3' + content.substring(start);
@@ -296,7 +283,7 @@ export function CommandConfigForm({
         <textarea
           id="command-content"
           value={content}
-          onChange={(e) => onContentChange(e.target.value)}
+          onChange={e => onContentChange(e.target.value)}
           className="content-textarea"
           placeholder={
             'Write your command content here. Use the buttons above to insert variables.\n\nYou can use:\n- $ARGUMENTS for all arguments\n- $1, $2, $3 for individual arguments\n- !`command` for bash execution\n- @path/to/file for file references'
@@ -322,7 +309,7 @@ export function CommandConfigForm({
               <select
                 id="model"
                 value={model}
-                onChange={(e) => onModelChange(e.target.value)}
+                onChange={e => onModelChange(e.target.value)}
                 className="form-select"
               >
                 <option value="default">Default (Current Model)</option>
@@ -342,13 +329,13 @@ export function CommandConfigForm({
                   id="disable-model-invocation"
                   type="checkbox"
                   checked={disableModelInvocation}
-                  onChange={(e) => onDisableModelInvocationChange(e.target.checked)}
+                  onChange={e => onDisableModelInvocationChange(e.target.checked)}
                 />
                 <span>Disable Model Invocation</span>
               </label>
               <div className="field-hint">
-                If checked, Claude cannot invoke this command programmatically. Users must type
-                it manually.
+                If checked, Claude cannot invoke this command programmatically. Users must type it
+                manually.
               </div>
             </div>
           </>
