@@ -42,11 +42,12 @@ export function registerMCPHandlers(): void {
           message: result.message,
         });
 
-        return {
+        const response: AddMCPServerResponse = {
           success: result.success,
-          message: result.message,
-          error: result.error,
         };
+        if (result.message) response.message = result.message;
+        if (result.error) response.error = result.error;
+        return response;
       } catch (error) {
         console.error('[MCPHandlers] Add MCP server error:', error);
         return {
@@ -74,11 +75,12 @@ export function registerMCPHandlers(): void {
           message: result.message,
         });
 
-        return {
+        const response: RemoveMCPServerResponse = {
           success: result.success,
-          message: result.message,
-          error: result.error,
         };
+        if (result.message) response.message = result.message;
+        if (result.error) response.error = result.error;
+        return response;
       } catch (error) {
         console.error('[MCPHandlers] Remove MCP server error:', error);
         return {

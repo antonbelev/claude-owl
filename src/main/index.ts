@@ -13,7 +13,6 @@ import { registerMCPHandlers } from './ipc/mcpHandlers';
 import { registerStatusHandlers } from './ipc/statusHandlers';
 import { registerDebugLogsHandlers } from './ipc/debugLogsHandlers';
 import { registerGitHubImportHandlers } from './ipc/githubImportHandlers';
-import { registerMCPHandlers } from './ipc/mcpHandlers';
 
 let mainWindow: BrowserWindow | null = null;
 
