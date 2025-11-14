@@ -51,6 +51,8 @@ export interface MCPServer {
   headers?: Record<string, string>;
   // Status information (if available from CLI)
   status?: 'connected' | 'error' | 'unknown';
+  // Project path (only for project-scoped servers)
+  projectPath?: string;
 }
 
 /**

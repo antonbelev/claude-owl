@@ -1,5 +1,8 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import * as os from 'os';
 import type {
   MCPAddOptions,
   MCPServer,
@@ -13,6 +16,29 @@ export interface ClaudeInstallationInfo {
   installed: boolean;
   version: string | null;
   path: string | null;
+}
+
+/**
+ * Structure of the .claude.json config file
+ */
+interface ClaudeConfigFile {
+  mcpServers?: Record<string, ClaudeConfigMCPServer>;
+  projects?: Record<string, ClaudeConfigProject>;
+  [key: string]: unknown;
+}
+
+interface ClaudeConfigProject {
+  mcpServers?: Record<string, ClaudeConfigMCPServer>;
+  [key: string]: unknown;
+}
+
+interface ClaudeConfigMCPServer {
+  type: 'stdio' | 'http' | 'sse';
+  command?: string;
+  args?: string[];
+  url?: string;
+  env?: Record<string, string>;
+  headers?: Record<string, string>;
 }
 
 export class ClaudeService {
@@ -68,6 +94,123 @@ export class ClaudeService {
       const { stdout } = await execAsync('claude --version');
       return stdout.trim();
     } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Read and parse the ~/.claude.json config file
+   */
+  private async readClaudeConfigFile(): Promise<ClaudeConfigFile | null> {
+    try {
+      const homeDir = os.homedir();
+      const configPath = path.join(homeDir, '.claude.json');
+
+      console.log('[ClaudeService] Reading config file:', configPath);
+
+      const fileContent = await fs.readFile(configPath, 'utf-8');
+      const config = JSON.parse(fileContent) as ClaudeConfigFile;
+
+      console.log('[ClaudeService] Config file loaded successfully');
+      return config;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        console.log('[ClaudeService] Config file not found, no MCP servers configured');
+        return null;
+      }
+      console.error('[ClaudeService] Failed to read config file:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Parse MCP servers from the .claude.json config file
+   */
+  private parseServersFromConfig(config: ClaudeConfigFile): MCPServer[] {
+    const servers: MCPServer[] = [];
+
+    // Parse global/user-level servers
+    if (config.mcpServers) {
+      for (const [name, serverConfig] of Object.entries(config.mcpServers)) {
+        const server = this.convertConfigServerToMCPServer(name, serverConfig, 'user');
+        if (server) {
+          servers.push(server);
+        }
+      }
+    }
+
+    // Parse project-level servers
+    if (config.projects) {
+      for (const [projectPath, projectConfig] of Object.entries(config.projects)) {
+        if (projectConfig.mcpServers) {
+          for (const [name, serverConfig] of Object.entries(projectConfig.mcpServers)) {
+            const server = this.convertConfigServerToMCPServer(
+              name,
+              serverConfig,
+              'project',
+              projectPath
+            );
+            if (server) {
+              servers.push(server);
+            }
+          }
+        }
+      }
+    }
+
+    console.log('[ClaudeService] Parsed', servers.length, 'servers from config file');
+    return servers;
+  }
+
+  /**
+   * Convert a config file server entry to MCPServer type
+   */
+  private convertConfigServerToMCPServer(
+    name: string,
+    config: ClaudeConfigMCPServer,
+    scope: MCPScope,
+    projectPath?: string
+  ): MCPServer | null {
+    try {
+      const server: MCPServer = {
+        name,
+        transport: config.type,
+        scope,
+      };
+
+      // Add stdio-specific fields
+      if (config.type === 'stdio') {
+        if (config.command) {
+          server.command = config.command;
+        }
+        if (config.args) {
+          server.args = config.args;
+        }
+      }
+
+      // Add HTTP/SSE-specific fields
+      if (config.type === 'http' || config.type === 'sse') {
+        if (config.url) {
+          server.url = config.url;
+        }
+      }
+
+      // Add optional metadata
+      if (config.env) {
+        server.env = config.env;
+      }
+      if (config.headers) {
+        server.headers = config.headers;
+      }
+
+      // Add project path for project-scoped servers
+      if (projectPath) {
+        server.projectPath = projectPath;
+      }
+
+      return server;
+    } catch (error) {
+      console.error('[ClaudeService] Failed to convert server config:', name, error);
       return null;
     }
   }
@@ -144,52 +287,29 @@ export class ClaudeService {
   }
 
   /**
-   * List MCP servers via `claude mcp list` command
-   * Note: claude mcp list doesn't support --scope filtering, so we list all servers
+   * List MCP servers by reading the ~/.claude.json config file
+   * This provides accurate scope and project information, unlike the CLI
    */
   async listMCPServers(scope?: MCPScope): Promise<MCPServer[]> {
-    console.log('[ClaudeService] Listing MCP servers (note: scope filter not supported by CLI)');
+    console.log('[ClaudeService] Listing MCP servers from config file, scope:', scope || 'all');
 
     try {
-      // Try with --format json first
-      let command = 'claude mcp list --format json';
-      console.log('[ClaudeService] Executing command:', command);
-
-      try {
-        const { stdout, stderr } = await execAsync(command);
-
-        // Try to parse as JSON
-        if (stdout && stdout.trim()) {
-          try {
-            const servers = JSON.parse(stdout) as MCPServer[];
-            console.log('[ClaudeService] Found MCP servers (JSON):', servers.length);
-            return servers;
-          } catch (jsonError) {
-            console.log('[ClaudeService] JSON parse failed, trying text format');
-            // Fall through to text parsing
-          }
-        }
-      } catch (jsonCmdError) {
-        console.log('[ClaudeService] --format json not supported, trying without');
-      }
-
-      // Fall back to plain text format
-      command = 'claude mcp list';
-      console.log('[ClaudeService] Executing command:', command);
-
-      const { stdout, stderr } = await execAsync(command);
-
-      if (stderr && stderr.toLowerCase().includes('error')) {
-        console.error('[ClaudeService] Error listing MCP servers:', stderr);
+      // Read the config file
+      const config = await this.readClaudeConfigFile();
+      if (!config) {
+        console.log('[ClaudeService] No config file found, returning empty list');
         return [];
       }
 
-      // Parse text output
-      const servers = this.parseTextServerList(stdout);
-      console.log('[ClaudeService] Found MCP servers (text):', servers.length);
+      // Parse all servers from the config
+      let servers = this.parseServersFromConfig(config);
 
-      // Note: We ignore the scope parameter since claude mcp list doesn't support filtering by scope
-      // The CLI returns all servers from all scopes combined
+      // Filter by scope if specified
+      if (scope) {
+        servers = servers.filter(server => server.scope === scope);
+        console.log('[ClaudeService] Filtered to', servers.length, 'servers with scope:', scope);
+      }
+
       return servers;
     } catch (error) {
       console.error('[ClaudeService] Failed to list MCP servers:', error);

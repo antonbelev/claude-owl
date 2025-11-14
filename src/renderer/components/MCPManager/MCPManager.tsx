@@ -8,7 +8,7 @@ import { useMCPServers } from '../../hooks/useMCPServers';
 import { ServerCard } from './ServerCard';
 import { AddServerForm } from './AddServerForm';
 import { ServerDetailView } from './ServerDetailView';
-import type { MCPServer, AddMCPServerRequest } from '@/shared/types/mcp.types';
+import type { MCPServer, MCPScope, AddMCPServerRequest } from '@/shared/types/mcp.types';
 import './MCPManager.css';
 
 type TabType = 'installed' | 'add';
@@ -16,8 +16,8 @@ type TabType = 'installed' | 'add';
 export const MCPManager: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('installed');
   const [selectedServer, setSelectedServer] = useState<MCPServer | null>(null);
-  // Note: Scope filtering is not supported by claude mcp list CLI, so we don't use it
-  const { servers, loading, error, addServer, removeServer, refresh } = useMCPServers();
+  const [scopeFilter, setScopeFilter] = useState<MCPScope | undefined>(undefined);
+  const { servers, loading, error, addServer, removeServer, refresh } = useMCPServers(scopeFilter);
 
   const handleAddServer = async (request: AddMCPServerRequest) => {
     const response = await addServer(request);
@@ -77,6 +77,20 @@ export const MCPManager: React.FC = () => {
           <div className="installed-tab">
             {/* Actions */}
             <div className="filters">
+              <select
+                value={scopeFilter || 'all'}
+                onChange={e =>
+                  setScopeFilter(
+                    e.target.value === 'all' ? undefined : (e.target.value as MCPScope)
+                  )
+                }
+                disabled={loading}
+              >
+                <option value="all">All Scopes</option>
+                <option value="user">User (Global)</option>
+                <option value="project">Project</option>
+                <option value="local">Local</option>
+              </select>
               <button className="btn btn-secondary" onClick={refresh} disabled={loading}>
                 {loading ? 'Refreshing...' : 'Refresh'}
               </button>
