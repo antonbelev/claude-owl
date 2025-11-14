@@ -145,14 +145,14 @@ export class ClaudeService {
 
   /**
    * List MCP servers via `claude mcp list` command
+   * Note: claude mcp list doesn't support --scope filtering, so we list all servers
    */
   async listMCPServers(scope?: MCPScope): Promise<MCPServer[]> {
-    console.log('[ClaudeService] Listing MCP servers, scope:', scope || 'all');
+    console.log('[ClaudeService] Listing MCP servers (note: scope filter not supported by CLI)');
 
     try {
       // Try with --format json first
-      const scopeArg = scope ? ` --scope ${scope}` : '';
-      let command = `claude mcp list --format json${scopeArg}`;
+      let command = 'claude mcp list --format json';
       console.log('[ClaudeService] Executing command:', command);
 
       try {
@@ -174,7 +174,7 @@ export class ClaudeService {
       }
 
       // Fall back to plain text format
-      command = `claude mcp list${scopeArg}`;
+      command = 'claude mcp list';
       console.log('[ClaudeService] Executing command:', command);
 
       const { stdout, stderr } = await execAsync(command);
@@ -187,6 +187,9 @@ export class ClaudeService {
       // Parse text output
       const servers = this.parseTextServerList(stdout);
       console.log('[ClaudeService] Found MCP servers (text):', servers.length);
+
+      // Note: We ignore the scope parameter since claude mcp list doesn't support filtering by scope
+      // The CLI returns all servers from all scopes combined
       return servers;
     } catch (error) {
       console.error('[ClaudeService] Failed to list MCP servers:', error);
