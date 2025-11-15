@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Plus, Search } from 'lucide-react';
 import { useMCP } from '../../hooks/useMCP';
 import type { MCPServer, AddMCPServerRequest } from '@/shared/types';
 import { PageHeader } from '../common/PageHeader';
@@ -6,7 +7,10 @@ import { ServerCard } from './ServerCard';
 import { AddServerForm } from './AddServerForm';
 import { ConnectionTester } from './ConnectionTester';
 import { ConfirmDialog } from '../common/ConfirmDialog';
-import './MCPServersManager.css';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Alert, AlertDescription } from '../ui/alert';
+import { Dialog, DialogContent } from '../ui/dialog';
 
 export const MCPServersManager: React.FC = () => {
   const { servers, loading, error, addServer, removeServer, testConnection, listServers } =
@@ -78,13 +82,13 @@ export const MCPServersManager: React.FC = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="mcp-servers-manager" data-testid="mcp-servers-manager">
+      <div className="h-full flex flex-col p-8 bg-white" data-testid="mcp-servers-manager">
         <PageHeader
           title="MCP Servers"
           description="Manage Model Context Protocol server integrations"
         />
-        <div className="mcp-loading">
-          <p>Loading MCP servers...</p>
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-neutral-600">Loading MCP servers...</p>
         </div>
       </div>
     );
@@ -93,7 +97,7 @@ export const MCPServersManager: React.FC = () => {
   // Error state
   if (error && servers.length === 0) {
     return (
-      <div className="mcp-servers-manager" data-testid="mcp-servers-manager">
+      <div className="h-full flex flex-col p-8 bg-white" data-testid="mcp-servers-manager">
         <PageHeader
           title="MCP Servers"
           description="Manage Model Context Protocol server integrations"
@@ -105,15 +109,17 @@ export const MCPServersManager: React.FC = () => {
             },
           ]}
         />
-        <div className="mcp-error">
-          <p className="error-message">Error: {error}</p>
+        <div className="flex-1 flex items-center justify-center">
+          <Alert variant="destructive" className="max-w-md">
+            <AlertDescription>Error: {error}</AlertDescription>
+          </Alert>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mcp-servers-manager" data-testid="mcp-servers-manager">
+    <div className="h-full flex flex-col p-8 bg-white" data-testid="mcp-servers-manager">
       <PageHeader
         title="MCP Servers"
         description="Manage Model Context Protocol server integrations"
@@ -127,29 +133,33 @@ export const MCPServersManager: React.FC = () => {
       />
 
       {/* Search and Filter */}
-      <div className="mcp-controls">
-        <div className="mcp-search">
-          <input
+      <div className="mb-6">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+          <Input
             type="text"
             placeholder="Search servers by name or description..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="mcp-search-input"
+            className="pl-10"
           />
         </div>
       </div>
 
       {/* Servers List */}
-      <div className="mcp-content">
+      <div className="flex-1 overflow-auto">
         {filteredServers.length === 0 ? (
-          <div className="mcp-empty">
-            <p>{searchQuery ? 'No servers match your search' : 'No MCP servers configured yet'}</p>
-            <button onClick={() => setShowAddForm(true)} className="btn-add-empty">
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <p className="text-neutral-600 mb-4">
+              {searchQuery ? 'No servers match your search' : 'No MCP servers configured yet'}
+            </p>
+            <Button onClick={() => setShowAddForm(true)}>
+              <Plus className="h-4 w-4 mr-2" />
               Add Your First Server
-            </button>
+            </Button>
           </div>
         ) : (
-          <div className="mcp-servers-grid">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredServers.map(server => (
               <ServerCard
                 key={`${server.scope}-${server.name}`}
@@ -165,11 +175,11 @@ export const MCPServersManager: React.FC = () => {
 
       {/* Add Server Modal */}
       {showAddForm && (
-        <div className="mcp-modal-overlay" onClick={() => setShowAddForm(false)}>
-          <div className="mcp-modal-content" onClick={e => e.stopPropagation()}>
+        <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <AddServerForm onSubmit={handleAddServer} onCancel={() => setShowAddForm(false)} />
-          </div>
-        </div>
+          </DialogContent>
+        </Dialog>
       )}
 
       {/* Delete Confirmation */}
@@ -194,7 +204,11 @@ export const MCPServersManager: React.FC = () => {
       )}
 
       {/* Show error toast if needed */}
-      {error && servers.length > 0 && <div className="mcp-error-toast">{error}</div>}
+      {error && servers.length > 0 && (
+        <Alert variant="destructive" className="fixed bottom-4 right-4 w-auto">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 };

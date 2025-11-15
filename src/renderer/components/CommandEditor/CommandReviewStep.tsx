@@ -1,9 +1,13 @@
 import { useState, useCallback } from 'react';
+import { Folder, Tag, Clipboard, Edit, CheckCircle } from 'lucide-react';
 import { CommandFrontmatter } from '../../../shared/types/command.types';
 import { CommandSecurityWarnings } from './CommandSecurityWarnings';
 import { RawMarkdownEditor } from './RawMarkdownEditor';
 import { generateCommandMarkdown } from '../../../shared/utils/command-markdown.utils';
-import './CommandReviewStep.css';
+import { Button } from '@/renderer/components/ui/button';
+import { Badge } from '@/renderer/components/ui/badge';
+import { Card, CardContent } from '@/renderer/components/ui/card';
+import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
 
 export interface CommandReviewStepProps {
   name: string;
@@ -109,85 +113,123 @@ export function CommandReviewStep({
     setShowRawEditor(false);
   }, []);
 
+  const getLocationIcon = () => {
+    switch (location) {
+      case 'user':
+        return <Folder className="h-4 w-4" />;
+      case 'project':
+        return <Folder className="h-4 w-4" />;
+      default:
+        return null;
+    }
+  };
+
+  const getLocationLabel = () => {
+    switch (location) {
+      case 'user':
+        return 'User (~/.claude/commands/)';
+      case 'project':
+        return 'Project (.claude/commands/)';
+      case 'plugin':
+        return 'Plugin (read-only)';
+      case 'mcp':
+        return 'MCP (read-only)';
+    }
+  };
+
   return (
-    <div className="command-review-step">
-      <div className="review-container">
-        <div className="review-summary">
-          <h3>Command Summary</h3>
+    <div className="space-y-6">
+      <Card>
+        <CardContent className="pt-6 space-y-4">
+          <h3 className="font-semibold text-base">Command Summary</h3>
 
-          <div className="summary-item">
-            <div className="summary-label">Command Name</div>
-            <div className="summary-value">
-              /{namespace ? `${namespace}:` : ''}
-              {name}
+          <div className="grid gap-4">
+            <div>
+              <div className="text-sm font-medium text-neutral-700 mb-1">Command Name</div>
+              <div className="text-base">
+                /{namespace ? `${namespace}:` : ''}
+                {name}
+              </div>
             </div>
-          </div>
 
-          <div className="summary-item">
-            <div className="summary-label">Description</div>
-            <div className="summary-value">{currentFrontmatter.description}</div>
-          </div>
-
-          <div className="summary-item">
-            <div className="summary-label">Location</div>
-            <div className="summary-value">
-              {location === 'user' && '📁 User (~/.claude/commands/)'}
-              {location === 'project' && '📁 Project (.claude/commands/)'}
-              {location === 'plugin' && '🔌 Plugin (read-only)'}
-              {location === 'mcp' && '🔗 MCP (read-only)'}
+            <div>
+              <div className="text-sm font-medium text-neutral-700 mb-1">Description</div>
+              <div className="text-base">{currentFrontmatter.description}</div>
             </div>
-          </div>
 
-          {namespace && (
-            <div className="summary-item">
-              <div className="summary-label">Namespace</div>
-              <div className="summary-value">🏷️ {namespace}</div>
+            <div>
+              <div className="text-sm font-medium text-neutral-700 mb-1">Location</div>
+              <div className="flex items-center gap-2">
+                {getLocationIcon()}
+                <span>{getLocationLabel()}</span>
+              </div>
             </div>
-          )}
-        </div>
 
-        <div className="review-markdown">
-          <div className="markdown-header">
-            <h3>Generated Markdown</h3>
-            <div className="markdown-actions">
-              <button
-                className="btn-secondary"
+            {namespace && (
+              <div>
+                <div className="text-sm font-medium text-neutral-700 mb-1">Namespace</div>
+                <div className="flex items-center gap-2">
+                  <Tag className="h-4 w-4" />
+                  <span>{namespace}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="pt-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-base">Generated Markdown</h3>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => {
                   navigator.clipboard.writeText(generatedMarkdown);
                 }}
                 title="Copy to clipboard"
               >
-                📋 Copy
-              </button>
-              <button
-                className="btn-secondary"
+                <Clipboard className="h-4 w-4 mr-2" />
+                Copy
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setShowRawEditor(true)}
                 title="Edit raw markdown"
               >
-                ✎ Edit Raw
-              </button>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit Raw
+              </Button>
             </div>
           </div>
 
-          <div className="markdown-preview">
-            <pre className="markdown-code">{generatedMarkdown}</pre>
+          <div className="bg-neutral-900 rounded-lg p-4 overflow-x-auto">
+            <pre className="text-sm text-neutral-100 font-mono whitespace-pre">
+              {generatedMarkdown}
+            </pre>
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        {securityWarnings.length > 0 && <CommandSecurityWarnings warnings={securityWarnings} />}
+      {securityWarnings.length > 0 && <CommandSecurityWarnings warnings={securityWarnings} />}
 
-        {securityWarnings.length === 0 && (
-          <div className="security-clear">✅ No security issues detected</div>
-        )}
-      </div>
+      {securityWarnings.length === 0 && (
+        <Alert>
+          <CheckCircle className="h-4 w-4" />
+          <AlertDescription>No security issues detected</AlertDescription>
+        </Alert>
+      )}
 
-      <div className="review-footer">
-        <button onClick={onBack} className="btn-secondary" disabled={isSaving || isLoading}>
+      <div className="flex justify-between gap-4 pt-4">
+        <Button onClick={onBack} variant="outline" disabled={isSaving || isLoading}>
           Back
-        </button>
-        <button onClick={handleConfirm} className="btn-primary" disabled={isSaving || isLoading}>
+        </Button>
+        <Button onClick={handleConfirm} disabled={isSaving || isLoading}>
           {isSaving ? 'Creating...' : 'Create Command'}
-        </button>
+        </Button>
       </div>
 
       {showRawEditor && (

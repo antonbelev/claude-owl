@@ -4,12 +4,14 @@
  */
 
 import React, { useState } from 'react';
+import { RefreshCw, Plus } from 'lucide-react';
 import { useMCPServers } from '../../hooks/useMCPServers';
 import { ServerCard } from './ServerCard';
 import { AddServerForm } from './AddServerForm';
 import { ServerDetailView } from './ServerDetailView';
+import { Button } from '../ui/button';
+import { Alert, AlertDescription } from '../ui/alert';
 import type { MCPServer, MCPScope, AddMCPServerRequest } from '@/shared/types/mcp.types';
-import './MCPManager.css';
 
 type TabType = 'installed' | 'add';
 
@@ -47,24 +49,33 @@ export const MCPManager: React.FC = () => {
   };
 
   return (
-    <div className="mcp-manager">
-      <div className="mcp-manager-header">
-        <h1>MCP Servers Manager</h1>
-        <p className="mcp-description">
+    <div className="h-full flex flex-col p-8 bg-white">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-neutral-900 mb-2">MCP Servers Manager</h1>
+        <p className="text-neutral-600">
           Manage Model Context Protocol servers that extend Claude Code capabilities.
         </p>
       </div>
 
       {/* Tab Navigation */}
-      <div className="tabs">
+      <div className="flex gap-2 border-b border-neutral-200 mb-6">
         <button
-          className={`tab ${activeTab === 'installed' ? 'active' : ''}`}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === 'installed'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-neutral-600 hover:text-neutral-900'
+          }`}
           onClick={() => setActiveTab('installed')}
         >
           Installed Servers ({servers.length})
         </button>
         <button
-          className={`tab ${activeTab === 'add' ? 'active' : ''}`}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === 'add'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-neutral-600 hover:text-neutral-900'
+          }`}
           onClick={() => setActiveTab('add')}
         >
           Add Server
@@ -72,11 +83,11 @@ export const MCPManager: React.FC = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="tab-content">
+      <div className="flex-1 overflow-auto">
         {activeTab === 'installed' && (
-          <div className="installed-tab">
+          <div className="space-y-4">
             {/* Actions */}
-            <div className="filters">
+            <div className="flex gap-4">
               <select
                 value={scopeFilter || 'all'}
                 onChange={e =>
@@ -85,36 +96,41 @@ export const MCPManager: React.FC = () => {
                   )
                 }
                 disabled={loading}
+                className="px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Scopes</option>
                 <option value="user">User (Global)</option>
                 <option value="project">Project</option>
                 <option value="local">Local</option>
               </select>
-              <button className="btn btn-secondary" onClick={refresh} disabled={loading}>
+              <Button variant="outline" onClick={refresh} disabled={loading}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 {loading ? 'Refreshing...' : 'Refresh'}
-              </button>
+              </Button>
             </div>
 
             {/* Error Display */}
             {error && (
-              <div className="error-message">
-                <strong>Error:</strong> {error}
-              </div>
+              <Alert variant="destructive">
+                <AlertDescription>
+                  <strong>Error:</strong> {error}
+                </AlertDescription>
+              </Alert>
             )}
 
             {/* Loading State */}
-            {loading && <div className="loading">Loading servers...</div>}
+            {loading && <div className="text-center py-8 text-neutral-600">Loading servers...</div>}
 
             {/* Server List */}
             {!loading && !selectedServer && (
-              <div className="server-grid">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {servers.length === 0 ? (
-                  <div className="empty-state">
-                    <p>No MCP servers installed.</p>
-                    <button className="btn btn-primary" onClick={() => setActiveTab('add')}>
+                  <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
+                    <p className="text-neutral-600 mb-4">No MCP servers installed.</p>
+                    <Button onClick={() => setActiveTab('add')}>
+                      <Plus className="h-4 w-4 mr-2" />
                       Add Your First Server
-                    </button>
+                    </Button>
                   </div>
                 ) : (
                   servers.map(server => (
@@ -141,7 +157,7 @@ export const MCPManager: React.FC = () => {
         )}
 
         {activeTab === 'add' && (
-          <div className="add-tab">
+          <div>
             <AddServerForm onSubmit={handleAddServer} onCancel={() => setActiveTab('installed')} />
           </div>
         )}

@@ -5,9 +5,12 @@
  */
 
 import { useState } from 'react';
+import { Check, AlertTriangle, X, ChevronRight, ExternalLink } from 'lucide-react';
 import type { HookEventSummary } from '@/shared/types/hook.types';
 import { HookDetailsViewer } from './HookDetailsViewer';
-import './HooksManager.css';
+import { Card, CardContent } from '@/renderer/components/ui/card';
+import { Button } from '@/renderer/components/ui/button';
+import { Badge } from '@/renderer/components/ui/badge';
 
 interface HookEventListProps {
   events: HookEventSummary[];
@@ -30,119 +33,128 @@ export function HookEventList({ events, className }: HookEventListProps) {
   const getScoreIcon = (score: 'green' | 'yellow' | 'red') => {
     switch (score) {
       case 'green':
-        return '✓';
+        return <Check className="h-4 w-4" />;
       case 'yellow':
-        return '⚠';
+        return <AlertTriangle className="h-4 w-4" />;
       case 'red':
-        return '✕';
+        return <X className="h-4 w-4" />;
     }
   };
 
   const getScoreColorClass = (score: 'green' | 'yellow' | 'red') => {
     switch (score) {
       case 'green':
-        return 'badge-green';
+        return 'bg-green-500/10 text-green-700 border-green-200';
       case 'yellow':
-        return 'badge-yellow';
+        return 'bg-yellow-500/10 text-yellow-700 border-yellow-200';
       case 'red':
-        return 'badge-red';
+        return 'bg-red-500/10 text-red-700 border-red-200';
     }
   };
 
   return (
     <div className={className}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      <div className="flex flex-col gap-3">
         {events.map(eventSummary => {
           const isExpanded = expandedEvents.has(eventSummary.event);
           const hasHooks = eventSummary.count > 0;
 
           return (
-            <div key={eventSummary.event} className="card">
+            <Card key={eventSummary.event}>
               <button
-                className="collapsible-trigger"
+                className="w-full text-left p-6 hover:bg-neutral-50 transition-colors"
                 onClick={() => toggleEvent(eventSummary.event)}
               >
-                <div className="hook-event-card">
-                  <div className="hook-event-info">
-                    <div className="hook-event-name">
-                      <h3>{eventSummary.info.name}</h3>
-                      <span className={`expand-icon ${isExpanded ? 'expanded' : ''}`}>➤</span>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-base">{eventSummary.info.name}</h3>
+                      <ChevronRight
+                        className={`h-4 w-4 text-neutral-500 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                      />
                     </div>
-                    <p className="card-description">{eventSummary.info.description}</p>
+                    <p className="text-sm text-neutral-600 mt-1">{eventSummary.info.description}</p>
                   </div>
 
-                  <div className="hook-event-badges">
+                  <div className="flex items-center gap-2">
                     {hasHooks && (
-                      <span className={`badge ${getScoreColorClass(eventSummary.worstScore)}`}>
+                      <Badge
+                        variant="outline"
+                        className={getScoreColorClass(eventSummary.worstScore)}
+                      >
                         {getScoreIcon(eventSummary.worstScore)}
-                      </span>
+                      </Badge>
                     )}
-                    <span className={`badge ${hasHooks ? 'badge-default' : 'badge-secondary'}`}>
+                    <Badge variant={hasHooks ? 'default' : 'secondary'}>
                       {hasHooks
                         ? `${eventSummary.count} hook${eventSummary.count > 1 ? 's' : ''}`
                         : 'No hooks'}
-                    </span>
+                    </Badge>
                   </div>
                 </div>
 
-                <div className="hook-event-badges">
-                  <span className="badge badge-outline">
-                    Triggers: {eventSummary.info.whenTriggers}
-                  </span>
+                <div className="flex flex-wrap gap-2 mt-4">
+                  <Badge variant="outline">Triggers: {eventSummary.info.whenTriggers}</Badge>
                   {eventSummary.info.supportsPromptHooks && (
-                    <span className="badge badge-outline">Supports prompt hooks</span>
+                    <Badge variant="outline">Supports prompt hooks</Badge>
                   )}
                 </div>
               </button>
 
               {isExpanded && (
-                <div className="hook-details">
+                <CardContent className="pt-0 space-y-4">
                   {/* Event Info */}
-                  <div className="hook-event-meta">
+                  <div className="space-y-2 text-sm">
                     <p>
-                      <span style={{ fontWeight: 500 }}>Matcher required:</span>{' '}
+                      <span className="font-medium">Matcher required:</span>{' '}
                       {eventSummary.info.requiresMatcher
                         ? 'Yes (specify tools)'
                         : 'No (applies to all)'}
                     </p>
                     <p>
-                      <span style={{ fontWeight: 500 }}>Available context:</span>{' '}
+                      <span className="font-medium">Available context:</span>{' '}
                       {eventSummary.info.contextVariables.join(', ')}
                     </p>
                   </div>
 
                   {/* Hooks List */}
                   {hasHooks ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      <h4 className="card-description">Configured Hooks ({eventSummary.count})</h4>
+                    <div className="flex flex-col gap-3">
+                      <h4 className="text-sm text-neutral-600">
+                        Configured Hooks ({eventSummary.count})
+                      </h4>
                       {eventSummary.hooks.map((hook, index) => (
                         <HookDetailsViewer key={index} hook={hook} />
                       ))}
                     </div>
                   ) : (
-                    <div className="empty-state">
-                      <p>No hooks configured for this event</p>
-                      <p className="card-description" style={{ marginTop: '0.25rem' }}>
+                    <div className="bg-neutral-50 rounded-lg p-6 text-center">
+                      <p className="text-neutral-900 font-medium">
+                        No hooks configured for this event
+                      </p>
+                      <p className="text-sm text-neutral-600 mt-1">
                         Use templates below to add hooks, or edit settings.json manually
                       </p>
                     </div>
                   )}
 
                   {/* Documentation Link */}
-                  <div style={{ paddingTop: '0.75rem', borderTop: '1px solid #e5e7eb' }}>
-                    <button
-                      className="button button-ghost"
+                  <div className="pt-4 border-t border-neutral-200">
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={(e: React.MouseEvent) => {
                         e.stopPropagation();
                         window.electronAPI.openExternal(eventSummary.info.docsUrl);
                       }}
                     >
-                      🔗 Learn more about {eventSummary.event}
-                    </button>
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Learn more about {eventSummary.event}
+                    </Button>
                   </div>
-                </div>
+                </CardContent>
               )}
-            </div>
+            </Card>
           );
         })}
       </div>

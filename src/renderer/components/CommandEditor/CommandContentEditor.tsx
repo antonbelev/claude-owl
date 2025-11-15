@@ -1,5 +1,9 @@
 import { useRef, useCallback } from 'react';
-import './CommandContentEditor.css';
+import { Terminal, FileText, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Button } from '@/renderer/components/ui/button';
+import { Textarea } from '@/renderer/components/ui/textarea';
+import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
+import { Badge } from '@/renderer/components/ui/badge';
 
 export interface CommandContentEditorProps {
   content: string;
@@ -49,65 +53,77 @@ export function CommandContentEditor({
   const hasBashTool = allowedTools.some(tool => tool.startsWith('Bash('));
 
   return (
-    <div className="content-editor">
-      <div className="editor-toolbar">
-        <div className="variable-helpers">
-          <span className="toolbar-label">Insert Variable:</span>
-          <button
-            className="helper-btn"
-            onClick={() => insertVariable('$ARGUMENTS')}
-            title="All arguments as single string"
-          >
-            $ARGUMENTS
-          </button>
-          <button
-            className="helper-btn"
-            onClick={() => insertVariable('$1')}
-            title="First argument"
-          >
-            $1
-          </button>
-          <button
-            className="helper-btn"
-            onClick={() => insertVariable('$2')}
-            title="Second argument"
-          >
-            $2
-          </button>
-          <button
-            className="helper-btn"
-            onClick={() => insertVariable('$3')}
-            title="Third argument"
-          >
-            $3
-          </button>
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-4 items-center p-4 bg-neutral-50 rounded-lg border border-neutral-200">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-neutral-700">Insert Variable:</span>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => insertVariable('$ARGUMENTS')}
+              title="All arguments as single string"
+            >
+              $ARGUMENTS
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => insertVariable('$1')}
+              title="First argument"
+            >
+              $1
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => insertVariable('$2')}
+              title="Second argument"
+            >
+              $2
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => insertVariable('$3')}
+              title="Third argument"
+            >
+              $3
+            </Button>
+          </div>
         </div>
 
-        <div className="advanced-helpers">
-          <span className="toolbar-label">Insert:</span>
-          <button
-            className="helper-btn"
-            onClick={insertBashTemplate}
-            title="Insert bash execution template"
-            disabled={!hasBashTool && !rawMode}
-          >
-            ! bash
-          </button>
-          <button
-            className="helper-btn"
-            onClick={insertFileReference}
-            title="Insert file reference"
-          >
-            @ file
-          </button>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-neutral-700">Insert:</span>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={insertBashTemplate}
+              title="Insert bash execution template"
+              disabled={!hasBashTool && !rawMode}
+            >
+              <Terminal className="h-3 w-3 mr-1" />
+              bash
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={insertFileReference}
+              title="Insert file reference"
+            >
+              <FileText className="h-3 w-3 mr-1" />
+              file
+            </Button>
+          </div>
         </div>
       </div>
 
-      <textarea
+      <Textarea
         ref={textareaRef}
         value={content}
         onChange={e => onChange(e.target.value)}
-        className={`content-textarea ${rawMode ? 'raw-mode' : ''}`}
+        className={`min-h-[300px] font-mono text-sm ${rawMode ? 'bg-neutral-50' : ''}`}
         placeholder={
           rawMode
             ? `---
@@ -117,9 +133,7 @@ description: Your command description
 Your command content here.
 
 Use $1, $2, etc. for arguments.
-Use !` +
-              '`command`' +
-              ` for bash execution.
+Use !\`command\` for bash execution.
 Use @file for file references.`
             : 'Write your command content here. Use the buttons above to insert variables.'
         }
@@ -127,30 +141,48 @@ Use @file for file references.`
       />
 
       {!rawMode && (
-        <div className="editor-help">
-          <h4>Syntax Guide</h4>
-          <ul>
-            <li>
-              <code>$ARGUMENTS</code> - All arguments as one string
+        <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
+          <h4 className="font-semibold text-sm mb-3">Syntax Guide</h4>
+          <ul className="space-y-2 text-sm text-neutral-700">
+            <li className="flex items-start gap-2">
+              <Badge variant="secondary" className="font-mono text-xs">
+                $ARGUMENTS
+              </Badge>
+              <span>All arguments as one string</span>
             </li>
-            <li>
-              <code>$1, $2, $3, ...</code> - Individual arguments
+            <li className="flex items-start gap-2">
+              <Badge variant="secondary" className="font-mono text-xs">
+                $1, $2, $3, ...
+              </Badge>
+              <span>Individual arguments</span>
             </li>
-            <li>
-              <code>!`git status`</code> - Execute bash command
+            <li className="flex items-start gap-2">
+              <Badge variant="secondary" className="font-mono text-xs">
+                !`git status`
+              </Badge>
+              <span>Execute bash command</span>
             </li>
-            <li>
-              <code>@src/main.ts</code> - Include file contents
+            <li className="flex items-start gap-2">
+              <Badge variant="secondary" className="font-mono text-xs">
+                @src/main.ts
+              </Badge>
+              <span>Include file contents</span>
             </li>
           </ul>
 
           {hasBashTool && (
-            <div className="bash-info">✅ Bash execution is enabled (Bash tool configured)</div>
+            <Alert className="mt-4">
+              <CheckCircle className="h-4 w-4" />
+              <AlertDescription>Bash execution is enabled (Bash tool configured)</AlertDescription>
+            </Alert>
           )}
           {!hasBashTool && content.includes('!`') && (
-            <div className="bash-warning">
-              ⚠️ Your content has bash execution (!`) but Bash tool is not configured
-            </div>
+            <Alert variant="destructive" className="mt-4">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                Your content has bash execution (!`) but Bash tool is not configured
+              </AlertDescription>
+            </Alert>
           )}
         </div>
       )}

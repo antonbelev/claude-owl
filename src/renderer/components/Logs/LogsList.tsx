@@ -1,6 +1,9 @@
 import React from 'react';
+import { Search, X, FileText } from 'lucide-react';
 import type { DebugLog } from '@/shared/types';
-import './LogsList.css';
+import { Input } from '@/renderer/components/ui/input';
+import { Button } from '@/renderer/components/ui/button';
+import { Spinner } from '@/renderer/components/ui/spinner';
 
 interface LogsListProps {
   logs: DebugLog[];
@@ -139,81 +142,107 @@ export const LogsList: React.FC<LogsListProps> = ({
   };
 
   return (
-    <div className="logs-list-container">
-      <div className="logs-search-bar">
-        <input
-          type="text"
-          className="logs-search-input"
-          placeholder="Search logs by content... (press Enter to search)"
-          value={searchInput}
-          onChange={handleSearch}
-          onKeyDown={handleKeyDown}
-          disabled={loading || isSearching}
-        />
-        {searchInput && (
-          <button className="logs-clear-search" onClick={handleClearSearch} title="Clear search">
-            ✕
-          </button>
-        )}
+    <div className="flex flex-col h-full">
+      <div className="relative p-4 border-b border-neutral-200">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
+          <Input
+            type="text"
+            className="pl-10 pr-10"
+            placeholder="Search logs by content... (press Enter to search)"
+            value={searchInput}
+            onChange={handleSearch}
+            onKeyDown={handleKeyDown}
+            disabled={loading || isSearching}
+          />
+          {searchInput && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 w-7"
+              onClick={handleClearSearch}
+              title="Clear search"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
 
-      {error && <div className="logs-error">{error}</div>}
+      {error && (
+        <div className="p-4 bg-red-50 border-b border-red-200">
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      )}
 
       {loading && (
-        <div className="logs-loading">
-          <div className="spinner" />
-          <span>Loading debug logs...</span>
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
+          <Spinner className="h-8 w-8" />
+          <span className="text-sm text-neutral-600">Loading debug logs...</span>
         </div>
       )}
 
       {!loading && logs.length === 0 && (
-        <div className="logs-empty">
-          <p className="logs-empty-icon">📝</p>
-          <p className="logs-empty-text">
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8 text-center">
+          <FileText className="h-12 w-12 text-neutral-300" />
+          <p className="text-neutral-600">
             {searchQuery ? 'No logs match your search' : 'No debug logs found'}
           </p>
         </div>
       )}
 
       {!loading && logs.length > 0 && (
-        <div className="logs-list">
-          <div className="logs-count">
-            {searchQuery && (
-              <>
-                Found <strong>{logs.length}</strong> log(s) matching &quot;{searchQuery}&quot;
-              </>
-            )}
-            {!searchQuery && (
-              <>
-                <strong>{logs.length}</strong> debug log(s)
-              </>
-            )}
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-4 bg-neutral-50 border-b border-neutral-200">
+            <p className="text-sm text-neutral-600">
+              {searchQuery && (
+                <>
+                  Found <strong>{logs.length}</strong> log(s) matching &quot;{searchQuery}&quot;
+                </>
+              )}
+              {!searchQuery && (
+                <>
+                  <strong>{logs.length}</strong> debug log(s)
+                </>
+              )}
+            </p>
           </div>
 
-          {logs.map(log => (
-            <div
-              key={log.filename}
-              className={`logs-list-item ${selectedLog?.filename === log.filename ? 'selected' : ''}`}
-              onClick={() => onSelectLog(log)}
-              role="button"
-              tabIndex={0}
-              onKeyPress={e => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  onSelectLog(log);
-                }
-              }}
-              title={formatFullDate(log.timestamp)}
-            >
-              <div className="log-item-main">
-                <div className="log-item-filename">{log.filename}</div>
-                <div className="log-item-meta">
-                  <span className="log-item-date">{formatDate(log.timestamp)}</span>
-                  <span className="log-item-timestamp">{formatFullDate(log.timestamp)}</span>
+          <div className="divide-y divide-neutral-200">
+            {logs.map(log => (
+              <div
+                key={log.filename}
+                className={`p-4 hover:bg-neutral-50 cursor-pointer transition-colors ${
+                  selectedLog?.filename === log.filename ? 'bg-blue-50 hover:bg-blue-50' : ''
+                }`}
+                onClick={() => onSelectLog(log)}
+                role="button"
+                tabIndex={0}
+                onKeyPress={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    onSelectLog(log);
+                  }
+                }}
+                title={formatFullDate(log.timestamp)}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm text-neutral-900 truncate">
+                      {log.filename}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-neutral-500">
+                      <span>{formatDate(log.timestamp)}</span>
+                      <span className="text-neutral-300">•</span>
+                      <span className="hidden sm:inline">{formatFullDate(log.timestamp)}</span>
+                    </div>
+                  </div>
+                  <div className="text-sm text-neutral-500 whitespace-nowrap">
+                    {formatFileSize(log.size)}
+                  </div>
                 </div>
               </div>
-              <div className="log-item-size">{formatFileSize(log.size)}</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>

@@ -5,22 +5,19 @@
  */
 
 import { useState } from 'react';
+import { Shield, Zap, FileText, Bell, Copy, Check, ChevronRight } from 'lucide-react';
+import { Card, CardHeader, CardContent } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Alert, AlertDescription } from '../ui/alert';
 import type { HookTemplate } from '@/shared/types/hook.types';
 import { useHookTemplates } from '@/renderer/hooks/useHooks';
-import './HooksManager.css';
 
-const CATEGORY_ICONS: Record<string, string> = {
-  security: '🛡️',
-  automation: '⚡',
-  logging: '📝',
-  notification: '🔔',
-};
-
-const CATEGORY_COLORS: Record<string, string> = {
-  security: 'category-security',
-  automation: 'category-automation',
-  logging: 'category-logging',
-  notification: 'category-notification',
+const CATEGORY_ICONS: Record<string, React.ReactNode> = {
+  security: <Shield className="h-4 w-4" />,
+  automation: <Zap className="h-4 w-4" />,
+  logging: <FileText className="h-4 w-4" />,
+  notification: <Bell className="h-4 w-4" />,
 };
 
 export function HookTemplateGallery() {
@@ -59,9 +56,9 @@ export function HookTemplateGallery() {
 
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div className="space-y-4">
         {[1, 2, 3].map(i => (
-          <div key={i} className="skeleton" style={{ height: '100px' }} />
+          <div key={i} className="h-24 bg-neutral-100 animate-pulse rounded-md" />
         ))}
       </div>
     );
@@ -69,156 +66,142 @@ export function HookTemplateGallery() {
 
   if (isError || !templates) {
     return (
-      <div className="error-card">
-        <p className="error-message">Failed to load templates</p>
-      </div>
+      <Alert variant="destructive">
+        <AlertDescription>Failed to load templates</AlertDescription>
+      </Alert>
     );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <div className="template-header">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-start justify-between">
         <div>
-          <h2 className="template-title">Hook Templates</h2>
-          <p className="template-subtitle">
+          <h2 className="text-2xl font-bold text-neutral-900">Hook Templates</h2>
+          <p className="text-neutral-600 mt-1">
             Pre-built, security-reviewed hooks for common use cases
           </p>
         </div>
-        <span className="badge badge-outline">{templates.length} templates</span>
+        <Badge variant="outline">{templates.length} templates</Badge>
       </div>
 
-      <div className="template-grid">
+      {/* Templates Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {templates.map(template => {
-          const categoryIcon = CATEGORY_ICONS[template.category] || '📦';
-          const categoryColor = CATEGORY_COLORS[template.category] || 'badge-secondary';
+          const categoryIcon = CATEGORY_ICONS[template.category];
           const isExpanded = expandedIds.has(template.id);
 
           return (
-            <div key={template.id} className="card">
-              <div className="card-header">
-                <div className="template-card-header">
-                  <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        marginBottom: '0.5rem',
-                      }}
-                    >
-                      <h3 className="card-title">{template.name}</h3>
-                      <span
-                        className={`badge ${template.securityLevel === 'green' ? 'badge-green' : 'badge-yellow'}`}
+            <Card key={template.id}>
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="text-lg font-semibold text-neutral-900">{template.name}</h3>
+                      <Badge
+                        variant={template.securityLevel === 'green' ? 'default' : 'outline'}
+                        className="flex items-center gap-1"
                       >
-                        {template.securityLevel === 'green' ? '✓ Safe' : '⚠ Review'}
-                      </span>
+                        {template.securityLevel === 'green' ? (
+                          <>
+                            <Check className="h-3 w-3" />
+                            Safe
+                          </>
+                        ) : (
+                          'Review'
+                        )}
+                      </Badge>
                     </div>
-                    <p className="card-description">{template.description}</p>
+                    <p className="text-sm text-neutral-600">{template.description}</p>
                   </div>
-                  <div className={`template-icon-wrapper ${categoryColor}`}>
-                    <span className="template-icon">{categoryIcon}</span>
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600">
+                    {categoryIcon}
                   </div>
                 </div>
 
-                <div className="hook-event-badges">
-                  <span className="badge badge-outline">{template.event}</span>
-                  <span className="badge badge-outline" style={{ textTransform: 'capitalize' }}>
+                <div className="flex gap-2 mt-3">
+                  <Badge variant="outline">{template.event}</Badge>
+                  <Badge variant="outline" className="capitalize">
                     {template.category}
-                  </span>
+                  </Badge>
                 </div>
-              </div>
+              </CardHeader>
 
-              <div className="card-content">
+              <CardContent className="space-y-4">
                 {/* Configuration Preview */}
                 <div>
                   <button
-                    className="collapsible-trigger"
-                    style={{ marginBottom: '0.5rem' }}
+                    className="flex items-center justify-between w-full text-sm font-medium text-neutral-900 hover:text-neutral-700 mb-2"
                     onClick={() => toggleExpand(template.id)}
                   >
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        width: '100%',
-                      }}
-                    >
-                      <span className="card-description" style={{ fontWeight: 500 }}>
-                        Configuration
-                      </span>
-                      <span className={`expand-icon ${isExpanded ? 'expanded' : ''}`}>➤</span>
-                    </div>
+                    <span>Configuration</span>
+                    <ChevronRight
+                      className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                    />
                   </button>
 
                   {isExpanded && (
-                    <div className="code-block">
-                      <pre>{JSON.stringify(template.configuration, null, 2)}</pre>
-                    </div>
+                    <pre className="p-3 bg-neutral-50 border border-neutral-200 rounded-md text-xs overflow-auto">
+                      {JSON.stringify(template.configuration, null, 2)}
+                    </pre>
                   )}
                 </div>
 
                 {/* Script Path */}
                 {template.scriptPath && (
-                  <div className="card-description">
-                    <span style={{ fontWeight: 500 }}>Script path:</span>{' '}
-                    <code
-                      className="code-block"
-                      style={{ display: 'inline', padding: '0.125rem 0.25rem' }}
-                    >
+                  <div className="text-sm">
+                    <span className="font-medium text-neutral-900">Script path:</span>{' '}
+                    <code className="px-1.5 py-0.5 bg-neutral-100 border border-neutral-200 rounded text-xs">
                       {template.scriptPath}
                     </code>
                   </div>
                 )}
 
                 {/* Actions */}
-                <div className="template-actions">
-                  <button
-                    className="button button-primary"
-                    style={{ flex: 1, gap: '0.5rem' }}
+                <div className="flex gap-2">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="flex-1"
                     onClick={() => handleCopyTemplate(template)}
                   >
                     {copiedId === template.id ? (
                       <>
-                        <span>✓</span>
+                        <Check className="h-4 w-4 mr-2" />
                         Copied!
                       </>
                     ) : (
                       <>
-                        <span>📋</span>
+                        <Copy className="h-4 w-4 mr-2" />
                         Copy Configuration
                       </>
                     )}
-                  </button>
+                  </Button>
 
                   {template.scriptContent && (
-                    <button
-                      className="button button-outline"
-                      style={{ gap: '0.5rem' }}
-                      onClick={() => handleCopyScript(template)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => handleCopyScript(template)}>
                       {copiedId === `${template.id}-script` ? (
                         <>
-                          <span>✓</span>
+                          <Check className="h-4 w-4 mr-2" />
                           Copied!
                         </>
                       ) : (
                         <>
-                          <span>📋</span>
+                          <Copy className="h-4 w-4 mr-2" />
                           Copy Script
                         </>
                       )}
-                    </button>
+                    </Button>
                   )}
                 </div>
 
                 {/* Usage Note */}
-                <p className="template-usage-note">
-                  💡 Copy the configuration and paste it into your settings.json file
+                <p className="text-xs text-neutral-600 bg-blue-50 border border-blue-200 rounded-md p-2">
+                  Copy the configuration and paste it into your settings.json file
                   {template.scriptContent && ' (and save the script to the specified path)'}.
                 </p>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           );
         })}
       </div>

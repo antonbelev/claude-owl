@@ -4,8 +4,11 @@
  */
 
 import React from 'react';
+import { Zap, Globe, Radio, Eye, Trash2 } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
 import type { MCPServer } from '@/shared/types/mcp.types';
-import './MCPManager.css';
 
 export interface ServerCardProps {
   server: MCPServer;
@@ -14,104 +17,111 @@ export interface ServerCardProps {
 }
 
 export const ServerCard: React.FC<ServerCardProps> = ({ server, onRemove, onViewDetails }) => {
-  const getScopeColor = (scope?: string): string => {
+  const getScopeBadgeVariant = (scope?: string) => {
     switch (scope) {
       case 'user':
-        return '#4CAF50'; // Green
+        return 'default' as const;
       case 'project':
-        return '#2196F3'; // Blue
+        return 'secondary' as const;
       case 'local':
-        return '#FF9800'; // Orange
+        return 'outline' as const;
       default:
-        return '#757575'; // Gray
+        return 'outline' as const;
     }
   };
 
-  const getTransportIcon = (transport: string): string => {
+  const getTransportIcon = (transport: string) => {
     switch (transport) {
       case 'stdio':
-        return '⚡';
+        return <Zap className="h-4 w-4" />;
       case 'http':
-        return '🌐';
+        return <Globe className="h-4 w-4" />;
       case 'sse':
-        return '📡';
+        return <Radio className="h-4 w-4" />;
       default:
-        return '•';
+        return null;
     }
   };
 
   return (
-    <div className="server-card">
-      <div className="server-card-header">
-        <div className="server-card-title">
-          <span className="transport-icon">{getTransportIcon(server.transport)}</span>
-          <h3>{server.name}</h3>
-        </div>
-        {server.scope && (
-          <span
-            className="scope-badge"
-            style={{ backgroundColor: getScopeColor(server.scope), color: 'white' }}
-          >
-            {server.scope}
-          </span>
-        )}
-      </div>
-
-      <div className="server-card-body">
-        <div className="server-info">
-          {/* Project Path (for project-scoped servers) */}
-          {server.scope === 'project' && server.projectPath && (
-            <div className="info-row">
-              <span className="info-label">Project:</span>
-              <span className="info-value" title={server.projectPath}>
-                {server.projectPath.split('/').pop() || server.projectPath}
-              </span>
-            </div>
-          )}
-
-          <div className="info-row">
-            <span className="info-label">Transport:</span>
-            <span className="info-value">{server.transport}</span>
+    <Card>
+      <CardHeader>
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-2">
+            {getTransportIcon(server.transport)}
+            <CardTitle className="text-lg">{server.name}</CardTitle>
           </div>
-
-          {server.command && (
-            <div className="info-row">
-              <span className="info-label">Command:</span>
-              <span className="info-value code">{server.command}</span>
-            </div>
-          )}
-
-          {server.url && (
-            <div className="info-row">
-              <span className="info-label">URL:</span>
-              <span className="info-value code">{server.url}</span>
-            </div>
-          )}
-
-          {server.env && Object.keys(server.env).length > 0 && (
-            <div className="info-row">
-              <span className="info-label">Env Vars:</span>
-              <span className="info-value">{Object.keys(server.env).length} configured</span>
-            </div>
-          )}
-
-          {server.headers && Object.keys(server.headers).length > 0 && (
-            <div className="info-row">
-              <span className="info-label">Headers:</span>
-              <span className="info-value">{Object.keys(server.headers).length} configured</span>
-            </div>
+          {server.scope && (
+            <Badge variant={getScopeBadgeVariant(server.scope)} className="capitalize">
+              {server.scope}
+            </Badge>
           )}
         </div>
-      </div>
+      </CardHeader>
 
-      <div className="server-card-actions">
-        <button className="btn btn-secondary" onClick={onViewDetails}>
+      <CardContent className="space-y-2">
+        {/* Project Path (for project-scoped servers) */}
+        {server.scope === 'project' && server.projectPath && (
+          <div className="flex items-start justify-between text-sm">
+            <span className="text-neutral-600 font-medium">Project:</span>
+            <span className="text-neutral-900 text-right truncate ml-2" title={server.projectPath}>
+              {server.projectPath.split('/').pop() || server.projectPath}
+            </span>
+          </div>
+        )}
+
+        <div className="flex items-start justify-between text-sm">
+          <span className="text-neutral-600 font-medium">Transport:</span>
+          <span className="text-neutral-900 capitalize">{server.transport}</span>
+        </div>
+
+        {server.command && (
+          <div className="flex items-start justify-between text-sm">
+            <span className="text-neutral-600 font-medium">Command:</span>
+            <span
+              className="text-neutral-900 font-mono text-xs truncate ml-2"
+              title={server.command}
+            >
+              {server.command}
+            </span>
+          </div>
+        )}
+
+        {server.url && (
+          <div className="flex items-start justify-between text-sm">
+            <span className="text-neutral-600 font-medium">URL:</span>
+            <span className="text-neutral-900 font-mono text-xs truncate ml-2" title={server.url}>
+              {server.url}
+            </span>
+          </div>
+        )}
+
+        {server.env && Object.keys(server.env).length > 0 && (
+          <div className="flex items-start justify-between text-sm">
+            <span className="text-neutral-600 font-medium">Env Vars:</span>
+            <span className="text-neutral-900">{Object.keys(server.env).length} configured</span>
+          </div>
+        )}
+
+        {server.headers && Object.keys(server.headers).length > 0 && (
+          <div className="flex items-start justify-between text-sm">
+            <span className="text-neutral-600 font-medium">Headers:</span>
+            <span className="text-neutral-900">
+              {Object.keys(server.headers).length} configured
+            </span>
+          </div>
+        )}
+      </CardContent>
+
+      <CardFooter className="flex gap-2">
+        <Button variant="outline" size="sm" onClick={onViewDetails} className="flex-1">
+          <Eye className="h-4 w-4 mr-2" />
           View Details
-        </button>
-        <button className="btn btn-danger" onClick={onRemove}>
-          Remove
-        </button>
-      </div>
-    </div>
+        </Button>
+        <Button variant="destructive" size="sm" onClick={onRemove}>
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };

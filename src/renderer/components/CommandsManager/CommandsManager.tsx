@@ -5,7 +5,20 @@ import { CommandEditor } from '../CommandEditor/CommandEditor';
 import { GitHubImportDialog } from '../GitHubImport/GitHubImportDialog';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { PageHeader } from '../common/PageHeader';
-import './CommandsManager.css';
+import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Terminal, X, Search, Pencil, Trash2, Download, Info, Clock } from 'lucide-react';
 
 export const CommandsManager: React.FC = () => {
   const { commands, loading, error, refetch, createCommand, updateCommand, deleteCommand } =
@@ -103,13 +116,13 @@ export const CommandsManager: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="commands-manager" data-testid="commands-manager">
+      <div className="h-full flex flex-col bg-white p-8" data-testid="commands-manager">
         <PageHeader
           title="Slash Commands"
           description="Custom slash commands that extend Claude Code functionality"
         />
-        <div className="commands-loading">
-          <p>Loading commands...</p>
+        <div className="text-center py-16">
+          <p className="text-gray-500">Loading commands...</p>
         </div>
       </div>
     );
@@ -117,7 +130,7 @@ export const CommandsManager: React.FC = () => {
 
   if (error) {
     return (
-      <div className="commands-manager" data-testid="commands-manager">
+      <div className="h-full flex flex-col bg-white p-8" data-testid="commands-manager">
         <PageHeader
           title="Slash Commands"
           description="Custom slash commands that extend Claude Code functionality"
@@ -129,23 +142,26 @@ export const CommandsManager: React.FC = () => {
             },
           ]}
         />
-        <div className="commands-error">
-          <p className="error-message">Error: {error}</p>
+        <div className="text-center py-16">
+          <Alert variant="destructive">
+            <AlertDescription>Error: {error}</AlertDescription>
+          </Alert>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="commands-manager" data-testid="commands-manager">
+    <div className="h-full flex flex-col bg-white p-8" data-testid="commands-manager">
       <PageHeader
         title="Slash Commands"
         description="Custom slash commands that extend Claude Code functionality"
         actions={[
           {
-            label: '⬇️ Import from GitHub',
+            label: 'Import from GitHub',
             onClick: handleImportCommand,
-            variant: 'primary',
+            variant: 'secondary',
+            icon: Download,
           },
           {
             label: '+ Create Command',
@@ -156,84 +172,89 @@ export const CommandsManager: React.FC = () => {
       />
 
       {commands.length > 0 && (
-        <div className="commands-filters">
-          <div className="commands-search">
-            <input
+        <div className="flex flex-col sm:flex-row gap-4 mt-8">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
               type="text"
               placeholder="Search commands by name, description, or namespace..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="search-input"
+              className="pl-10 pr-10"
             />
             {searchQuery && (
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setSearchQuery('')}
-                className="search-clear"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
                 title="Clear search"
               >
-                ✕
-              </button>
+                <X className="h-4 w-4" />
+              </Button>
             )}
           </div>
-          <div className="location-filter">
-            <label htmlFor="location-filter">Location:</label>
-            <select
-              id="location-filter"
+          <div className="flex items-center gap-2">
+            <Label htmlFor="location-filter" className="shrink-0">
+              Location:
+            </Label>
+            <Select
               value={locationFilter}
-              onChange={e =>
-                setLocationFilter(e.target.value as 'all' | 'user' | 'project' | 'plugin')
-              }
-              className="filter-select"
+              onValueChange={v => setLocationFilter(v as 'all' | 'user' | 'project' | 'plugin')}
             >
-              <option value="all">All ({commands.length})</option>
-              <option value="user">
-                User ({commands.filter(c => c.location === 'user').length})
-              </option>
-              <option value="project">
-                Project ({commands.filter(c => c.location === 'project').length})
-              </option>
-              <option value="plugin">
-                Plugin ({commands.filter(c => c.location === 'plugin').length})
-              </option>
-            </select>
+              <SelectTrigger id="location-filter" className="w-[200px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All ({commands.length})</SelectItem>
+                <SelectItem value="user">
+                  User ({commands.filter(c => c.location === 'user').length})
+                </SelectItem>
+                <SelectItem value="project">
+                  Project ({commands.filter(c => c.location === 'project').length})
+                </SelectItem>
+                <SelectItem value="plugin">
+                  Plugin ({commands.filter(c => c.location === 'plugin').length})
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       )}
 
-      <div className="commands-content">
+      <div className="flex-1 mt-8">
         {commands.length === 0 ? (
-          <div className="commands-empty">
-            <div className="empty-icon">⌘</div>
-            <h3>No Commands Yet</h3>
-            <p>
+          <div className="text-center py-16">
+            <Terminal className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">No Commands Yet</h3>
+            <p className="text-gray-600 mb-6 max-w-lg mx-auto">
               Create custom slash commands to streamline your Claude Code workflow with reusable
               prompts and automations.
             </p>
-            <button onClick={handleCreateCommand} className="btn-create-empty">
+            <Button onClick={handleCreateCommand} size="lg">
               Create Your First Command
-            </button>
+            </Button>
           </div>
         ) : filteredCommands.length === 0 ? (
-          <div className="commands-empty">
-            <div className="empty-icon">🔍</div>
-            <h3>No Commands Found</h3>
-            <p>
+          <div className="text-center py-16">
+            <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">No Commands Found</h3>
+            <p className="text-gray-600 mb-6">
               No commands match your search criteria
               {searchQuery && ` "${searchQuery}"`}
               {locationFilter !== 'all' && ` in ${locationFilter} location`}
             </p>
-            <button
+            <Button
               onClick={() => {
                 setSearchQuery('');
                 setLocationFilter('all');
               }}
-              className="btn-create-empty"
             >
               Clear Filters
-            </button>
+            </Button>
           </div>
         ) : (
-          <div className="commands-grid">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredCommands.map(command => (
               <CommandCard
                 key={`${command.location}-${command.filePath}`}
@@ -248,7 +269,7 @@ export const CommandsManager: React.FC = () => {
       </div>
 
       {showCreateModal && (
-        <div className="command-editor-overlay">
+        <div className="fixed inset-0 z-50">
           <CommandEditor
             command={editingCommand || undefined}
             onSave={async commandData => {
@@ -349,7 +370,14 @@ const CommandCard: React.FC<CommandCardProps> = ({ command, onView, onEdit, onDe
         : command.location === 'mcp'
           ? 'MCP'
           : 'Plugin';
-  const locationClass = `location-badge location-${command.location}`;
+
+  const locationVariant =
+    command.location === 'user'
+      ? 'default'
+      : command.location === 'project'
+        ? 'secondary'
+        : 'outline';
+
   const canEdit = command.location !== 'plugin' && command.location !== 'mcp';
 
   const handleCardClick = () => {
@@ -367,57 +395,67 @@ const CommandCard: React.FC<CommandCardProps> = ({ command, onView, onEdit, onDe
   };
 
   return (
-    <div className="command-card" data-testid="command-card" onClick={handleCardClick}>
-      <div className="command-card-header">
-        <h3 className="command-name">
-          /{command.namespace ? `${command.namespace}:` : ''}
-          {command.name}
-        </h3>
-        <span className={locationClass}>{locationBadge}</span>
-      </div>
-
-      {command.frontmatter.description && (
-        <p className="command-description">{command.frontmatter.description}</p>
-      )}
-
-      {command.frontmatter['argument-hint'] && (
-        <div className="command-hint">
-          <span className="hint-label">Usage:</span>
-          <code className="hint-value">
-            /{command.name} {command.frontmatter['argument-hint']}
-          </code>
+    <Card
+      className="cursor-pointer transition-all hover:border-blue-500 hover:shadow-md hover:-translate-y-0.5"
+      data-testid="command-card"
+      onClick={handleCardClick}
+    >
+      <CardHeader className="pb-3">
+        <div className="flex justify-between items-start">
+          <h3 className="text-xl font-semibold text-gray-900 font-mono flex-1 break-words">
+            /{command.namespace ? `${command.namespace}:` : ''}
+            {command.name}
+          </h3>
+          <Badge variant={locationVariant} className="ml-2 shrink-0">
+            {locationBadge}
+          </Badge>
         </div>
-      )}
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {command.frontmatter.description && (
+          <p className="text-gray-600 line-clamp-2">{command.frontmatter.description}</p>
+        )}
 
-      <div className="command-meta">
-        {command.frontmatter.model && (
-          <div className="command-model">
-            <span className="meta-label">Model:</span>
-            <span className="meta-value">{command.frontmatter.model}</span>
+        {command.frontmatter['argument-hint'] && (
+          <div className="bg-gray-50 p-2 rounded">
+            <span className="text-xs font-semibold text-gray-700">Usage:</span>
+            <code className="block text-sm font-mono text-gray-800 mt-1">
+              /{command.name} {command.frontmatter['argument-hint']}
+            </code>
           </div>
         )}
-        {command.frontmatter['allowed-tools'] &&
-          command.frontmatter['allowed-tools'].length > 0 && (
-            <div className="command-tools">
-              <span className="meta-label">Tools:</span>
-              <span className="meta-value">
-                {command.frontmatter['allowed-tools'].length} configured
-              </span>
+
+        <div className="flex flex-wrap gap-3 text-sm">
+          {command.frontmatter.model && (
+            <div className="flex items-center gap-1">
+              <span className="font-semibold text-gray-700">Model:</span>
+              <span className="text-gray-600">{command.frontmatter.model}</span>
             </div>
           )}
-      </div>
-
-      {canEdit && (
-        <div className="command-card-actions">
-          <button onClick={handleEdit} className="btn-edit" title="Edit command">
-            ✏️ Edit
-          </button>
-          <button onClick={handleDelete} className="btn-delete" title="Delete command">
-            🗑️ Delete
-          </button>
+          {command.frontmatter['allowed-tools'] &&
+            command.frontmatter['allowed-tools'].length > 0 && (
+              <div className="flex items-center gap-1">
+                <span className="font-semibold text-gray-700">Tools:</span>
+                <span className="text-gray-600">
+                  {command.frontmatter['allowed-tools'].length} configured
+                </span>
+              </div>
+            )}
         </div>
+      </CardContent>
+      {canEdit && (
+        <CardFooter className="gap-2">
+          <Button onClick={handleEdit} variant="outline" size="sm" className="flex-1">
+            <Pencil className="h-3 w-3 mr-1" />
+            Edit
+          </Button>
+          <Button onClick={handleDelete} variant="destructive" size="sm" className="flex-1">
+            <Trash2 className="h-3 w-3 mr-1" />
+            Delete
+          </Button>
+        </CardFooter>
       )}
-    </div>
+    </Card>
   );
 };
 
@@ -456,88 +494,115 @@ const CommandDetailModal: React.FC<CommandDetailModalProps> = ({
     onDelete(command);
   };
 
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const locationVariant =
+    command.location === 'user'
+      ? 'default'
+      : command.location === 'project'
+        ? 'secondary'
+        : 'outline';
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content command-detail-modal" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
-          <div>
-            <h2>
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-8"
+      onClick={handleOverlayClick}
+    >
+      <div
+        className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex justify-between items-center p-6 border-b">
+          <div className="flex items-center gap-3">
+            <h2 className="text-2xl font-semibold font-mono">
               /{command.namespace ? `${command.namespace}:` : ''}
               {command.name}
             </h2>
-            <span className={`location-badge location-${command.location}`}>
+            <Badge variant={locationVariant}>
               {command.location.charAt(0).toUpperCase() + command.location.slice(1)}
-            </span>
+            </Badge>
           </div>
-          <button onClick={onClose} className="modal-close">
-            ×
-          </button>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <X className="h-5 w-5" />
+          </Button>
         </div>
 
-        <div className="modal-body">
+        <div className="p-6 space-y-8">
           {command.frontmatter.description && (
-            <div className="detail-section">
-              <h3>Description</h3>
-              <p>{command.frontmatter.description}</p>
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Description</h3>
+              <p className="text-gray-600">{command.frontmatter.description}</p>
             </div>
           )}
 
           {command.frontmatter['argument-hint'] && (
-            <div className="detail-section">
-              <h3>Usage</h3>
-              <code className="code-text">
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Usage</h3>
+              <code className="block bg-gray-50 p-3 rounded font-mono text-sm">
                 /{command.name} {command.frontmatter['argument-hint']}
               </code>
             </div>
           )}
 
           {command.frontmatter.model && (
-            <div className="detail-section">
-              <h3>Model</h3>
-              <p className="code-text">{command.frontmatter.model}</p>
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Model</h3>
+              <p className="font-mono text-gray-700">{command.frontmatter.model}</p>
             </div>
           )}
 
           {command.frontmatter['allowed-tools'] &&
             command.frontmatter['allowed-tools'].length > 0 && (
-              <div className="detail-section">
-                <h3>Allowed Tools</h3>
-                <div className="tools-list">
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Allowed Tools</h3>
+                <div className="flex flex-wrap gap-2">
                   {command.frontmatter['allowed-tools'].map((tool, idx) => (
-                    <span key={idx} className="tool-badge">
+                    <Badge key={idx} variant="secondary">
                       {tool}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               </div>
             )}
 
           {command.frontmatter['disable-model-invocation'] && (
-            <div className="detail-section">
-              <p className="info-message">
-                ⓘ Model invocation disabled - Claude cannot invoke this command programmatically
-              </p>
-            </div>
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Model invocation disabled - Claude cannot invoke this command programmatically
+              </AlertDescription>
+            </Alert>
           )}
 
-          <div className="detail-section">
-            <h3>Command Content</h3>
-            <pre className="code-block">{command.content}</pre>
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Command Content</h3>
+            <pre className="bg-gray-50 p-4 rounded-md overflow-x-auto font-mono text-sm leading-relaxed whitespace-pre-wrap break-words">
+              {command.content}
+            </pre>
           </div>
 
-          <div className="detail-section detail-meta">
-            <div className="meta-item">
-              <span className="meta-label">File Path:</span>
-              <code className="meta-value">{command.filePath}</code>
+          <div className="space-y-4 text-sm">
+            <div>
+              <span className="font-semibold text-gray-700">File Path:</span>
+              <code className="block bg-gray-50 p-2 rounded font-mono text-xs mt-1 overflow-x-auto">
+                {command.filePath}
+              </code>
             </div>
-            <div className="meta-item">
-              <span className="meta-label">Last Modified:</span>
-              <span className="meta-value">{new Date(command.lastModified).toLocaleString()}</span>
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-gray-500" />
+              <span className="font-semibold text-gray-700">Last Modified:</span>
+              <span className="text-gray-600">
+                {new Date(command.lastModified).toLocaleString()}
+              </span>
             </div>
             {command.metadata && (
-              <div className="meta-item">
-                <span className="meta-label">Imported From:</span>
-                <span className="meta-value">
+              <div>
+                <span className="font-semibold text-gray-700">Imported From:</span>
+                <span className="block text-gray-600 mt-1">
                   {command.metadata.source.url || command.metadata.source.type}
                 </span>
               </div>
@@ -546,13 +611,11 @@ const CommandDetailModal: React.FC<CommandDetailModalProps> = ({
         </div>
 
         {canEdit && (
-          <div className="modal-footer">
-            <button onClick={handleDelete} className="btn-danger">
+          <div className="flex justify-between p-6 border-t gap-3">
+            <Button onClick={handleDelete} variant="destructive">
               Delete Command
-            </button>
-            <button onClick={handleEdit} className="btn-primary">
-              Edit Command
-            </button>
+            </Button>
+            <Button onClick={handleEdit}>Edit Command</Button>
           </div>
         )}
       </div>

@@ -1,9 +1,38 @@
 import React, { useState, useMemo } from 'react';
+import { Bot, Plus, Search, X, Edit2, Trash2, AlertCircle } from 'lucide-react';
 import { useAgents } from '../../hooks/useAgents';
 import type { Agent, AgentFrontmatter } from '@/shared/types';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { PageHeader } from '../common/PageHeader';
-import './AgentsManager.css';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from '@/renderer/components/ui/card';
+import { Button } from '@/renderer/components/ui/button';
+import { Badge } from '@/renderer/components/ui/badge';
+import { Input } from '@/renderer/components/ui/input';
+import { Label } from '@/renderer/components/ui/label';
+import { Textarea } from '@/renderer/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/renderer/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/renderer/components/ui/dialog';
+import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
+import { EmptyState } from '../common/EmptyState';
+import { cn } from '@/renderer/lib/utils';
 
 export const AgentsManager: React.FC = () => {
   const { agents, loading, error, refetch, saveAgent, deleteAgent } = useAgents();
@@ -73,13 +102,13 @@ export const AgentsManager: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="agents-manager" data-testid="agents-manager">
+      <div className="h-full flex flex-col bg-white p-8" data-testid="agents-manager">
         <PageHeader
           title="Subagents"
           description="Custom agents with specialized capabilities and system prompts"
         />
-        <div className="agents-loading">
-          <p>Loading subagents...</p>
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-neutral-600">Loading subagents...</p>
         </div>
       </div>
     );
@@ -87,7 +116,7 @@ export const AgentsManager: React.FC = () => {
 
   if (error) {
     return (
-      <div className="agents-manager" data-testid="agents-manager">
+      <div className="h-full flex flex-col bg-white p-8" data-testid="agents-manager">
         <PageHeader
           title="Subagents"
           description="Custom agents with specialized capabilities and system prompts"
@@ -99,72 +128,76 @@ export const AgentsManager: React.FC = () => {
             },
           ]}
         />
-        <div className="agents-error">
-          <p className="error-message">Error: {error}</p>
-        </div>
+        <Alert variant="destructive" className="mt-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       </div>
     );
   }
 
   return (
-    <div className="agents-manager" data-testid="agents-manager">
+    <div className="h-full flex flex-col bg-white p-8" data-testid="agents-manager">
       <PageHeader
         title="Subagents"
         description="Custom agents with specialized capabilities and system prompts"
         actions={[
           {
-            label: '+ Create Subagent',
+            label: 'Create Subagent',
             onClick: handleCreateAgent,
             variant: 'primary',
+            icon: Plus,
           },
         ]}
       />
 
       {agents.length > 0 && (
-        <div className="agents-search">
-          <input
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
+          <Input
             type="text"
             placeholder="Search agents by name or description..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="search-input"
+            className="pl-10 pr-10"
           />
           {searchQuery && (
-            <button
+            <Button
               onClick={() => setSearchQuery('')}
-              className="search-clear"
+              variant="ghost"
+              size="sm"
+              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0"
               title="Clear search"
             >
-              ✕
-            </button>
+              <X className="h-4 w-4" />
+            </Button>
           )}
         </div>
       )}
 
-      <div className="agents-content">
+      <div className="flex-1">
         {agents.length === 0 ? (
-          <div className="agents-empty">
-            <div className="empty-icon">🤖</div>
-            <h3>No Subagents Yet</h3>
-            <p>
-              Create specialized subagents to handle specific tasks with custom system prompts and
-              tool access.
-            </p>
-            <button onClick={handleCreateAgent} className="btn-create-empty">
-              Create Your First Subagent
-            </button>
-          </div>
+          <EmptyState
+            icon={Bot}
+            title="No Subagents Yet"
+            description="Create specialized subagents to handle specific tasks with custom system prompts and tool access."
+            action={{
+              label: 'Create Your First Subagent',
+              onClick: handleCreateAgent,
+            }}
+          />
         ) : filteredAgents.length === 0 ? (
-          <div className="agents-empty">
-            <div className="empty-icon">🔍</div>
-            <h3>No Agents Found</h3>
-            <p>No agents match your search query &quot;{searchQuery}&quot;</p>
-            <button onClick={() => setSearchQuery('')} className="btn-create-empty">
-              Clear Search
-            </button>
-          </div>
+          <EmptyState
+            icon={Search}
+            title="No Agents Found"
+            description={`No agents match your search query "${searchQuery}"`}
+            action={{
+              label: 'Clear Search',
+              onClick: () => setSearchQuery(''),
+            }}
+          />
         ) : (
-          <div className="agents-grid">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredAgents.map(agent => (
               <AgentCard
                 key={`${agent.location}-${agent.frontmatter.name}`}
@@ -216,7 +249,8 @@ interface AgentCardProps {
 const AgentCard: React.FC<AgentCardProps> = ({ agent, onView, onEdit, onDelete }) => {
   const locationBadge =
     agent.location === 'user' ? 'User' : agent.location === 'project' ? 'Project' : 'Plugin';
-  const locationClass = `location-badge location-${agent.location}`;
+  const locationVariant: 'default' | 'secondary' | 'outline' =
+    agent.location === 'user' ? 'default' : agent.location === 'project' ? 'secondary' : 'outline';
   const canEdit = agent.location !== 'plugin';
 
   const handleCardClick = () => {
@@ -234,39 +268,61 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent, onView, onEdit, onDelete }
   };
 
   return (
-    <div className="agent-card" data-testid="agent-card" onClick={handleCardClick}>
-      <div className="agent-card-header">
-        <h3 className="agent-name">{agent.frontmatter.name}</h3>
-        <span className={locationClass}>{locationBadge}</span>
-      </div>
-      <p className="agent-description">{agent.frontmatter.description}</p>
+    <Card
+      className="cursor-pointer hover:border-primary transition-colors"
+      data-testid="agent-card"
+      onClick={handleCardClick}
+    >
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <span className="text-base">{agent.frontmatter.name}</span>
+          <Badge variant={locationVariant}>{locationBadge}</Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <p className="text-sm text-neutral-600">{agent.frontmatter.description}</p>
 
-      <div className="agent-meta">
-        {agent.frontmatter.model && (
-          <div className="agent-model">
-            <span className="meta-label">Model:</span>
-            <span className="meta-value">{agent.frontmatter.model}</span>
-          </div>
-        )}
-        {agent.frontmatter.tools && agent.frontmatter.tools.length > 0 && (
-          <div className="agent-tools">
-            <span className="meta-label">Tools:</span>
-            <span className="meta-value">{agent.frontmatter.tools.length} configured</span>
-          </div>
-        )}
-      </div>
+        <div className="space-y-2 text-xs">
+          {agent.frontmatter.model && (
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-neutral-700">Model:</span>
+              <span className="text-neutral-600">{agent.frontmatter.model}</span>
+            </div>
+          )}
+          {agent.frontmatter.tools && agent.frontmatter.tools.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-neutral-700">Tools:</span>
+              <span className="text-neutral-600">{agent.frontmatter.tools.length} configured</span>
+            </div>
+          )}
+        </div>
+      </CardContent>
 
       {canEdit && (
-        <div className="agent-card-actions">
-          <button onClick={handleEdit} className="btn-edit" title="Edit agent">
-            ✏️ Edit
-          </button>
-          <button onClick={handleDelete} className="btn-delete" title="Delete agent">
-            🗑️ Delete
-          </button>
-        </div>
+        <CardFooter className="flex gap-2 pt-4">
+          <Button
+            onClick={handleEdit}
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            title="Edit agent"
+          >
+            <Edit2 className="h-3 w-3 mr-1" />
+            Edit
+          </Button>
+          <Button
+            onClick={handleDelete}
+            variant="outline"
+            size="sm"
+            className="flex-1 text-destructive hover:bg-destructive/10"
+            title="Delete agent"
+          >
+            <Trash2 className="h-3 w-3 mr-1" />
+            Delete
+          </Button>
+        </CardFooter>
       )}
-    </div>
+    </Card>
   );
 };
 

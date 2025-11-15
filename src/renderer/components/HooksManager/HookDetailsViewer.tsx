@@ -4,10 +4,19 @@
  * Shows hook details with syntax highlighting and validation
  */
 
+import { Edit, ExternalLink } from 'lucide-react';
 import type { HookWithMetadata } from '@/shared/types/hook.types';
 import { HookValidationPanel } from './HookValidationPanel';
 import { useOpenSettingsFile } from '@/renderer/hooks/useHooks';
-import './HooksManager.css';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/renderer/components/ui/card';
+import { Button } from '@/renderer/components/ui/button';
+import { Badge } from '@/renderer/components/ui/badge';
 
 interface HookDetailsViewerProps {
   hook: HookWithMetadata;
@@ -27,110 +36,103 @@ export function HookDetailsViewer({ hook, className }: HookDetailsViewerProps) {
 
   return (
     <div className={className}>
-      <div className="card">
-        <div className="card-header">
-          <div className="hook-event-card">
-            <div className="hook-event-info">
-              <h4 className="card-title">
+      <Card>
+        <CardHeader>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <CardTitle className="text-base">
                 {hook.event} Hook #{hook.hookIndex + 1}
-              </h4>
-              <p className="card-description" style={{ marginTop: '0.25rem' }}>
+              </CardTitle>
+              <CardDescription className="mt-1">
                 {hook.configuration.matcher ? (
                   <>
                     Matches tools:{' '}
-                    <code style={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                    <code className="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">
                       {hook.configuration.matcher}
                     </code>
                   </>
                 ) : (
                   'Applies to all tool invocations'
                 )}
-              </p>
+              </CardDescription>
             </div>
-            <div className="hook-event-badges">
-              <span className="badge badge-outline">{hook.location}</span>
-              <span
-                className={`badge ${hook.hook.type === 'command' ? 'badge-default' : 'badge-secondary'}`}
-              >
+            <div className="flex gap-2">
+              <Badge variant="outline">{hook.location}</Badge>
+              <Badge variant={hook.hook.type === 'command' ? 'default' : 'secondary'}>
                 {hook.hook.type}
-              </span>
+              </Badge>
             </div>
           </div>
-        </div>
+        </CardHeader>
 
-        <div className="card-content">
+        <CardContent className="space-y-4">
           {/* Hook Configuration */}
           <div>
-            <h4 className="card-description" style={{ marginBottom: '0.5rem' }}>
-              Configuration
-            </h4>
-            <div className="code-block">
-              <pre>{JSON.stringify(hook.hook, null, 2)}</pre>
+            <h4 className="text-sm text-neutral-600 mb-2">Configuration</h4>
+            <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
+              <pre className="text-xs text-neutral-900 overflow-x-auto">
+                {JSON.stringify(hook.hook, null, 2)}
+              </pre>
             </div>
           </div>
 
           {/* Command/Prompt Content */}
           {hook.hook.command && (
-            <div style={{ marginTop: '1rem' }}>
-              <h4 className="card-description" style={{ marginBottom: '0.5rem' }}>
-                Bash Command
-              </h4>
-              <div className="code-block-dark">
-                <code style={{ whiteSpace: 'pre-wrap' }}>{hook.hook.command}</code>
+            <div>
+              <h4 className="text-sm text-neutral-600 mb-2">Bash Command</h4>
+              <div className="bg-neutral-900 text-neutral-100 rounded-lg p-4">
+                <code className="text-sm whitespace-pre-wrap">{hook.hook.command}</code>
               </div>
             </div>
           )}
 
           {hook.hook.prompt && (
-            <div style={{ marginTop: '1rem' }}>
-              <h4 className="card-description" style={{ marginBottom: '0.5rem' }}>
-                LLM Prompt
-              </h4>
-              <div className="code-block" style={{ fontSize: '0.875rem', whiteSpace: 'pre-wrap' }}>
-                {hook.hook.prompt}
+            <div>
+              <h4 className="text-sm text-neutral-600 mb-2">LLM Prompt</h4>
+              <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
+                <div className="text-sm whitespace-pre-wrap">{hook.hook.prompt}</div>
               </div>
             </div>
           )}
 
           {/* Timeout */}
           {hook.hook.timeout && (
-            <div style={{ marginTop: '1rem' }}>
-              <h4 className="card-description" style={{ marginBottom: '0.5rem' }}>
-                Timeout
-              </h4>
-              <p className="card-description">{hook.hook.timeout} seconds</p>
+            <div>
+              <h4 className="text-sm text-neutral-600 mb-2">Timeout</h4>
+              <p className="text-sm text-neutral-600">{hook.hook.timeout} seconds</p>
             </div>
           )}
 
           {/* Validation Results */}
-          <div style={{ marginTop: '1rem' }}>
+          <div>
             <HookValidationPanel validation={hook.validation} />
           </div>
 
           {/* Actions */}
-          <div
-            className="template-actions"
-            style={{ borderTop: '1px solid #e5e7eb', marginTop: '0.5rem' }}
-          >
-            <button
-              className="button button-outline"
+          <div className="flex gap-2 pt-4 border-t border-neutral-200">
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleOpenSettings}
               disabled={openSettingsFile.isPending}
             >
-              📝 Edit in settings.json
-            </button>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit in settings.json
+            </Button>
 
-            <button
-              className="button button-ghost"
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => {
                 window.electronAPI.openExternal('https://code.claude.com/docs/en/hooks');
               }}
             >
-              🔗 View Documentation
-            </button>
+              <ExternalLink className="h-4 w-4 mr-2" />
+              View Documentation
+            </Button>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

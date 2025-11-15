@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
+import { Lock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { useLevelSettings } from '../../hooks/useSettings';
 import type { ConfigLevel } from '@/shared/types';
 import { EnhancedPermissionsEditor } from './editors/PermissionsEditor/EnhancedPermissionsEditor';
 import { EnvironmentEditor } from './editors/EnvironmentEditor';
 import { CoreConfigEditor } from './editors/CoreConfigEditor';
+import { Button } from '@/renderer/components/ui/button';
+import { Badge } from '@/renderer/components/ui/badge';
+import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
+import { EmptyState } from '../common/EmptyState';
+import { cn } from '@/renderer/lib/utils';
 
 interface SettingsHierarchyTabProps {
   level: ConfigLevel;
@@ -70,9 +76,9 @@ export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ leve
 
   if (loading) {
     return (
-      <div className="settings-hierarchy-tab">
-        <div className="loading-state">
-          <p>Loading {level} settings...</p>
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col items-center justify-center p-16 gap-4">
+          <p className="text-neutral-600">Loading {level} settings...</p>
         </div>
       </div>
     );
@@ -80,10 +86,11 @@ export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ leve
 
   if (error) {
     return (
-      <div className="settings-hierarchy-tab">
-        <div className="error-state">
-          <p className="error-message">Error: {error}</p>
-        </div>
+      <div className="max-w-6xl mx-auto">
+        <Alert variant="destructive">
+          <XCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       </div>
     );
   }
@@ -91,20 +98,13 @@ export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ leve
   // Show helpful message if managed settings don't exist
   if (level === 'managed' && !Object.keys(settings).length) {
     return (
-      <div className="settings-hierarchy-tab">
-        <div className="empty-state">
-          <div className="empty-icon">🔒</div>
-          <h3>No Managed Settings</h3>
-          <p>
-            Your organization hasn&apos;t configured any managed policies. Managed settings are
-            typically set by IT departments in enterprise environments to enforce security and
-            compliance rules.
-          </p>
-          <p className="empty-hint">
-            If you&apos;re part of an organization and expect to see managed settings here, contact
-            your IT administrator.
-          </p>
-        </div>
+      <div className="max-w-6xl mx-auto">
+        <EmptyState
+          icon={Lock}
+          title="No Managed Settings"
+          description="Your organization hasn't configured any managed policies. Managed settings are typically set by IT departments in enterprise environments to enforce security and compliance rules."
+          secondaryMessage="If you're part of an organization and expect to see managed settings here, contact your IT administrator."
+        />
       </div>
     );
   }
@@ -137,22 +137,22 @@ export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ leve
         );
       case 'raw':
         return (
-          <div className="raw-editor">
-            <div className="raw-editor-controls">
-              <p className="raw-editor-help">
+          <div className="w-full">
+            <div className="mb-4">
+              <p className="text-sm text-neutral-600 mb-3">
                 Edit the JSON below. Changes are applied automatically when the JSON is valid.
               </p>
               {rawJsonError && (
-                <div className="raw-editor-error">
-                  <span className="error-icon">⚠️</span>
-                  <span>{rawJsonError}</span>
-                </div>
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{rawJsonError}</AlertDescription>
+                </Alert>
               )}
               {!rawJsonError && rawJsonText !== JSON.stringify(settings, null, 2) && (
-                <div className="raw-editor-warning">
-                  <span className="warning-icon">✓</span>
-                  <span>Valid JSON - will be applied on save</span>
-                </div>
+                <Alert variant="default" className="border-success bg-success/10">
+                  <CheckCircle className="h-4 w-4 text-success" />
+                  <AlertDescription>Valid JSON - will be applied on save</AlertDescription>
+                </Alert>
               )}
             </div>
             <textarea
@@ -170,7 +170,7 @@ export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ leve
                 }
               }}
               readOnly={isReadOnly}
-              className="raw-json-editor"
+              className="w-full p-4 bg-neutral-900 text-neutral-100 border border-neutral-600 rounded-lg font-mono text-sm leading-relaxed resize-y focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
               rows={25}
               spellCheck={false}
             />
@@ -178,7 +178,7 @@ export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ leve
         );
       default:
         return (
-          <div className="coming-soon">
+          <div className="text-center p-16 text-neutral-400">
             <p>This section is coming soon!</p>
           </div>
         );
@@ -186,76 +186,92 @@ export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ leve
   };
 
   return (
-    <div className="settings-hierarchy-tab">
-      <div className="tab-header">
-        <div className="tab-info">
-          <h2>{level.charAt(0).toUpperCase() + level.slice(1)} Settings</h2>
-          {isReadOnly && <span className="readonly-badge">Read Only</span>}
+    <div className="max-w-6xl mx-auto">
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-semibold text-neutral-900">
+            {level.charAt(0).toUpperCase() + level.slice(1)} Settings
+          </h2>
+          {isReadOnly && <Badge variant="warning">Read Only</Badge>}
         </div>
         {!isReadOnly && (
-          <div className="tab-actions">
+          <div className="flex gap-3 items-center">
             {hasChanges && (
               <>
-                <button onClick={handleDiscard} className="btn-secondary">
+                <Button onClick={handleDiscard} variant="outline" size="sm">
                   Discard Changes
-                </button>
-                <button onClick={handleSave} className="btn-primary">
+                </Button>
+                <Button onClick={handleSave} variant="default" size="sm">
                   Save Settings
-                </button>
+                </Button>
               </>
             )}
-            {saveSuccess && <span className="save-success">✓ Saved successfully</span>}
-            {saveError && <span className="save-error">{saveError}</span>}
+            {saveSuccess && (
+              <span className="text-success text-sm font-medium inline-flex items-center gap-1">
+                <CheckCircle className="h-4 w-4" />
+                Saved successfully
+              </span>
+            )}
+            {saveError && <span className="text-destructive text-sm">{saveError}</span>}
           </div>
         )}
       </div>
 
-      <div className="section-nav">
-        <button
-          className={`section-btn ${activeSection === 'core' ? 'active' : ''}`}
+      <div className="flex gap-2 mb-8 flex-wrap">
+        <Button
+          variant={activeSection === 'core' ? 'default' : 'outline'}
+          size="sm"
           onClick={() => setActiveSection('core')}
         >
           Core Config
-        </button>
-        <button
-          className={`section-btn ${activeSection === 'permissions' ? 'active' : ''}`}
+        </Button>
+        <Button
+          variant={activeSection === 'permissions' ? 'default' : 'outline'}
+          size="sm"
           onClick={() => setActiveSection('permissions')}
         >
           Permissions
-        </button>
-        <button
-          className={`section-btn ${activeSection === 'environment' ? 'active' : ''}`}
+        </Button>
+        <Button
+          variant={activeSection === 'environment' ? 'default' : 'outline'}
+          size="sm"
           onClick={() => setActiveSection('environment')}
         >
           Environment
-        </button>
-        <button
-          className={`section-btn ${activeSection === 'sandbox' ? 'active' : ''}`}
+        </Button>
+        <Button
+          variant={activeSection === 'sandbox' ? 'default' : 'outline'}
+          size="sm"
           onClick={() => setActiveSection('sandbox')}
         >
           Sandbox
-        </button>
-        <button
-          className={`section-btn ${activeSection === 'hooks' ? 'active' : ''}`}
+        </Button>
+        <Button
+          variant={activeSection === 'hooks' ? 'default' : 'outline'}
+          size="sm"
           onClick={() => setActiveSection('hooks')}
         >
           Hooks
-        </button>
-        <button
-          className={`section-btn ${activeSection === 'plugins' ? 'active' : ''}`}
+        </Button>
+        <Button
+          variant={activeSection === 'plugins' ? 'default' : 'outline'}
+          size="sm"
           onClick={() => setActiveSection('plugins')}
         >
           Plugins
-        </button>
-        <button
-          className={`section-btn ${activeSection === 'raw' ? 'active' : ''}`}
+        </Button>
+        <Button
+          variant={activeSection === 'raw' ? 'default' : 'outline'}
+          size="sm"
           onClick={() => setActiveSection('raw')}
         >
           Raw JSON
-        </button>
+        </Button>
       </div>
 
-      <div className="section-content">{renderSectionContent()}</div>
+      <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-8">
+        {renderSectionContent()}
+      </div>
     </div>
   );
 };

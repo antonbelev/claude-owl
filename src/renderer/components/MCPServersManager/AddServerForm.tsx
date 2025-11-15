@@ -1,4 +1,9 @@
 import React, { useState } from 'react';
+import { X, Plus, Info } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Alert, AlertDescription } from '../ui/alert';
 import type { AddMCPServerRequest } from '@/shared/types';
 
 interface AddServerFormProps {
@@ -125,64 +130,72 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
   };
 
   return (
-    <form className="add-server-form" onSubmit={handleSubmit}>
-      <div className="form-header">
-        <h2>Add MCP Server</h2>
-        <button type="button" className="btn-close" onClick={onCancel} title="Close">
-          ✕
-        </button>
+    <form className="space-y-6" onSubmit={handleSubmit}>
+      {/* Header */}
+      <div className="flex items-start justify-between">
+        <h2 className="text-2xl font-bold text-neutral-900">Add MCP Server</h2>
+        <Button type="button" variant="ghost" size="sm" onClick={onCancel} title="Close">
+          <X className="h-4 w-4" />
+        </Button>
       </div>
 
       {/* Errors */}
-      {error && <div className="form-error alert-error">{error}</div>}
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       {/* Server Name */}
-      <div className="form-group">
-        <label className="form-label">
-          Server Name <span className="required">*</span>
-        </label>
-        <input
+      <div className="space-y-2">
+        <Label>
+          Server Name <span className="text-red-500">*</span>
+        </Label>
+        <Input
           type="text"
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="e.g., sequential-thinking"
-          className={`form-input ${validationErrors.name ? 'input-error' : ''}`}
+          className={validationErrors.name ? 'border-red-500' : ''}
         />
-        {validationErrors.name && <p className="field-error">{validationErrors.name}</p>}
+        {validationErrors.name && <p className="text-sm text-red-500">{validationErrors.name}</p>}
       </div>
 
       {/* Transport Type */}
-      <div className="form-group">
-        <label className="form-label">
-          Transport Type <span className="required">*</span>
-        </label>
-        <div className="radio-group">
-          <label className="radio-label">
+      <div className="space-y-2">
+        <Label>
+          Transport Type <span className="text-red-500">*</span>
+        </Label>
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
               value="stdio"
               checked={transport === 'stdio'}
               onChange={e => setTransport(e.target.value as typeof transport)}
+              className="w-4 h-4"
             />
-            Stdio (local process)
+            <span className="text-sm">Stdio (local process)</span>
           </label>
-          <label className="radio-label">
+          <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
               value="http"
               checked={transport === 'http'}
               onChange={e => setTransport(e.target.value as typeof transport)}
+              className="w-4 h-4"
             />
-            HTTP (remote server)
+            <span className="text-sm">HTTP (remote server)</span>
           </label>
-          <label className="radio-label">
+          <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
               value="sse"
               checked={transport === 'sse'}
               onChange={e => setTransport(e.target.value as typeof transport)}
+              className="w-4 h-4"
             />
-            SSE (deprecated)
+            <span className="text-sm">SSE (deprecated)</span>
           </label>
         </div>
       </div>
@@ -190,123 +203,133 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
       {/* Stdio Config */}
       {transport === 'stdio' && (
         <>
-          <div className="form-group">
-            <label className="form-label">
-              Command <span className="required">*</span>
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label>
+              Command <span className="text-red-500">*</span>
+            </Label>
+            <Input
               type="text"
               value={command}
               onChange={e => setCommand(e.target.value)}
               placeholder="e.g., npx, node, python"
-              className={`form-input ${validationErrors.command ? 'input-error' : ''}`}
+              className={validationErrors.command ? 'border-red-500' : ''}
             />
-            <p className="form-hint">Common commands: npx, node, python, python3</p>
-            {validationErrors.command && <p className="field-error">{validationErrors.command}</p>}
+            <p className="text-sm text-neutral-600">Common commands: npx, node, python, python3</p>
+            {validationErrors.command && (
+              <p className="text-sm text-red-500">{validationErrors.command}</p>
+            )}
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Arguments</label>
+          <div className="space-y-2">
+            <Label>Arguments</Label>
             <textarea
               value={args}
               onChange={e => setArgs(e.target.value)}
-              placeholder="One argument per line, e.g.:-y&#10;@modelcontextprotocol/server-sequential-thinking"
-              className="form-textarea"
+              placeholder="One argument per line, e.g.:&#10;-y&#10;@modelcontextprotocol/server-sequential-thinking"
+              className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={4}
             />
-            <p className="form-hint">Each line is treated as one argument</p>
+            <p className="text-sm text-neutral-600">Each line is treated as one argument</p>
           </div>
         </>
       )}
 
       {/* HTTP Config */}
       {transport === 'http' && (
-        <div className="form-group">
-          <label className="form-label">
-            Server URL <span className="required">*</span>
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label>
+            Server URL <span className="text-red-500">*</span>
+          </Label>
+          <Input
             type="url"
             value={url}
             onChange={e => setUrl(e.target.value)}
             placeholder="https://mcp.example.com/mcp"
-            className={`form-input ${validationErrors.url ? 'input-error' : ''}`}
+            className={validationErrors.url ? 'border-red-500' : ''}
           />
-          {validationErrors.url && <p className="field-error">{validationErrors.url}</p>}
+          {validationErrors.url && <p className="text-sm text-red-500">{validationErrors.url}</p>}
         </div>
       )}
 
       {/* Environment Variables */}
-      <div className="form-group">
-        <label className="form-label">Environment Variables</label>
+      <div className="space-y-2">
+        <Label>Environment Variables</Label>
 
         {/* Existing variables */}
         {Object.entries(envVars).length > 0 && (
-          <div className="env-vars-list">
+          <div className="space-y-2 mb-2">
             {Object.entries(envVars).map(([key]) => (
-              <div key={key} className="env-var-item">
-                <div className="env-var-display">
-                  <span className="env-key">{key}</span>
-                  <span className="env-value">••••••••••••••••</span>
+              <div
+                key={key}
+                className="flex items-center gap-2 p-2 border border-neutral-200 rounded-md"
+              >
+                <div className="flex-1 flex items-center gap-2">
+                  <span className="font-mono text-sm text-neutral-900">{key}</span>
+                  <span className="text-neutral-400">••••••••••••••••</span>
                 </div>
-                <button
+                <Button
                   type="button"
-                  className="btn-remove"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => handleRemoveEnvVar(key)}
                   title="Remove variable"
                 >
-                  ✕
-                </button>
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
             ))}
           </div>
         )}
 
         {/* Add new variable */}
-        <div className="add-env-var">
-          <input
+        <div className="flex gap-2">
+          <Input
             type="text"
             value={envKey}
             onChange={e => setEnvKey(e.target.value)}
             placeholder="Variable name (e.g., API_KEY)"
-            className="form-input"
+            className="flex-1"
           />
-          <input
+          <Input
             type="password"
             value={envValue}
             onChange={e => setEnvValue(e.target.value)}
             placeholder="Variable value"
-            className="form-input"
+            className="flex-1"
           />
-          <button type="button" className="btn-secondary" onClick={handleAddEnvVar}>
-            Add
-          </button>
+          <Button type="button" variant="outline" onClick={handleAddEnvVar}>
+            <Plus className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
       {/* Note: Servers are always stored in user-level config */}
-      <div
-        className="form-group"
-        style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}
-      >
-        <p style={{ margin: 0, fontSize: '0.9rem', color: '#6c757d' }}>
-          ℹ️ MCP servers are managed globally at the user level (~/.claude.json) and available to
-          all your projects. To manage project-specific servers, use the Claude CLI or select a
-          project in a future update.
-        </p>
-        <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.85rem', color: '#6c757d' }}>
-          For project-specific MCP servers, edit your project&apos;s .mcp.json directly.
-        </p>
-      </div>
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertDescription className="text-xs">
+          <p className="mb-2">
+            MCP servers are managed globally at the user level (~/.claude.json) and available to all
+            your projects. To manage project-specific servers, use the Claude CLI or select a
+            project in a future update.
+          </p>
+          <p>For project-specific MCP servers, edit your project&apos;s .mcp.json directly.</p>
+        </AlertDescription>
+      </Alert>
 
       {/* Buttons */}
-      <div className="form-actions">
-        <button type="button" className="btn btn-secondary" onClick={onCancel} disabled={loading}>
+      <div className="flex gap-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={loading}
+          className="flex-1"
+        >
           Cancel
-        </button>
-        <button type="submit" className="btn btn-primary" disabled={loading}>
+        </Button>
+        <Button type="submit" disabled={loading} className="flex-1">
           {loading ? 'Adding...' : 'Add Server'}
-        </button>
+        </Button>
       </div>
     </form>
   );

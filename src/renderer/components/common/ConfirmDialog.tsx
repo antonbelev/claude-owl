@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import './ConfirmDialog.css';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/renderer/components/ui/dialog';
+import { Button } from '@/renderer/components/ui/button';
+import { AlertCircle, Loader2 } from 'lucide-react';
 
 export interface ConfirmDialogProps {
   title: string;
@@ -11,6 +20,10 @@ export interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
+/**
+ * Confirmation dialog component using shadcn/ui Dialog
+ * Provides a consistent confirmation modal across the app
+ */
 export function ConfirmDialog({
   title,
   message,
@@ -32,29 +45,29 @@ export function ConfirmDialog({
   };
 
   return (
-    <div className="confirm-overlay">
-      <div className="confirm-dialog">
-        <div className="confirm-header">
-          <h2>{title}</h2>
-        </div>
-
-        <div className="confirm-body">
-          <p>{message}</p>
-        </div>
-
-        <div className="confirm-footer">
-          <button onClick={onCancel} className="btn-secondary" disabled={isLoading}>
+    <Dialog open={true} onOpenChange={open => !open && onCancel()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            {isDangerous && <AlertCircle className="h-5 w-5 text-destructive" />}
+            {title}
+          </DialogTitle>
+          <DialogDescription className="text-base pt-2">{message}</DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button variant="outline" onClick={onCancel} disabled={isLoading}>
             {cancelText}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant={isDangerous ? 'destructive' : 'default'}
             onClick={handleConfirm}
-            className={`btn-primary ${isDangerous ? 'btn-danger' : ''}`}
             disabled={isLoading}
           >
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isLoading ? 'Processing...' : confirmText}
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

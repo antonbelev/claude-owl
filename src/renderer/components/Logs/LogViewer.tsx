@@ -1,7 +1,10 @@
 import React from 'react';
+import { X, Search, Trash2 } from 'lucide-react';
 import type { DebugLog } from '@/shared/types';
 import { ConfirmDialog } from '../common/ConfirmDialog';
-import './LogViewer.css';
+import { Button } from '@/renderer/components/ui/button';
+import { Input } from '@/renderer/components/ui/input';
+import { Badge } from '@/renderer/components/ui/badge';
 
 interface LogViewerProps {
   log: DebugLog;
@@ -99,74 +102,79 @@ export const LogViewer: React.FC<LogViewerProps> = ({ log, onClose, onDelete }) 
   };
 
   return (
-    <div className="log-viewer-panel">
-      <div className="log-viewer-header">
-        <div className="log-viewer-title-section">
-          <h2 className="log-viewer-title">{log.filename}</h2>
-          <button className="log-viewer-close-btn" onClick={onClose} aria-label="Close">
-            ✕
-          </button>
+    <div className="flex flex-col h-full bg-white">
+      <div className="flex items-center justify-between p-6 border-b border-neutral-200">
+        <div className="flex-1 min-w-0">
+          <h2 className="text-xl font-semibold truncate">{log.filename}</h2>
         </div>
+        <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close">
+          <X className="h-5 w-5" />
+        </Button>
       </div>
 
-      <div className="log-viewer-info">
-        <div className="log-info-item">
-          <span className="log-info-label">Size:</span>
-          <span className="log-info-value">{formatFileSize(log.size)}</span>
+      <div className="flex items-center gap-6 px-6 py-3 bg-neutral-50 border-b border-neutral-200">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-neutral-700">Size:</span>
+          <Badge variant="secondary">{formatFileSize(log.size)}</Badge>
         </div>
-        <div className="log-info-item">
-          <span className="log-info-label">Modified:</span>
-          <span className="log-info-value">{formatDate(log.timestamp)}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-neutral-700">Modified:</span>
+          <Badge variant="secondary">{formatDate(log.timestamp)}</Badge>
         </div>
       </div>
 
       {showSearch && (
-        <div className="log-search-bar">
-          <input
-            ref={searchInputRef}
-            type="text"
-            className="log-search-input"
-            placeholder="Search in log... (Cmd+F to search, Esc to close)"
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
+        <div className="flex items-center gap-3 p-4 bg-neutral-50 border-b border-neutral-200">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
+            <Input
+              ref={searchInputRef}
+              type="text"
+              className="pl-10"
+              placeholder="Search in log... (Cmd+F to search, Esc to close)"
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+          </div>
           {searchQuery && (
-            <span className="log-search-count">
+            <span className="text-sm text-neutral-600 whitespace-nowrap">
               {searchMatches > 0
                 ? `${searchMatches} match${searchMatches !== 1 ? 'es' : ''}`
                 : 'No matches'}
             </span>
           )}
-          <button
-            className="log-search-close"
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => {
               setShowSearch(false);
               setSearchQuery('');
             }}
             aria-label="Close search"
           >
-            ✕
-          </button>
+            <X className="h-4 w-4" />
+          </Button>
         </div>
       )}
 
-      <div className="log-viewer-content">
+      <div className="flex-1 overflow-auto p-6 bg-neutral-900">
         <pre
           ref={contentRef}
-          className="log-content"
+          className="text-sm text-neutral-100 font-mono whitespace-pre-wrap"
           dangerouslySetInnerHTML={{
             __html: highlightContent || '',
           }}
         />
       </div>
 
-      <div className="log-viewer-actions">
-        <button className="btn btn-secondary" onClick={onClose}>
+      <div className="flex justify-between gap-4 p-6 border-t border-neutral-200">
+        <Button onClick={onClose} variant="outline">
           Close
-        </button>
-        <button className="btn btn-danger" onClick={handleDelete} disabled={isDeleting}>
+        </Button>
+        <Button onClick={handleDelete} variant="destructive" disabled={isDeleting}>
+          <Trash2 className="h-4 w-4 mr-2" />
           {isDeleting ? 'Deleting...' : 'Delete Log'}
-        </button>
+        </Button>
       </div>
 
       {deleteConfirm && (

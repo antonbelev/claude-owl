@@ -1,8 +1,11 @@
 import { useState, useCallback } from 'react';
+import { AlertTriangle, Info } from 'lucide-react';
 import { CommandFrontmatter, CommandWithMetadata } from '../../../shared/types/command.types';
 import { CommandConfigForm } from './CommandConfigForm';
 import { CommandReviewStep } from './CommandReviewStep';
-import './CommandEditor.css';
+import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
+import { Badge } from '@/renderer/components/ui/badge';
+import { Button } from '@/renderer/components/ui/button';
 
 export interface CommandEditorProps {
   command: CommandWithMetadata | undefined;
@@ -143,26 +146,28 @@ export function CommandEditor({ command, onSave, onCancel, isLoading }: CommandE
   const totalSteps = 2;
 
   return (
-    <div className="command-editor">
-      <div className="command-editor-header">
-        <h2>{displayTitle}</h2>
-        <div className="step-indicator">
+    <div className="flex flex-col h-full bg-white">
+      <div className="flex items-center justify-between p-6 border-b border-neutral-200">
+        <h2 className="text-xl font-semibold">{displayTitle}</h2>
+        <Badge variant="secondary">
           Step {currentStepNumber}/{totalSteps}
-        </div>
+        </Badge>
       </div>
 
       {errors.length > 0 && currentStep === 'config' && (
-        <div className="error-panel">
-          <div className="error-header">⚠️ Errors</div>
-          <ul>
-            {errors.map((error, idx) => (
-              <li key={idx}>{error}</li>
-            ))}
-          </ul>
-        </div>
+        <Alert variant="destructive" className="m-6">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            <ul className="list-disc list-inside space-y-1">
+              {errors.map((error, idx) => (
+                <li key={idx}>{error}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
       )}
 
-      <div className="command-editor-content">
+      <div className="flex-1 overflow-y-auto p-6">
         {currentStep === 'config' && (
           <>
             <CommandConfigForm
@@ -187,10 +192,13 @@ export function CommandEditor({ command, onSave, onCancel, isLoading }: CommandE
               onContentChange={setContent}
             />
 
-            <div className="step-info">
-              ℹ️ Next: You&apos;ll review the generated markdown and have the option to edit it
-              manually.
-            </div>
+            <Alert className="mt-6">
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Next: You&apos;ll review the generated markdown and have the option to edit it
+                manually.
+              </AlertDescription>
+            </Alert>
           </>
         )}
 
@@ -215,13 +223,13 @@ export function CommandEditor({ command, onSave, onCancel, isLoading }: CommandE
       </div>
 
       {currentStep === 'config' && (
-        <div className="command-editor-footer">
-          <button onClick={onCancel} className="cancel-btn" disabled={isLoading}>
+        <div className="flex justify-between gap-4 p-6 border-t border-neutral-200">
+          <Button onClick={onCancel} variant="outline" disabled={isLoading}>
             Cancel
-          </button>
-          <button onClick={handleNextStep} className="save-btn" disabled={isLoading}>
+          </Button>
+          <Button onClick={handleNextStep} disabled={isLoading}>
             Next: Review
-          </button>
+          </Button>
         </div>
       )}
     </div>

@@ -4,8 +4,12 @@
  */
 
 import React, { useState } from 'react';
+import { Plus, X } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Alert, AlertDescription } from '../ui/alert';
 import type { MCPTransport, MCPScope, AddMCPServerRequest } from '@/shared/types/mcp.types';
-import './MCPManager.css';
 
 export interface AddServerFormProps {
   onSubmit: (request: AddMCPServerRequest) => Promise<void>;
@@ -134,17 +138,21 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
   };
 
   return (
-    <form className="add-server-form" onSubmit={handleSubmit}>
-      <h2>Add MCP Server</h2>
+    <form className="max-w-2xl space-y-6" onSubmit={handleSubmit}>
+      <h2 className="text-2xl font-bold text-neutral-900">Add MCP Server</h2>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       {/* Server Name */}
-      <div className="form-group">
-        <label htmlFor="name">
-          Server Name <span className="required">*</span>
-        </label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="name">
+          Server Name <span className="text-red-500">*</span>
+        </Label>
+        <Input
           type="text"
           id="name"
           value={name}
@@ -152,66 +160,83 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
           placeholder="e.g., sequential-thinking"
           required
         />
-        <small>Lowercase with hyphens, no special characters</small>
+        <p className="text-sm text-neutral-600">Lowercase with hyphens, no special characters</p>
       </div>
 
       {/* Transport Type (P0) */}
-      <div className="form-group">
-        <label>
-          Transport Type <span className="required">*</span>
-        </label>
-        <div className="transport-selector">
+      <div className="space-y-2">
+        <Label>
+          Transport Type <span className="text-red-500">*</span>
+        </Label>
+        <div className="grid grid-cols-3 gap-2">
           <button
             type="button"
-            className={`transport-option ${transport === 'stdio' ? 'active' : ''}`}
+            className={`p-4 border rounded-lg transition-colors ${
+              transport === 'stdio'
+                ? 'border-blue-500 bg-blue-50 text-blue-900'
+                : 'border-neutral-300 hover:border-neutral-400'
+            }`}
             onClick={() => setTransport('stdio')}
           >
-            <span className="transport-name">Stdio</span>
-            <span className="transport-desc">Standard input/output</span>
+            <div className="font-medium">Stdio</div>
+            <div className="text-xs text-neutral-600">Standard input/output</div>
           </button>
           <button
             type="button"
-            className={`transport-option ${transport === 'http' ? 'active' : ''}`}
+            className={`p-4 border rounded-lg transition-colors ${
+              transport === 'http'
+                ? 'border-blue-500 bg-blue-50 text-blue-900'
+                : 'border-neutral-300 hover:border-neutral-400'
+            }`}
             onClick={() => setTransport('http')}
           >
-            <span className="transport-name">HTTP</span>
-            <span className="transport-desc">HTTP-based</span>
+            <div className="font-medium">HTTP</div>
+            <div className="text-xs text-neutral-600">HTTP-based</div>
           </button>
           <button
             type="button"
-            className={`transport-option ${transport === 'sse' ? 'active' : ''}`}
+            className={`p-4 border rounded-lg transition-colors ${
+              transport === 'sse'
+                ? 'border-blue-500 bg-blue-50 text-blue-900'
+                : 'border-neutral-300 hover:border-neutral-400'
+            }`}
             onClick={() => setTransport('sse')}
           >
-            <span className="transport-name">SSE</span>
-            <span className="transport-desc">Server-Sent Events</span>
+            <div className="font-medium">SSE</div>
+            <div className="text-xs text-neutral-600">Server-Sent Events</div>
           </button>
         </div>
       </div>
 
       {/* Scope (P0) */}
-      <div className="form-group">
-        <label htmlFor="scope">
-          Scope <span className="required">*</span>
-        </label>
-        <select id="scope" value={scope} onChange={e => setScope(e.target.value as MCPScope)}>
+      <div className="space-y-2">
+        <Label htmlFor="scope">
+          Scope <span className="text-red-500">*</span>
+        </Label>
+        <select
+          id="scope"
+          value={scope}
+          onChange={e => setScope(e.target.value as MCPScope)}
+          className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
           <option value="user">User (Global config)</option>
           <option value="project">Project (Project config)</option>
           <option value="local">Local (Local overrides)</option>
         </select>
-        <small>
+        <p className="text-sm text-neutral-600">
           Where to save the server configuration. User = global, Project = project-level, Local =
           local overrides.
-        </small>
+        </p>
       </div>
 
       {/* Stdio-specific fields */}
       {transport === 'stdio' && (
         <>
-          <div className="form-group">
-            <label htmlFor="command">
-              Command <span className="required">*</span>
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="command">
+              Command <span className="text-red-500">*</span>
+            </Label>
+            <Input
               type="text"
               id="command"
               value={command}
@@ -219,30 +244,30 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
               placeholder="e.g., npx"
               required={transport === 'stdio'}
             />
-            <small>Executable command to run</small>
+            <p className="text-sm text-neutral-600">Executable command to run</p>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="args">Arguments</label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="args">Arguments</Label>
+            <Input
               type="text"
               id="args"
               value={args}
               onChange={e => setArgs(e.target.value)}
               placeholder="e.g., -y @modelcontextprotocol/server-sequential-thinking"
             />
-            <small>Space-separated command arguments</small>
+            <p className="text-sm text-neutral-600">Space-separated command arguments</p>
           </div>
         </>
       )}
 
       {/* HTTP/SSE-specific fields */}
       {(transport === 'http' || transport === 'sse') && (
-        <div className="form-group">
-          <label htmlFor="url">
-            URL <span className="required">*</span>
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="url">
+            URL <span className="text-red-500">*</span>
+          </Label>
+          <Input
             type="url"
             id="url"
             value={url}
@@ -250,84 +275,105 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
             placeholder="https://example.com/mcp"
             required={transport === 'http' || transport === 'sse'}
           />
-          <small>Server endpoint URL</small>
+          <p className="text-sm text-neutral-600">Server endpoint URL</p>
         </div>
       )}
 
       {/* Environment Variables (P1) */}
-      <div className="form-group">
-        <label>Environment Variables (Optional)</label>
-        {envVars.map((envVar, index) => (
-          <div key={index} className="key-value-row">
-            <input
-              type="text"
-              placeholder="KEY"
-              value={envVar.key}
-              onChange={e => updateEnvVar(index, 'key', e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="value"
-              value={envVar.value}
-              onChange={e => updateEnvVar(index, 'value', e.target.value)}
-            />
-            <button type="button" className="btn btn-danger-sm" onClick={() => removeEnvVar(index)}>
-              Remove
-            </button>
-          </div>
-        ))}
-        <button type="button" className="btn btn-secondary" onClick={addEnvVar}>
-          + Add Environment Variable
-        </button>
-        <small>Environment variables to pass to the server (e.g., API keys)</small>
+      <div className="space-y-2">
+        <Label>Environment Variables (Optional)</Label>
+        <div className="space-y-2">
+          {envVars.map((envVar, index) => (
+            <div key={index} className="flex gap-2">
+              <Input
+                type="text"
+                placeholder="KEY"
+                value={envVar.key}
+                onChange={e => updateEnvVar(index, 'key', e.target.value)}
+                className="flex-1"
+              />
+              <Input
+                type="text"
+                placeholder="value"
+                value={envVar.value}
+                onChange={e => updateEnvVar(index, 'value', e.target.value)}
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={() => removeEnvVar(index)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+          <Button type="button" variant="outline" onClick={addEnvVar} className="w-full">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Environment Variable
+          </Button>
+        </div>
+        <p className="text-sm text-neutral-600">
+          Environment variables to pass to the server (e.g., API keys)
+        </p>
       </div>
 
       {/* HTTP Headers (P1, only for HTTP/SSE) */}
       {(transport === 'http' || transport === 'sse') && (
-        <div className="form-group">
-          <label>HTTP Headers (Optional)</label>
-          {headers.map((header, index) => (
-            <div key={index} className="key-value-row">
-              <input
-                type="text"
-                placeholder="Header-Name"
-                value={header.key}
-                onChange={e => updateHeader(index, 'key', e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="value"
-                value={header.value}
-                onChange={e => updateHeader(index, 'value', e.target.value)}
-              />
-              <button
-                type="button"
-                className="btn btn-danger-sm"
-                onClick={() => removeHeader(index)}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-          <button type="button" className="btn btn-secondary" onClick={addHeader}>
-            + Add Header
-          </button>
-          <small>Custom HTTP headers (e.g., Authorization: Bearer TOKEN)</small>
+        <div className="space-y-2">
+          <Label>HTTP Headers (Optional)</Label>
+          <div className="space-y-2">
+            {headers.map((header, index) => (
+              <div key={index} className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Header-Name"
+                  value={header.key}
+                  onChange={e => updateHeader(index, 'key', e.target.value)}
+                  className="flex-1"
+                />
+                <Input
+                  type="text"
+                  placeholder="value"
+                  value={header.value}
+                  onChange={e => updateHeader(index, 'value', e.target.value)}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => removeHeader(index)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            <Button type="button" variant="outline" onClick={addHeader} className="w-full">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Header
+            </Button>
+          </div>
+          <p className="text-sm text-neutral-600">
+            Custom HTTP headers (e.g., Authorization: Bearer TOKEN)
+          </p>
         </div>
       )}
 
-      <div className="form-actions">
-        <button
+      <div className="flex gap-4 pt-4">
+        <Button
           type="button"
-          className="btn btn-secondary"
+          variant="outline"
           onClick={onCancel}
           disabled={isSubmitting}
+          className="flex-1"
         >
           Cancel
-        </button>
-        <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+        </Button>
+        <Button type="submit" disabled={isSubmitting} className="flex-1">
           {isSubmitting ? 'Adding...' : 'Add Server'}
-        </button>
+        </Button>
       </div>
     </form>
   );

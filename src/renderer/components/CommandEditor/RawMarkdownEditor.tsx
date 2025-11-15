@@ -1,10 +1,13 @@
 import { useState, useCallback } from 'react';
+import { CheckCircle, XCircle, AlertTriangle, X } from 'lucide-react';
 import { CommandFrontmatter } from '../../../shared/types/command.types';
 import {
   parseCommandMarkdown,
   validateCommandMarkdown,
 } from '../../../shared/utils/command-markdown.utils';
-import './RawMarkdownEditor.css';
+import { Button } from '@/renderer/components/ui/button';
+import { Textarea } from '@/renderer/components/ui/textarea';
+import { Alert, AlertDescription, AlertTitle } from '@/renderer/components/ui/alert';
 
 export interface RawMarkdownEditorProps {
   markdown: string;
@@ -38,72 +41,86 @@ export function RawMarkdownEditor({ markdown, onSave, onCancel }: RawMarkdownEdi
   const validation = validateCommandMarkdown(editedMarkdown);
 
   return (
-    <div className="raw-editor-overlay" onClick={onCancel}>
-      <div className="raw-editor-modal" onClick={e => e.stopPropagation()}>
-        <div className="editor-header">
-          <h2>Edit Raw Markdown</h2>
-          <button onClick={onCancel} className="modal-close">
-            ×
-          </button>
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      onClick={onCancel}
+    >
+      <div
+        className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between p-6 border-b border-neutral-200">
+          <h2 className="text-xl font-semibold">Edit Raw Markdown</h2>
+          <Button variant="ghost" size="icon" onClick={onCancel}>
+            <X className="h-5 w-5" />
+          </Button>
         </div>
 
-        <div className="editor-warning">
-          ⚠️ Editing raw markdown. Changes won&apos;t sync back to visual form. After saving,
-          you&apos;ll return to the review page.
-        </div>
+        <Alert className="m-6">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            Editing raw markdown. Changes won&apos;t sync back to visual form. After saving,
+            you&apos;ll return to the review page.
+          </AlertDescription>
+        </Alert>
 
-        <div className="editor-body">
-          <textarea
+        <div className="flex-1 px-6 overflow-hidden">
+          <Textarea
             value={editedMarkdown}
             onChange={e => {
               setEditedMarkdown(e.target.value);
               setValidationErrors([]);
             }}
-            className={`raw-textarea ${validation.valid ? '' : 'invalid'}`}
+            className={`h-full font-mono text-sm resize-none ${validation.valid ? '' : 'border-red-500'}`}
             spellCheck="false"
           />
         </div>
 
-        <div className="editor-validation">
+        <div className="p-6 space-y-4">
           {validation.valid && (
-            <div className="validation-success">
-              ✅ Valid markdown
-              <br />
-              ✅ Frontmatter is valid YAML
-              <br />✅ Ready to save
-            </div>
+            <Alert>
+              <CheckCircle className="h-4 w-4" />
+              <AlertTitle>Valid markdown</AlertTitle>
+              <AlertDescription>Frontmatter is valid YAML. Ready to save.</AlertDescription>
+            </Alert>
           )}
 
           {!validation.valid && validationErrors.length > 0 && (
-            <div className="validation-errors">
-              <div className="error-title">❌ Validation Errors:</div>
-              <ul>
-                {validationErrors.map((error, idx) => (
-                  <li key={idx}>{error}</li>
-                ))}
-              </ul>
-            </div>
+            <Alert variant="destructive">
+              <XCircle className="h-4 w-4" />
+              <AlertTitle>Validation Errors</AlertTitle>
+              <AlertDescription>
+                <ul className="list-disc list-inside space-y-1">
+                  {validationErrors.map((error, idx) => (
+                    <li key={idx}>{error}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
           )}
 
           {!validation.valid && validation.errors.length > 0 && validationErrors.length === 0 && (
-            <div className="validation-errors">
-              <div className="error-title">⚠️ Issues:</div>
-              <ul>
-                {validation.errors.map((error, idx) => (
-                  <li key={idx}>{error}</li>
-                ))}
-              </ul>
-            </div>
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Issues</AlertTitle>
+              <AlertDescription>
+                <ul className="list-disc list-inside space-y-1">
+                  {validation.errors.map((error, idx) => (
+                    <li key={idx}>{error}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
           )}
-        </div>
 
-        <div className="editor-footer">
-          <button onClick={onCancel} className="btn-secondary">
-            Cancel
-          </button>
-          <button onClick={handleSave} className="btn-primary" disabled={!validation.valid}>
-            Save Edits
-          </button>
+          <div className="flex justify-end gap-4">
+            <Button onClick={onCancel} variant="outline">
+              Cancel
+            </Button>
+            <Button onClick={handleSave} disabled={!validation.valid}>
+              Save Edits
+            </Button>
+          </div>
         </div>
       </div>
     </div>
