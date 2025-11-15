@@ -5,7 +5,6 @@ import { CommandSecurityWarnings } from './CommandSecurityWarnings';
 import { RawMarkdownEditor } from './RawMarkdownEditor';
 import { generateCommandMarkdown } from '../../../shared/utils/command-markdown.utils';
 import { Button } from '@/renderer/components/ui/button';
-import { Badge } from '@/renderer/components/ui/badge';
 import { Card, CardContent } from '@/renderer/components/ui/card';
 import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
 

@@ -9,7 +9,6 @@ import { Button } from '@/renderer/components/ui/button';
 import { Badge } from '@/renderer/components/ui/badge';
 import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
 import { EmptyState } from '../common/EmptyState';
-import { cn } from '@/renderer/lib/utils';
 
 interface SettingsHierarchyTabProps {
   level: ConfigLevel;
@@ -102,8 +101,7 @@ export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ leve
         <EmptyState
           icon={Lock}
           title="No Managed Settings"
-          description="Your organization hasn't configured any managed policies. Managed settings are typically set by IT departments in enterprise environments to enforce security and compliance rules."
-          secondaryMessage="If you're part of an organization and expect to see managed settings here, contact your IT administrator."
+          description="Your organization hasn't configured any managed policies. Managed settings are typically set by IT departments in enterprise environments to enforce security and compliance rules. If you're part of an organization and expect to see managed settings here, contact your IT administrator."
         />
       </div>
     );

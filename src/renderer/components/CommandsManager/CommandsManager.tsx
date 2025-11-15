@@ -5,19 +5,19 @@ import { CommandEditor } from '../CommandEditor/CommandEditor';
 import { GitHubImportDialog } from '../GitHubImport/GitHubImportDialog';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { PageHeader } from '../common/PageHeader';
-import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardFooter } from '@/renderer/components/ui/card';
+import { Button } from '@/renderer/components/ui/button';
+import { Badge } from '@/renderer/components/ui/badge';
+import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
+import { Input } from '@/renderer/components/ui/input';
+import { Label } from '@/renderer/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/renderer/components/ui/select';
 import { Terminal, X, Search, Pencil, Trash2, Download, Info, Clock } from 'lucide-react';
 
 export const CommandsManager: React.FC = () => {
@@ -166,7 +166,7 @@ export const CommandsManager: React.FC = () => {
           {
             label: '+ Create Command',
             onClick: handleCreateCommand,
-            variant: 'primary',
+            variant: 'default',
           },
         ]}
       />

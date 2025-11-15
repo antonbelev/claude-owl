@@ -31,7 +31,7 @@ export const SettingsEditor: React.FC = () => {
           {
             label: 'Documentation',
             onClick: handleDocsClick,
-            variant: 'docs',
+            variant: 'outline',
             icon: BookOpen,
           },
         ]}

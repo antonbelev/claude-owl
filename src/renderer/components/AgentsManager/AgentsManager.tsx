@@ -128,7 +128,7 @@ export const AgentsManager: React.FC = () => {
           {
             label: 'Create Subagent',
             onClick: handleCreateAgent,
-            variant: 'primary',
+            variant: 'default',
             icon: Plus,
           },
         ]}

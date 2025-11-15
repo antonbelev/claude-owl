@@ -1,9 +1,8 @@
 import React from 'react';
-import { Search, X, FileText } from 'lucide-react';
+import { Search, X, FileText, Loader2 } from 'lucide-react';
 import type { DebugLog } from '@/shared/types';
 import { Input } from '@/renderer/components/ui/input';
 import { Button } from '@/renderer/components/ui/button';
-import { Spinner } from '@/renderer/components/ui/spinner';
 
 interface LogsListProps {
   logs: DebugLog[];
@@ -177,7 +176,7 @@ export const LogsList: React.FC<LogsListProps> = ({
 
       {loading && (
         <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
-          <Spinner className="h-8 w-8" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <span className="text-sm text-neutral-600">Loading debug logs...</span>
         </div>
       )}

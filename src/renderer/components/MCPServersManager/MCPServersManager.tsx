@@ -127,7 +127,7 @@ export const MCPServersManager: React.FC = () => {
           {
             label: '+ Add Server',
             onClick: () => setShowAddForm(true),
-            variant: 'primary',
+            variant: 'default',
           },
         ]}
       />
