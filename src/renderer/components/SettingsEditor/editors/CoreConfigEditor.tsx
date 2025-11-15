@@ -36,9 +36,9 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
         <div className="space-y-2">
           <Label htmlFor="model">Default Model</Label>
           <Select
-            value={settings.model || ''}
+            value={settings.model || '__default__'}
             onValueChange={value => {
-              if (value === '') {
+              if (value === '__default__') {
                 const { model: _removed, ...rest } = settings;
                 updateSettings(rest);
               } else {
@@ -51,7 +51,7 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
               <SelectValue placeholder="Select a model (default: Sonnet 4.5)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Use default</SelectItem>
+              <SelectItem value="__default__">Use default</SelectItem>
               {AVAILABLE_MODELS.map(model => (
                 <SelectItem key={model.value} value={model.value}>
                   {model.label}
@@ -97,9 +97,9 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
         <div className="space-y-2">
           <Label htmlFor="forceLoginMethod">Force Login Method</Label>
           <Select
-            value={settings.forceLoginMethod || ''}
+            value={settings.forceLoginMethod || '__none__'}
             onValueChange={value => {
-              if (value === '') {
+              if (value === '__none__') {
                 const { forceLoginMethod: _removed, ...rest } = settings;
                 updateSettings(rest);
               } else {
@@ -114,7 +114,7 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
               <SelectValue placeholder="No restriction" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">No restriction</SelectItem>
+              <SelectItem value="__none__">No restriction</SelectItem>
               <SelectItem value="claudeai">Claude.ai</SelectItem>
               <SelectItem value="console">Anthropic Console</SelectItem>
             </SelectContent>
