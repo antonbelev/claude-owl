@@ -1,174 +1,170 @@
 /**
- * MCP (Model Context Protocol) Types and Interfaces
+ * MCP (Model Context Protocol) Types
  *
- * Defines all types related to MCP server configuration, management, and testing
+ * Type definitions for MCP server management via `claude mcp` CLI commands.
  */
 
 /**
- * MCP Server Configuration
- * Supports stdio, HTTP, and SSE transports
- *
- * NOTE: Claude Owl is a standalone desktop app with no project context.
- * Only 'user' scope is supported for global MCP servers available to all projects.
+ * MCP transport types supported by Claude Code
  */
-export interface MCPServerConfig {
+export type MCPTransport = 'stdio' | 'http' | 'sse';
+
+/**
+ * MCP configuration scopes
+ * - user: Global user-level config (~/.claude.json)
+ * - project: Project-level config (.claude/settings.json)
+ * - local: Local overrides (.claude/settings.local.json)
+ */
+export type MCPScope = 'user' | 'project' | 'local';
+
+/**
+ * Options for adding a new MCP server
+ */
+export interface MCPAddOptions {
   name: string;
-  transport: 'stdio' | 'http' | 'sse';
-  scope: 'user';
-
-  // Stdio-specific fields
-  command?: string | undefined;
-  args?: string[] | undefined;
-  env?: Record<string, string> | undefined;
-  workingDirectory?: string | undefined;
-
-  // HTTP-specific fields
-  url?: string | undefined;
-  headers?: Record<string, string> | undefined;
-
-  // Common fields
-  description?: string | undefined;
-  tags?: string[] | undefined;
+  transport: MCPTransport;
+  scope: MCPScope;
+  // For stdio transport
+  command?: string;
+  args?: string[];
+  // For HTTP/SSE transports
+  url?: string;
+  // Optional for all transports
+  env?: Record<string, string>;
+  headers?: Record<string, string>;
 }
 
 /**
- * MCP Server Status
+ * MCP Server configuration (alias for MCPAddOptions)
  */
-export type MCPServerStatus = 'connected' | 'error' | 'auth-required' | 'disabled' | 'testing';
+export type MCPServerConfig = MCPAddOptions;
 
 /**
- * MCP Server with metadata
+ * Step in an MCP connection test
  */
-export interface MCPServer extends MCPServerConfig {
-  filePath: string;
-  status: MCPServerStatus;
-  lastError?: string | undefined;
-  latency?: number | undefined;
-  tools?: MCPTool[] | undefined;
-  resources?: MCPResource[] | undefined;
-  prompts?: MCPPrompt[] | undefined;
-}
-
-/**
- * MCP Tool definition
- */
-export interface MCPTool {
+export interface MCPConnectionTestStep {
   name: string;
-  description: string;
-  inputSchema?: {
-    type: string;
-    properties?: Record<string, unknown>;
-    required?: string[];
-  };
+  status: 'success' | 'error' | 'pending';
+  message?: string;
+  details?: string;
 }
 
 /**
- * MCP Resource
- */
-export interface MCPResource {
-  uri: string;
-  name: string;
-  description?: string;
-  mimeType?: string;
-}
-
-/**
- * MCP Prompt
- */
-export interface MCPPrompt {
-  name: string;
-  description?: string;
-  arguments?: Array<{
-    name: string;
-    description?: string;
-    required?: boolean;
-  }>;
-}
-
-/**
- * Connection test result
+ * Result from testing an MCP server connection
  */
 export interface MCPConnectionTestResult {
   success: boolean;
   steps: MCPConnectionTestStep[];
-  error?: string | undefined;
-  tools?: MCPTool[] | undefined;
-  latency?: number | undefined;
-  logs?: string[] | undefined;
-}
-
-export interface MCPConnectionTestStep {
-  name: string;
-  status: 'success' | 'error' | 'pending';
-  message?: string | undefined;
-  details?: string | undefined;
+  error?: string;
+  latency?: number;
+  tools?: unknown[];
+  logs?: string[];
 }
 
 /**
- * Environment variable for MCP servers
+ * MCP Server configuration returned by `claude mcp list`
  */
-export interface MCPEnvironmentVariable {
+export interface MCPServer {
   name: string;
-  value: string;
-  scope: 'user' | 'project';
-  isSecret?: boolean | undefined;
+  transport: MCPTransport;
+  scope?: MCPScope;
+  // For stdio transport
+  command?: string;
+  args?: string[];
+  // For HTTP/SSE transports
+  url?: string;
+  // Optional metadata
+  env?: Record<string, string>;
+  headers?: Record<string, string>;
+  // Status information (if available from CLI)
+  status?: 'connected' | 'error' | 'unknown' | 'testing' | 'disabled' | 'auth-required';
+  // Project path (only for project-scoped servers)
+  projectPath?: string;
+  // Additional optional properties
+  description?: string;
+  tools?: unknown[];
+  lastError?: string;
+  latency?: number;
 }
 
 /**
- * MCP Server template for marketplace
+ * Result from MCP CLI command execution
  */
-export interface MCPServerTemplate {
-  id: string;
-  name: string;
-  description: string;
-  author: string;
-  category: 'essential' | 'web' | 'automation' | 'data' | 'ai' | 'file-systems' | 'apis';
-  transport: 'stdio' | 'http' | 'sse';
+export interface MCPCommandResult {
+  success: boolean;
+  message?: string;
+  error?: string;
+  data?: unknown;
+}
 
-  // Pre-configured settings
+/**
+ * Request to add an MCP server
+ */
+export interface AddMCPServerRequest {
+  name: string;
+  transport: MCPTransport;
+  scope: MCPScope;
   command?: string;
   args?: string[];
   url?: string;
-
-  // Requirements
-  requirements?: {
-    nodeVersion?: string;
-    apiKey?: boolean;
-    apiKeyName?: string;
-    apiKeyUrl?: string;
-  };
-
-  // Metadata
-  verified: boolean;
-  installs?: number;
-  rating?: number;
-  tags?: string[];
-  documentation?: string;
+  env?: Record<string, string>;
+  headers?: Record<string, string>;
 }
 
 /**
- * Server marketplace
+ * Response from adding an MCP server
  */
-export interface MCPMarketplace {
+export interface AddMCPServerResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
+/**
+ * Request to remove an MCP server
+ */
+export interface RemoveMCPServerRequest {
   name: string;
-  url: string;
-  type: 'official' | 'community' | 'custom';
+  scope: MCPScope;
 }
 
 /**
- * Validation error for MCP configuration
+ * Response from removing an MCP server
  */
-export interface MCPValidationError {
-  field: string;
-  message: string;
-  suggestion?: string;
+export interface RemoveMCPServerResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
 }
 
 /**
- * Platform-specific configuration hints
+ * Request to list MCP servers
  */
-export interface MCPPlatformHints {
-  isWindows: boolean;
-  hasNpx: boolean;
-  nodeVersion?: string;
+export interface ListMCPServersRequest {
+  scope?: MCPScope;
+}
+
+/**
+ * Response from listing MCP servers
+ */
+export interface ListMCPServersResponse {
+  success: boolean;
+  servers?: MCPServer[];
+  error?: string;
+}
+
+/**
+ * Request to get a specific MCP server
+ */
+export interface GetMCPServerRequest {
+  name: string;
+}
+
+/**
+ * Response from getting a specific MCP server
+ */
+export interface GetMCPServerResponse {
+  success: boolean;
+  server?: MCPServer;
+  error?: string;
 }

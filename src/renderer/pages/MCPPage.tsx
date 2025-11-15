@@ -1,6 +1,10 @@
 import React from 'react';
-import { MCPServersManager } from '../components/MCPServersManager/MCPServersManager';
+import { MCPManager } from '../components/MCPManager/MCPManager';
 
 export const MCPPage: React.FC = () => {
-  return <MCPServersManager />;
+  return (
+    <div className="page mcp-page">
+      <MCPManager />
+    </div>
+  );
 };

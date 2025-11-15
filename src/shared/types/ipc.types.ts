@@ -124,6 +124,24 @@ export type {
   OpenSettingsFileResponse,
 } from './ipc.hooks.types';
 
+// Re-export MCP types
+export type {
+  MCPServer,
+  MCPScope,
+  MCPTransport,
+  MCPServerConfig,
+  MCPConnectionTestResult,
+  MCPConnectionTestStep,
+  AddMCPServerRequest,
+  AddMCPServerResponse,
+  RemoveMCPServerRequest,
+  RemoveMCPServerResponse,
+  ListMCPServersRequest,
+  ListMCPServersResponse,
+  GetMCPServerRequest,
+  GetMCPServerResponse,
+} from './ipc.mcp.types';
+
 // Re-export system types
 export type {
   ExecuteCLIRequest,
@@ -152,54 +170,3 @@ export type {
   SearchDebugLogsRequest,
   SearchDebugLogsResponse,
 } from './ipc.status.types';
-
-// Re-export MCP types
-export type {
-  ListMCPServersResponse,
-  GetMCPServerRequest,
-  GetMCPServerResponse,
-  AddMCPServerRequest,
-  AddMCPServerResponse,
-  UpdateMCPServerRequest,
-  UpdateMCPServerResponse,
-  RemoveMCPServerRequest,
-  RemoveMCPServerResponse,
-  TestMCPServerRequest,
-  TestMCPServerResponse,
-  GetMCPServerToolsRequest,
-  GetMCPServerToolsResponse,
-  GetMCPTemplatesResponse,
-  SearchMCPTemplatesRequest,
-  SearchMCPTemplatesResponse,
-  InstallMCPFromTemplateRequest,
-  InstallMCPFromTemplateResponse,
-  ValidateMCPConfigRequest,
-  ValidateMCPConfigResponse,
-  GetMCPEnvironmentVariablesResponse,
-  SetMCPEnvironmentVariableRequest,
-  SetMCPEnvironmentVariableResponse,
-  DeleteMCPEnvironmentVariableRequest,
-  DeleteMCPEnvironmentVariableResponse,
-  TestAllMCPServersRequest,
-  TestAllMCPServersResponse,
-  GetMCPPlatformHintsResponse,
-  ToggleMCPServerRequest,
-  ToggleMCPServerResponse,
-} from './ipc.mcp.types';
-
-// Re-export core MCP types
-export type {
-  MCPServerConfig,
-  MCPServerStatus,
-  MCPServer,
-  MCPTool,
-  MCPResource,
-  MCPPrompt,
-  MCPConnectionTestResult,
-  MCPConnectionTestStep,
-  MCPEnvironmentVariable,
-  MCPServerTemplate,
-  MCPMarketplace,
-  MCPValidationError,
-  MCPPlatformHints,
-} from './mcp.types';

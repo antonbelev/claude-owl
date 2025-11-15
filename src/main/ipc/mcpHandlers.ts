@@ -1,110 +1,55 @@
+/**
+ * IPC handlers for MCP server management
+ */
+
 import { ipcMain } from 'electron';
-import { IPC_CHANNELS } from '@/shared/types';
+import { IPC_CHANNELS } from '../../shared/types/ipc.common.types';
 import type {
-  ListMCPServersResponse,
-  GetMCPServerRequest,
-  GetMCPServerResponse,
   AddMCPServerRequest,
   AddMCPServerResponse,
   RemoveMCPServerRequest,
   RemoveMCPServerResponse,
-  TestMCPServerRequest,
-  TestMCPServerResponse,
-  ValidateMCPConfigRequest,
-  ValidateMCPConfigResponse,
-  TestAllMCPServersRequest,
-  TestAllMCPServersResponse,
-  GetMCPPlatformHintsResponse,
-  MCPServerConfig,
-} from '@/shared/types';
-import { MCPService } from '../services/MCPService';
+  ListMCPServersRequest,
+  ListMCPServersResponse,
+  GetMCPServerRequest,
+  GetMCPServerResponse,
+} from '../../shared/types/ipc.mcp.types';
+import { ClaudeService } from '../services/ClaudeService';
 
-const mcpService = new MCPService();
+const claudeService = new ClaudeService();
 
 /**
- * Register IPC handlers for MCP operations
+ * Register all MCP-related IPC handlers
  */
-export function registerMCPHandlers() {
+export function registerMCPHandlers(): void {
   console.log('[MCPHandlers] Registering MCP IPC handlers');
 
-  /**
-   * List all MCP servers
-   */
-  ipcMain.handle(IPC_CHANNELS.LIST_MCP_SERVERS, async (): Promise<ListMCPServersResponse> => {
-    try {
-      console.log('[MCPHandler] LIST_MCP_SERVERS request');
-      const servers = await mcpService.listServers();
-      return {
-        success: true,
-        data: servers,
-      };
-    } catch (error) {
-      console.error('[MCPHandler] LIST_MCP_SERVERS failed:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to list MCP servers',
-      };
-    }
-  });
-
-  /**
-   * Get a specific MCP server
-   */
-  ipcMain.handle(
-    IPC_CHANNELS.GET_MCP_SERVER,
-    async (_event, request: GetMCPServerRequest): Promise<GetMCPServerResponse> => {
-      try {
-        console.log('[MCPHandler] GET_MCP_SERVER request:', request.name);
-        const server = await mcpService.getServer(request.name);
-        return {
-          success: true,
-          data: server,
-        };
-      } catch (error) {
-        console.error('[MCPHandler] GET_MCP_SERVER failed:', error);
-        return {
-          success: false,
-          error: error instanceof Error ? error.message : 'Failed to get MCP server',
-        };
-      }
-    }
-  );
-
-  /**
-   * Add a new MCP server
-   */
+  // Add MCP server
   ipcMain.handle(
     IPC_CHANNELS.ADD_MCP_SERVER,
-    async (_event, request: AddMCPServerRequest): Promise<AddMCPServerResponse> => {
+    async (_, request: AddMCPServerRequest): Promise<AddMCPServerResponse> => {
+      console.log('[MCPHandlers] Add MCP server request:', {
+        name: request.name,
+        transport: request.transport,
+        scope: request.scope,
+      });
+
       try {
-        console.log('[MCPHandler] ADD_MCP_SERVER request:', {
-          name: request.name,
-          transport: request.transport,
+        const result = await claudeService.addMCPServer(request);
+
+        console.log('[MCPHandlers] Add MCP server result:', {
+          success: result.success,
+          message: result.message,
         });
 
-        const config: MCPServerConfig = {
-          name: request.name,
-          transport: request.transport,
-          scope: 'user',
+        const response: AddMCPServerResponse = {
+          success: result.success,
         };
-
-        // Only add defined optional properties
-        if (request.command !== undefined) config.command = request.command;
-        if (request.args !== undefined) config.args = request.args;
-        if (request.env !== undefined) config.env = request.env;
-        if (request.workingDirectory !== undefined)
-          config.workingDirectory = request.workingDirectory;
-        if (request.url !== undefined) config.url = request.url;
-        if (request.headers !== undefined) config.headers = request.headers;
-
-        const server = await mcpService.addServer(config);
-
-        return {
-          success: true,
-          data: server,
-        };
+        if (result.message) response.message = result.message;
+        if (result.error) response.error = result.error;
+        return response;
       } catch (error) {
-        console.error('[MCPHandler] ADD_MCP_SERVER failed:', error);
+        console.error('[MCPHandlers] Add MCP server error:', error);
         return {
           success: false,
           error: error instanceof Error ? error.message : 'Failed to add MCP server',
@@ -113,21 +58,31 @@ export function registerMCPHandlers() {
     }
   );
 
-  /**
-   * Remove an MCP server
-   */
+  // Remove MCP server
   ipcMain.handle(
     IPC_CHANNELS.REMOVE_MCP_SERVER,
-    async (_event, request: RemoveMCPServerRequest): Promise<RemoveMCPServerResponse> => {
+    async (_, request: RemoveMCPServerRequest): Promise<RemoveMCPServerResponse> => {
+      console.log('[MCPHandlers] Remove MCP server request:', {
+        name: request.name,
+        scope: request.scope,
+      });
+
       try {
-        console.log('[MCPHandler] REMOVE_MCP_SERVER request:', request.name);
-        await mcpService.removeServer(request.name, 'user');
-        return {
-          success: true,
-          data: { removed: true },
+        const result = await claudeService.removeMCPServer(request.name, request.scope);
+
+        console.log('[MCPHandlers] Remove MCP server result:', {
+          success: result.success,
+          message: result.message,
+        });
+
+        const response: RemoveMCPServerResponse = {
+          success: result.success,
         };
+        if (result.message) response.message = result.message;
+        if (result.error) response.error = result.error;
+        return response;
       } catch (error) {
-        console.error('[MCPHandler] REMOVE_MCP_SERVER failed:', error);
+        console.error('[MCPHandlers] Remove MCP server error:', error);
         return {
           success: false,
           error: error instanceof Error ? error.message : 'Failed to remove MCP server',
@@ -136,129 +91,65 @@ export function registerMCPHandlers() {
     }
   );
 
-  /**
-   * Test MCP server connection
-   */
+  // List MCP servers
   ipcMain.handle(
-    IPC_CHANNELS.TEST_MCP_SERVER,
-    async (_event, request: TestMCPServerRequest): Promise<TestMCPServerResponse> => {
-      try {
-        console.log('[MCPHandler] TEST_MCP_SERVER request:', request.name);
-        const result = await mcpService.testConnection(request.name, request.timeout);
-        return {
-          success: result.success,
-          data: result,
-        };
-      } catch (error) {
-        console.error('[MCPHandler] TEST_MCP_SERVER failed:', error);
-        return {
-          success: false,
-          error: error instanceof Error ? error.message : 'Failed to test MCP server connection',
-        };
-      }
-    }
-  );
+    IPC_CHANNELS.LIST_MCP_SERVERS,
+    async (_, request?: ListMCPServersRequest): Promise<ListMCPServersResponse> => {
+      console.log('[MCPHandlers] List MCP servers request, scope:', request?.scope || 'all');
 
-  /**
-   * Validate MCP server configuration
-   */
-  ipcMain.handle(
-    IPC_CHANNELS.VALIDATE_MCP_CONFIG,
-    async (_event, request: ValidateMCPConfigRequest): Promise<ValidateMCPConfigResponse> => {
       try {
-        console.log('[MCPHandler] VALIDATE_MCP_CONFIG request:', request.name);
-        // Cast the request config to the expected type (includes name)
-        const validation = await mcpService.validateConfig(
-          request.config as Omit<MCPServerConfig, 'scope'>
-        );
+        const servers = await claudeService.listMCPServers(request?.scope);
+
+        console.log('[MCPHandlers] List MCP servers result:', {
+          count: servers.length,
+        });
+
         return {
           success: true,
-          data: validation,
+          servers,
         };
       } catch (error) {
-        console.error('[MCPHandler] VALIDATE_MCP_CONFIG failed:', error);
+        console.error('[MCPHandlers] List MCP servers error:', error);
         return {
           success: false,
-          error: error instanceof Error ? error.message : 'Failed to validate MCP config',
+          servers: [],
+          error: error instanceof Error ? error.message : 'Failed to list MCP servers',
         };
       }
     }
   );
 
-  /**
-   * Test all MCP server connections
-   */
+  // Get MCP server
   ipcMain.handle(
-    IPC_CHANNELS.TEST_ALL_MCP_SERVERS,
-    async (_event, request: TestAllMCPServersRequest): Promise<TestAllMCPServersResponse> => {
-      try {
-        console.log('[MCPHandler] TEST_ALL_MCP_SERVERS request');
-        const servers = await mcpService.listServers();
-        const results: Record<string, any> = {};
-        let connected = 0;
-        let failed = 0;
+    IPC_CHANNELS.GET_MCP_SERVER,
+    async (_, request: GetMCPServerRequest): Promise<GetMCPServerResponse> => {
+      console.log('[MCPHandlers] Get MCP server request:', request.name);
 
-        for (const server of servers) {
-          const result = await mcpService.testConnection(server.name, request.timeout || 10000);
-          results[server.name] = result;
-          if (result.success) {
-            connected++;
-          } else {
-            failed++;
-          }
+      try {
+        const server = await claudeService.getMCPServer(request.name);
+
+        if (server) {
+          console.log('[MCPHandlers] Get MCP server result: found');
+          return {
+            success: true,
+            server,
+          };
+        } else {
+          console.log('[MCPHandlers] Get MCP server result: not found');
+          return {
+            success: false,
+            error: `MCP server not found: ${request.name}`,
+          };
         }
-
-        return {
-          success: true,
-          data: {
-            results,
-            summary: {
-              total: servers.length,
-              connected,
-              failed,
-            },
-          },
-        };
       } catch (error) {
-        console.error('[MCPHandler] TEST_ALL_MCP_SERVERS failed:', error);
+        console.error('[MCPHandlers] Get MCP server error:', error);
         return {
           success: false,
-          error: error instanceof Error ? error.message : 'Failed to test all MCP servers',
-        };
-      }
-    }
-  );
-
-  /**
-   * Get MCP platform hints
-   */
-  ipcMain.handle(
-    IPC_CHANNELS.GET_MCP_PLATFORM_HINTS,
-    async (): Promise<GetMCPPlatformHintsResponse> => {
-      try {
-        console.log('[MCPHandler] GET_MCP_PLATFORM_HINTS request');
-        const hints = mcpService.getPlatformHints();
-        return {
-          success: true,
-          data: hints,
-        };
-      } catch (error) {
-        console.error('[MCPHandler] GET_MCP_PLATFORM_HINTS failed:', error);
-        return {
-          success: false,
-          error: error instanceof Error ? error.message : 'Failed to get platform hints',
+          error: error instanceof Error ? error.message : 'Failed to get MCP server',
         };
       }
     }
   );
 
   console.log('[MCPHandlers] MCP IPC handlers registered successfully');
-}
-
-/**
- * Cleanup MCP service on shutdown
- */
-export function cleanupMCPService() {
-  console.log('[MCPHandlers] Cleaning up MCP service');
-  mcpService.cleanup();
 }

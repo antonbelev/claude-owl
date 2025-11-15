@@ -101,9 +101,8 @@ export class MCPService {
 
       return {
         ...config,
-        filePath,
-        status: 'testing',
-      };
+        status: 'unknown',
+      } as MCPServer;
     } catch (error) {
       console.error('[MCPService] Failed to add server:', error);
       throw error;
@@ -169,7 +168,6 @@ export class MCPService {
         try {
           const serverProcess = spawn(cmd, args, {
             env: { ...process.env, ...server.env },
-            cwd: server.workingDirectory,
             timeout,
           });
 
@@ -366,19 +364,21 @@ export class MCPService {
 
       for (const [name, config] of Object.entries(configData.mcpServers || {})) {
         const serverConfig = config as Record<string, unknown>;
-        servers.push({
+        const server: MCPServer = {
           name,
           transport: (serverConfig.transport as 'stdio' | 'http' | 'sse') || 'stdio',
           scope,
-          filePath,
           status: 'connected',
-          command: serverConfig.command as string | undefined,
-          args: serverConfig.args as string[] | undefined,
-          env: serverConfig.env as Record<string, string> | undefined,
-          workingDirectory: serverConfig.workingDirectory as string | undefined,
-          url: serverConfig.url as string | undefined,
-          headers: serverConfig.headers as Record<string, string> | undefined,
-        });
+        };
+
+        // Only add optional properties if they are defined
+        if (serverConfig.command) server.command = serverConfig.command as string;
+        if (serverConfig.args) server.args = serverConfig.args as string[];
+        if (serverConfig.env) server.env = serverConfig.env as Record<string, string>;
+        if (serverConfig.url) server.url = serverConfig.url as string;
+        if (serverConfig.headers) server.headers = serverConfig.headers as Record<string, string>;
+
+        servers.push(server);
       }
 
       return servers;
@@ -441,7 +441,6 @@ export class MCPService {
       command: config.command,
       args: config.args,
       env: config.env,
-      workingDirectory: config.workingDirectory,
       url: config.url,
       headers: config.headers,
     };

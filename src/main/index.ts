@@ -9,10 +9,10 @@ import { registerSettingsHandlers } from './ipc/settingsHandlers';
 import { registerCCUsageHandlers } from './ipc/ccusageHandlers';
 import { registerPluginsHandlers } from './ipc/pluginsHandlers';
 import { registerHooksHandlers } from './ipc/hooksHandlers';
+import { registerMCPHandlers } from './ipc/mcpHandlers';
 import { registerStatusHandlers } from './ipc/statusHandlers';
 import { registerDebugLogsHandlers } from './ipc/debugLogsHandlers';
 import { registerGitHubImportHandlers } from './ipc/githubImportHandlers';
-import { registerMCPHandlers } from './ipc/mcpHandlers';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -125,10 +125,10 @@ app.whenReady().then(() => {
   registerCCUsageHandlers();
   registerPluginsHandlers();
   registerHooksHandlers();
+  registerMCPHandlers();
   registerStatusHandlers();
   registerDebugLogsHandlers();
   registerGitHubImportHandlers();
-  registerMCPHandlers();
 
   createWindow();
 

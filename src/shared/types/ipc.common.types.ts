@@ -86,23 +86,10 @@ export const IPC_CHANNELS = {
   OPEN_SETTINGS_FILE: 'hooks:open-settings',
 
   // MCP Servers
+  ADD_MCP_SERVER: 'mcp:add',
+  REMOVE_MCP_SERVER: 'mcp:remove',
   LIST_MCP_SERVERS: 'mcp:list',
   GET_MCP_SERVER: 'mcp:get',
-  ADD_MCP_SERVER: 'mcp:add',
-  UPDATE_MCP_SERVER: 'mcp:update',
-  REMOVE_MCP_SERVER: 'mcp:remove',
-  TEST_MCP_SERVER: 'mcp:test',
-  TEST_ALL_MCP_SERVERS: 'mcp:test-all',
-  GET_MCP_SERVER_TOOLS: 'mcp:get-tools',
-  GET_MCP_TEMPLATES: 'mcp:get-templates',
-  SEARCH_MCP_TEMPLATES: 'mcp:search-templates',
-  INSTALL_MCP_FROM_TEMPLATE: 'mcp:install-template',
-  VALIDATE_MCP_CONFIG: 'mcp:validate-config',
-  GET_MCP_ENV_VARS: 'mcp:get-env-vars',
-  SET_MCP_ENV_VAR: 'mcp:set-env-var',
-  DELETE_MCP_ENV_VAR: 'mcp:delete-env-var',
-  TOGGLE_MCP_SERVER: 'mcp:toggle',
-  GET_MCP_PLATFORM_HINTS: 'mcp:get-platform-hints',
 
   // Service Status
   GET_SERVICE_STATUS: 'status:get-service-status',

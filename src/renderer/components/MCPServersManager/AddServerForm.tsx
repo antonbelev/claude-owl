@@ -98,6 +98,7 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
       const config: AddMCPServerRequest = {
         name: name.trim(),
         transport,
+        scope: 'user', // Default to user scope
       };
 
       // Add transport-specific fields
