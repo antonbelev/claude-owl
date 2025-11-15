@@ -7,8 +7,6 @@ import type {
   ListMCPServersResponse,
   AddMCPServerResponse,
   RemoveMCPServerResponse,
-  TestMCPServerResponse,
-  GetMCPPlatformHintsResponse,
 } from '@/shared/types';
 
 interface UseMCPOptions {
@@ -24,7 +22,7 @@ export function useMCP(options: UseMCPOptions = {}) {
   const [servers, setServers] = useState<MCPServer[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [platformHints, setPlatformHints] = useState<any>(null);
+  const [_platformHints, _setPlatformHints] = useState<any>(null);
 
   /**
    * Load all MCP servers
@@ -35,14 +33,14 @@ export function useMCP(options: UseMCPOptions = {}) {
       setError(null);
       console.log('[useMCP] Loading MCP servers');
 
-      const response: ListMCPServersResponse = await window.electronAPI.listMCPServers();
+      const response = (await window.electronAPI.listMCPServers()) as ListMCPServersResponse;
 
       if (!response.success) {
         throw new Error(response.error || 'Failed to load servers');
       }
 
-      setServers(response.data || []);
-      console.log('[useMCP] Loaded servers:', response.data);
+      setServers(response.servers || []);
+      console.log('[useMCP] Loaded servers:', response.servers);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error';
       console.error('[useMCP] Failed to load servers:', message);
@@ -54,18 +52,11 @@ export function useMCP(options: UseMCPOptions = {}) {
 
   /**
    * Load platform hints
+   * @deprecated Not implemented yet
    */
   const loadPlatformHints = useCallback(async () => {
-    try {
-      console.log('[useMCP] Loading platform hints');
-      const response: GetMCPPlatformHintsResponse = await window.electronAPI.getMCPPlatformHints();
-
-      if (response.success) {
-        setPlatformHints(response.data);
-      }
-    } catch (err) {
-      console.warn('[useMCP] Failed to load platform hints:', err);
-    }
+    // TODO: Implement when getMCPPlatformHints is available
+    console.log('[useMCP] Platform hints not implemented yet');
   }, []);
 
   /**
@@ -77,7 +68,7 @@ export function useMCP(options: UseMCPOptions = {}) {
         setError(null);
         console.log('[useMCP] Adding server:', config.name);
 
-        const response: AddMCPServerResponse = await window.electronAPI.addMCPServer(config);
+        const response = (await window.electronAPI.addMCPServer(config)) as AddMCPServerResponse;
 
         if (!response.success) {
           throw new Error(response.error || 'Failed to add server');
@@ -86,7 +77,7 @@ export function useMCP(options: UseMCPOptions = {}) {
         // Refresh servers list
         await listServers();
         console.log('[useMCP] Server added:', config.name);
-        return response.data;
+        return undefined;
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Unknown error';
         console.error('[useMCP] Failed to add server:', message);
@@ -106,7 +97,7 @@ export function useMCP(options: UseMCPOptions = {}) {
         setError(null);
         console.log('[useMCP] Removing server:', request.name);
 
-        const response: RemoveMCPServerResponse = await window.electronAPI.removeMCPServer(request);
+        const response = (await window.electronAPI.removeMCPServer(request)) as RemoveMCPServerResponse;
 
         if (!response.success) {
           throw new Error(response.error || 'Failed to remove server');
@@ -127,95 +118,46 @@ export function useMCP(options: UseMCPOptions = {}) {
 
   /**
    * Test MCP server connection
+   * @deprecated Not implemented yet
    */
-  const testConnection = useCallback(async (name: string, timeout?: number) => {
-    try {
-      setError(null);
-      console.log('[useMCP] Testing connection for:', name);
-
-      const response: TestMCPServerResponse = await window.electronAPI.testMCPServer({
-        name,
-        timeout: timeout ?? 10000,
-      });
-
-      if (!response.success) {
-        throw new Error(response.error || 'Failed to test connection');
-      }
-
-      console.log('[useMCP] Test result:', response.data);
-      return response.data as MCPConnectionTestResult;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      console.error('[useMCP] Connection test failed:', message);
-      setError(message);
-      throw err;
-    }
+  const testConnection = useCallback(async (name: string, _timeout?: number): Promise<MCPConnectionTestResult> => {
+    // TODO: Implement when testMCPServer API is available
+    console.log('[useMCP] Connection test not implemented yet for:', name);
+    return {
+      success: false,
+      steps: [],
+      error: 'Not implemented',
+    };
   }, []);
 
   /**
    * Test all MCP server connections
+   * @deprecated Not implemented yet
    */
-  const testAllConnections = useCallback(async (timeout?: number) => {
-    try {
-      setError(null);
-      console.log('[useMCP] Testing all connections');
-
-      const response = (await window.electronAPI.testAllMCPServers({ timeout })) as any;
-
-      if (!response.success) {
-        throw new Error(response.error || 'Failed to test connections');
-      }
-
-      console.log('[useMCP] All tests completed:', response.data);
-      return response.data;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      console.error('[useMCP] Failed to test connections:', message);
-      setError(message);
-      throw err;
-    }
+  const testAllConnections = useCallback(async (_timeout?: number) => {
+    // TODO: Implement when testAllMCPServers API is available
+    console.log('[useMCP] Test all connections not implemented yet');
+    return [];
   }, []);
 
   /**
    * Validate MCP config
+   * @deprecated Not implemented yet
    */
-  const validateConfig = useCallback(async (name: string, config: any) => {
-    try {
-      console.log('[useMCP] Validating config:', name);
-
-      const response = (await window.electronAPI.validateMCPConfig({ name, config })) as any;
-
-      if (!response.success) {
-        throw new Error(response.error || 'Failed to validate config');
-      }
-
-      return response.data;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      console.error('[useMCP] Validation failed:', message);
-      throw err;
-    }
+  const validateConfig = useCallback(async (name: string, _config: unknown) => {
+    // TODO: Implement when validateMCPConfig API is available
+    console.log('[useMCP] Validation not implemented yet for:', name);
+    return { valid: false, errors: ['Not implemented'] };
   }, []);
 
   /**
    * Get server tools
+   * @deprecated Not implemented yet
    */
   const getServerTools = useCallback(async (name: string) => {
-    try {
-      console.log('[useMCP] Getting tools for:', name);
-
-      const response = (await window.electronAPI.getMCPServerTools({ name })) as any;
-
-      if (!response.success) {
-        throw new Error(response.error || 'Failed to get tools');
-      }
-
-      return response.data;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      console.error('[useMCP] Failed to get tools:', message);
-      throw err;
-    }
+    // TODO: Implement when getMCPServerTools API is available
+    console.log('[useMCP] Get server tools not implemented yet for:', name);
+    return [];
   }, []);
 
   /**
@@ -233,7 +175,7 @@ export function useMCP(options: UseMCPOptions = {}) {
     servers,
     loading,
     error,
-    platformHints,
+    platformHints: _platformHints,
 
     // Methods
     listServers,

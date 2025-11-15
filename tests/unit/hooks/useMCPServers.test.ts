@@ -162,7 +162,10 @@ describe('useMCPServers', () => {
 
     expect(response.success).toBe(false);
     expect(response.error).toBe('Server already exists');
-    expect(result.current.error).toBe('Server already exists');
+
+    await waitFor(() => {
+      expect(result.current.error).toBe('Server already exists');
+    });
   });
 
   it('should remove server successfully', async () => {
@@ -221,7 +224,10 @@ describe('useMCPServers', () => {
 
     expect(response.success).toBe(false);
     expect(response.error).toBe('Server not found');
-    expect(result.current.error).toBe('Server not found');
+
+    await waitFor(() => {
+      expect(result.current.error).toBe('Server not found');
+    });
   });
 
   it('should support refresh functionality', async () => {

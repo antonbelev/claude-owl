@@ -111,7 +111,9 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
 
   const updateEnvVar = (index: number, field: 'key' | 'value', value: string) => {
     const updated = [...envVars];
-    updated[index][field] = value;
+    if (updated[index]) {
+      updated[index][field] = value;
+    }
     setEnvVars(updated);
   };
 
@@ -125,7 +127,9 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
 
   const updateHeader = (index: number, field: 'key' | 'value', value: string) => {
     const updated = [...headers];
-    updated[index][field] = value;
+    if (updated[index]) {
+      updated[index][field] = value;
+    }
     setHeaders(updated);
   };
 

@@ -35,6 +35,33 @@ export interface MCPAddOptions {
 }
 
 /**
+ * MCP Server configuration (alias for MCPAddOptions)
+ */
+export type MCPServerConfig = MCPAddOptions;
+
+/**
+ * Step in an MCP connection test
+ */
+export interface MCPConnectionTestStep {
+  name: string;
+  status: 'success' | 'error' | 'pending';
+  message?: string;
+  details?: string;
+}
+
+/**
+ * Result from testing an MCP server connection
+ */
+export interface MCPConnectionTestResult {
+  success: boolean;
+  steps: MCPConnectionTestStep[];
+  error?: string;
+  latency?: number;
+  tools?: unknown[];
+  logs?: string[];
+}
+
+/**
  * MCP Server configuration returned by `claude mcp list`
  */
 export interface MCPServer {
@@ -50,9 +77,14 @@ export interface MCPServer {
   env?: Record<string, string>;
   headers?: Record<string, string>;
   // Status information (if available from CLI)
-  status?: 'connected' | 'error' | 'unknown';
+  status?: 'connected' | 'error' | 'unknown' | 'testing' | 'disabled' | 'auth-required';
   // Project path (only for project-scoped servers)
   projectPath?: string;
+  // Additional optional properties
+  description?: string;
+  tools?: unknown[];
+  lastError?: string;
+  latency?: number;
 }
 
 /**

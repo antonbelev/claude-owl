@@ -238,11 +238,14 @@ export class ClaudeService {
 
       console.log('[ClaudeService] MCP add result:', { success, output });
 
-      return {
+      const result: MCPCommandResult = {
         success,
         message: success ? `Successfully added MCP server: ${options.name}` : output,
-        error: success ? undefined : output,
       };
+      if (!success) {
+        result.error = output;
+      }
+      return result;
     } catch (error) {
       console.error('[ClaudeService] Failed to add MCP server:', error);
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -276,11 +279,14 @@ export class ClaudeService {
 
       console.log('[ClaudeService] MCP remove result:', { success, output });
 
-      return {
+      const result: MCPCommandResult = {
         success,
         message: success ? `Successfully removed MCP server: ${name}` : output,
-        error: success ? undefined : output,
       };
+      if (!success) {
+        result.error = output;
+      }
+      return result;
     } catch (error) {
       console.error('[ClaudeService] Failed to remove MCP server:', error);
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -423,8 +429,10 @@ export class ClaudeService {
   /**
    * Parse text output from `claude mcp list` as fallback
    * This parser handles the actual output format from claude mcp list
+   * @deprecated Reserved for future use if JSON parsing fails
    */
-  private parseTextServerList(output: string): MCPServer[] {
+  // @ts-expect-error - Reserved for future use if JSON parsing fails
+  private _parseTextServerList(output: string): MCPServer[] {
     console.log('[ClaudeService] Parsing text server list (fallback)');
     console.log('[ClaudeService] Raw output:', output);
 
@@ -440,7 +448,7 @@ export class ClaudeService {
       // Parse format: "server-name: command args - ✓ Connected"
       // or: "server-name: command args - ✗ Error message"
       const match = line.match(/^([^:]+):\s+(.+?)\s+-\s+(.+)$/);
-      if (match) {
+      if (match && match[1] && match[2] && match[3]) {
         const [, name, commandPart, statusPart] = match;
         const serverName = name.trim();
         const commandStr = commandPart.trim();

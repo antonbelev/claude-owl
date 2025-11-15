@@ -130,7 +130,7 @@ export const ConnectionTester: React.FC<ConnectionTesterProps> = ({
                 <div className="tester-tools">
                   <h4>Available Tools</h4>
                   <ul className="tools-list">
-                    {result.tools.map(tool => (
+                    {result.tools.map((tool: any) => (
                       <li key={tool.name} className="tool-item">
                         <div className="tool-name">{tool.name}</div>
                         {tool.description && (

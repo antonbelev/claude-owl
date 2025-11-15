@@ -54,6 +54,7 @@ export const MCPServersManager: React.FC = () => {
     try {
       await removeServer({
         name: deleteConfirm.name,
+        scope: deleteConfirm.scope || 'user', // Use server's scope or default to user
       });
     } catch (err) {
       console.error('Failed to delete server:', err);
