@@ -39,7 +39,7 @@ const allNavItems: NavItem[] = [
   { path: '/plugins', label: 'Plugins', icon: Package, underDevelopment: true },
   { path: '/commands', label: 'Slash Commands', icon: Terminal },
   { path: '/hooks', label: 'Hooks', icon: Webhook },
-  { path: '/mcp', label: 'MCP Servers', icon: Link2, underDevelopment: true },
+  { path: '/mcp', label: 'MCP Servers', icon: Link2 },
   { path: '/sessions', label: 'Sessions', icon: FileText },
   { path: '/tests', label: 'Test Runner', icon: TestTube, underDevelopment: true },
   { path: '/logs', label: 'Debug Logs', icon: FileCode },
