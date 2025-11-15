@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { FolderNavigator } from './FolderNavigator';
-import './GitHubImportDialog.css';
+import { Button } from '@/renderer/components/ui/button';
+import { Input } from '@/renderer/components/ui/input';
+import { Label } from '@/renderer/components/ui/label';
+import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
+import { CheckCircle, Info } from 'lucide-react';
 
 export interface GitHubImportDialogProps {
   onClose: () => void;
@@ -271,80 +275,95 @@ export function GitHubImportDialog({ onClose, onImportComplete }: GitHubImportDi
     }
   };
 
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   // Render Step 1: URL Entry
   if (step === 'url-entry') {
     return (
-      <div className="import-overlay">
-        <div className="import-modal" onClick={e => e.stopPropagation()}>
-          <div className="import-header">
-            <h2>Import Commands from GitHub</h2>
-            <button onClick={onClose} className="modal-close" title="Close">
-              ×
-            </button>
+      <div
+        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-8"
+        onClick={handleOverlayClick}
+      >
+        <div
+          className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between p-6 border-b">
+            <h2 className="text-xl font-semibold">Import Commands from GitHub</h2>
+            <Button variant="ghost" size="icon" onClick={onClose} title="Close">
+              ✕
+            </Button>
           </div>
 
-          <div className="import-body">
-            <div className="how-it-works">
-              <h3>How it works:</h3>
-              <ul>
-                <li>Paste any GitHub URL: repo root, folder, or single file</li>
-                <li>Navigate through folders to find commands</li>
-                <li>Select multiple files from different folders</li>
-                <li>Security scan before importing</li>
-              </ul>
-            </div>
+          <div className="flex-1 p-6 space-y-6">
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                <div className="font-semibold mb-2">How it works:</div>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                  <li>Paste any GitHub URL: repo root, folder, or single file</li>
+                  <li>Navigate through folders to find commands</li>
+                  <li>Select multiple files from different folders</li>
+                  <li>Security scan before importing</li>
+                </ul>
+              </AlertDescription>
+            </Alert>
 
-            <div className="form-group">
-              <label htmlFor="repo-url">GitHub Repository URL:</label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="repo-url">GitHub Repository URL:</Label>
+              <Input
                 id="repo-url"
                 type="text"
                 value={repoUrl}
                 onChange={handleUrlInput}
                 placeholder="https://github.com/owner/repo or .../tree/main/folder"
-                className={`repo-input ${error ? 'error' : ''}`}
+                className={error ? 'border-red-500' : ''}
                 disabled={isValidating}
               />
-              {error && <div className="error-message">{error}</div>}
+              {error && <p className="text-sm text-red-500">{error}</p>}
             </div>
 
-            <div className="examples-section">
-              <h4>Examples:</h4>
-              <div className="examples-grid">
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm">Examples:</h4>
+              <div className="space-y-2">
                 {EXAMPLE_REPOS.map(repo => (
-                  <button
+                  <Button
                     key={repo.url}
-                    className="example-button"
+                    variant="outline"
+                    className="w-full text-left justify-start h-auto py-3"
                     onClick={() => handleExampleClick(repo.url)}
-                    title={repo.description}
                   >
-                    <div className="example-name">{repo.name}</div>
-                    <div className="example-desc">{repo.description}</div>
-                  </button>
+                    <div className="flex flex-col items-start">
+                      <div className="font-medium font-mono text-sm">{repo.name}</div>
+                      <div className="text-xs text-gray-500">{repo.description}</div>
+                    </div>
+                  </Button>
                 ))}
               </div>
             </div>
 
-            <div className="info-box">
-              <span className="info-icon">ℹ️</span>
-              <span>
-                Supports repo root, folders, and single files. Custom branches detected
-                automatically.
-              </span>
-            </div>
+            <Alert variant="default">
+              <Info className="h-4 w-4" />
+              <AlertDescription className="text-sm">
+                Supports repo root, folders, and single files. Custom branches detected automatically.
+              </AlertDescription>
+            </Alert>
           </div>
 
-          <div className="import-footer">
-            <button onClick={onClose} className="btn-secondary" disabled={isValidating}>
+          <div className="flex justify-end gap-3 p-6 border-t">
+            <Button variant="outline" onClick={onClose} disabled={isValidating}>
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleBrowseRepository}
-              className="btn-primary"
               disabled={isValidating || !repoUrl.trim()}
             >
               {isValidating ? 'Loading...' : 'Browse Repository'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -354,21 +373,28 @@ export function GitHubImportDialog({ onClose, onImportComplete }: GitHubImportDi
   // Render Step 2: Scanning
   if (step === 'scanning') {
     return (
-      <div className="import-overlay" onClick={() => {}}>
-        <div className="import-modal" onClick={e => e.stopPropagation()}>
-          <div className="import-header">
-            <h2>{isImporting ? 'Importing Commands' : 'Scanning Repository'}</h2>
-            <button onClick={onClose} className="modal-close" title="Close" disabled>
-              ×
-            </button>
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-8">
+        <div
+          className="bg-white rounded-xl max-w-lg w-full shadow-2xl"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between p-6 border-b">
+            <h2 className="text-xl font-semibold">
+              {isImporting ? 'Importing Commands' : 'Scanning Repository'}
+            </h2>
+            <Button variant="ghost" size="icon" onClick={onClose} disabled title="Close">
+              ✕
+            </Button>
           </div>
 
-          <div className="import-body scanning-body">
-            <div className="scanning-progress">
-              <div className="progress-step">{scanProgress?.step}</div>
-              <p className="progress-message">{scanProgress?.message}</p>
-              <div className="progress-bar">
-                <div className="progress-bar-fill"></div>
+          <div className="p-12 flex items-center justify-center">
+            <div className="w-full text-center space-y-4">
+              <div className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+                {scanProgress?.step}
+              </div>
+              <p className="text-lg text-gray-900 font-medium">{scanProgress?.message}</p>
+              <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full animate-pulse"></div>
               </div>
             </div>
           </div>
@@ -380,39 +406,40 @@ export function GitHubImportDialog({ onClose, onImportComplete }: GitHubImportDi
   // Render Step 3: Navigate & Select
   if (step === 'navigate-select' && folderContents) {
     return (
-      <div className="import-overlay">
-        <div className="import-modal import-modal-large" onClick={e => e.stopPropagation()}>
-          <div className="import-header">
-            <h2>Select Commands to Import</h2>
-            <button onClick={onClose} className="modal-close" title="Close">
-              ×
-            </button>
+      <div
+        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-8"
+        onClick={handleOverlayClick}
+      >
+        <div
+          className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between p-6 border-b">
+            <h2 className="text-xl font-semibold">Select Commands to Import</h2>
+            <Button variant="ghost" size="icon" onClick={onClose} title="Close">
+              ✕
+            </Button>
           </div>
 
-          <div className="import-body" style={{ display: 'flex', flexDirection: 'column' }}>
+          <div className="flex-1 overflow-y-auto p-6">
             <FolderNavigator
               initialContents={folderContents}
               onSelectionChange={setSelectedFiles}
             />
           </div>
 
-          <div className="import-footer">
-            <button
-              onClick={() => setStep('url-entry')}
-              className="btn-secondary"
-              disabled={isImporting}
-            >
+          <div className="flex justify-between gap-3 p-6 border-t">
+            <Button variant="outline" onClick={() => setStep('url-entry')} disabled={isImporting}>
               Back
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => performImport()}
-              className="btn-primary"
               disabled={isImporting || selectedFiles.size === 0}
             >
               {isImporting
                 ? 'Importing...'
                 : `Import ${selectedFiles.size} Command${selectedFiles.size !== 1 ? 's' : ''}`}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -422,37 +449,36 @@ export function GitHubImportDialog({ onClose, onImportComplete }: GitHubImportDi
   // Render Step 4: Complete
   if (step === 'complete') {
     return (
-      <div className="import-overlay">
-        <div className="import-modal" onClick={e => e.stopPropagation()}>
-          <div className="import-header">
-            <h2>Import Complete</h2>
-            <button onClick={onClose} className="modal-close" title="Close">
-              ×
-            </button>
+      <div
+        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-8"
+        onClick={handleOverlayClick}
+      >
+        <div
+          className="bg-white rounded-xl max-w-lg w-full shadow-2xl"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between p-6 border-b">
+            <h2 className="text-xl font-semibold">Import Complete</h2>
+            <Button variant="ghost" size="icon" onClick={onClose} title="Close">
+              ✕
+            </Button>
           </div>
 
-          <div className="import-body">
-            <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-              <p style={{ fontSize: '24px' }}>✅</p>
-              <p style={{ marginTop: '10px', fontSize: '16px', fontWeight: 'bold' }}>
-                Commands imported successfully!
-              </p>
-              <p style={{ color: '#666', marginTop: '10px' }}>
-                Your commands are now available in the commands manager
-              </p>
-            </div>
+          <div className="p-12 text-center space-y-4">
+            <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
+            <p className="text-lg font-semibold">Commands imported successfully!</p>
+            <p className="text-gray-600">Your commands are now available in the commands manager</p>
           </div>
 
-          <div className="import-footer">
-            <button
+          <div className="flex justify-end p-6 border-t">
+            <Button
               onClick={() => {
                 onImportComplete();
                 onClose();
               }}
-              className="btn-primary"
             >
               Done
-            </button>
+            </Button>
           </div>
         </div>
       </div>

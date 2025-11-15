@@ -269,10 +269,9 @@ export const CommandsManager: React.FC = () => {
       </div>
 
       {showCreateModal && (
-        <div className="fixed inset-0 z-50">
-          <CommandEditor
-            command={editingCommand || undefined}
-            onSave={async commandData => {
+        <CommandEditor
+          command={editingCommand || undefined}
+          onSave={async commandData => {
               if (editingCommand) {
                 // Update existing command
                 const updateOptions: {
@@ -317,7 +316,6 @@ export const CommandsManager: React.FC = () => {
             }}
             onCancel={handleCloseModal}
           />
-        </div>
       )}
 
       {selectedCommand && (

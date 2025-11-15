@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { AlertTriangle, Info } from 'lucide-react';
+import { AlertTriangle, Info, X } from 'lucide-react';
 import { CommandFrontmatter, CommandWithMetadata } from '../../../shared/types/command.types';
 import { CommandConfigForm } from './CommandConfigForm';
 import { CommandReviewStep } from './CommandReviewStep';
@@ -146,92 +146,99 @@ export function CommandEditor({ command, onSave, onCancel, isLoading }: CommandE
   const totalSteps = 2;
 
   return (
-    <div className="flex flex-col h-full bg-white">
-      <div className="flex items-center justify-between p-6 border-b border-neutral-200">
-        <h2 className="text-xl font-semibold">{displayTitle}</h2>
-        <Badge variant="secondary">
-          Step {currentStepNumber}/{totalSteps}
-        </Badge>
-      </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onCancel}>
+      <div className="flex flex-col bg-white rounded-lg shadow-2xl w-full max-w-5xl max-h-[90vh] m-4" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between p-6 border-b border-neutral-200">
+          <h2 className="text-xl font-semibold">{displayTitle}</h2>
+          <div className="flex items-center gap-4">
+            <Badge variant="secondary">
+              Step {currentStepNumber}/{totalSteps}
+            </Badge>
+            <Button variant="ghost" size="icon" onClick={onCancel}>
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
 
-      {errors.length > 0 && currentStep === 'config' && (
-        <Alert variant="destructive" className="m-6">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>
-            <ul className="list-disc list-inside space-y-1">
-              {errors.map((error, idx) => (
-                <li key={idx}>{error}</li>
-              ))}
-            </ul>
-          </AlertDescription>
-        </Alert>
-      )}
+        {errors.length > 0 && currentStep === 'config' && (
+          <Alert variant="destructive" className="m-6">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              <ul className="list-disc list-inside space-y-1">
+                {errors.map((error, idx) => (
+                  <li key={idx}>{error}</li>
+                ))}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
 
-      <div className="flex-1 overflow-y-auto p-6">
-        {currentStep === 'config' && (
-          <>
-            <CommandConfigForm
+        <div className="flex-1 overflow-y-auto p-6">
+          {currentStep === 'config' && (
+            <>
+              <CommandConfigForm
+                name={name}
+                description={description}
+                argumentHint={argumentHint}
+                model={model}
+                allowedTools={allowedTools}
+                disableModelInvocation={disableModelInvocation}
+                location={location}
+                namespace={namespace}
+                content={content}
+                errors={errors}
+                onNameChange={setName}
+                onDescriptionChange={setDescription}
+                onArgumentHintChange={setArgumentHint}
+                onModelChange={val => setModel(val as any)}
+                onToolsChange={setAllowedTools}
+                onDisableModelInvocationChange={setDisableModelInvocation}
+                onLocationChange={loc => setLocation(loc as 'user' | 'project')}
+                onNamespaceChange={setNamespace}
+                onContentChange={setContent}
+              />
+
+              <Alert className="mt-6">
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  Next: You&apos;ll review the generated markdown and have the option to edit it
+                  manually.
+                </AlertDescription>
+              </Alert>
+            </>
+          )}
+
+          {currentStep === 'review' && (
+            <CommandReviewStep
               name={name}
-              description={description}
-              argumentHint={argumentHint}
-              model={model}
-              allowedTools={allowedTools}
-              disableModelInvocation={disableModelInvocation}
               location={location}
               namespace={namespace}
+              frontmatter={buildFrontmatterForReview({
+                description,
+                argumentHint,
+                model,
+                allowedTools,
+                disableModelInvocation,
+              })}
               content={content}
-              errors={errors}
-              onNameChange={setName}
-              onDescriptionChange={setDescription}
-              onArgumentHintChange={setArgumentHint}
-              onModelChange={val => setModel(val as any)}
-              onToolsChange={setAllowedTools}
-              onDisableModelInvocationChange={setDisableModelInvocation}
-              onLocationChange={loc => setLocation(loc as 'user' | 'project')}
-              onNamespaceChange={setNamespace}
-              onContentChange={setContent}
+              onBack={handleBackToConfig}
+              onConfirm={handleConfirmReview}
+              isLoading={isLoading}
             />
+          )}
+        </div>
 
-            <Alert className="mt-6">
-              <Info className="h-4 w-4" />
-              <AlertDescription>
-                Next: You&apos;ll review the generated markdown and have the option to edit it
-                manually.
-              </AlertDescription>
-            </Alert>
-          </>
-        )}
-
-        {currentStep === 'review' && (
-          <CommandReviewStep
-            name={name}
-            location={location}
-            namespace={namespace}
-            frontmatter={buildFrontmatterForReview({
-              description,
-              argumentHint,
-              model,
-              allowedTools,
-              disableModelInvocation,
-            })}
-            content={content}
-            onBack={handleBackToConfig}
-            onConfirm={handleConfirmReview}
-            isLoading={isLoading}
-          />
+        {currentStep === 'config' && (
+          <div className="flex justify-between gap-4 p-6 border-t border-neutral-200">
+            <Button onClick={onCancel} variant="outline" disabled={isLoading}>
+              Cancel
+            </Button>
+            <Button onClick={handleNextStep} disabled={isLoading}>
+              Next: Review
+            </Button>
+          </div>
         )}
       </div>
-
-      {currentStep === 'config' && (
-        <div className="flex justify-between gap-4 p-6 border-t border-neutral-200">
-          <Button onClick={onCancel} variant="outline" disabled={isLoading}>
-            Cancel
-          </Button>
-          <Button onClick={handleNextStep} disabled={isLoading}>
-            Next: Review
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
