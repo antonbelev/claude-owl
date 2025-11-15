@@ -97,7 +97,9 @@ export function useMCP(options: UseMCPOptions = {}) {
         setError(null);
         console.log('[useMCP] Removing server:', request.name);
 
-        const response = (await window.electronAPI.removeMCPServer(request)) as RemoveMCPServerResponse;
+        const response = (await window.electronAPI.removeMCPServer(
+          request
+        )) as RemoveMCPServerResponse;
 
         if (!response.success) {
           throw new Error(response.error || 'Failed to remove server');
@@ -120,15 +122,18 @@ export function useMCP(options: UseMCPOptions = {}) {
    * Test MCP server connection
    * @deprecated Not implemented yet
    */
-  const testConnection = useCallback(async (name: string, _timeout?: number): Promise<MCPConnectionTestResult> => {
-    // TODO: Implement when testMCPServer API is available
-    console.log('[useMCP] Connection test not implemented yet for:', name);
-    return {
-      success: false,
-      steps: [],
-      error: 'Not implemented',
-    };
-  }, []);
+  const testConnection = useCallback(
+    async (name: string, _timeout?: number): Promise<MCPConnectionTestResult> => {
+      // TODO: Implement when testMCPServer API is available
+      console.log('[useMCP] Connection test not implemented yet for:', name);
+      return {
+        success: false,
+        steps: [],
+        error: 'Not implemented',
+      };
+    },
+    []
+  );
 
   /**
    * Test all MCP server connections

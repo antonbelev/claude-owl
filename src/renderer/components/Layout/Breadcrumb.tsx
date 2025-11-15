@@ -47,23 +47,26 @@ export const Breadcrumb: React.FC = () => {
   }
 
   return (
-    <nav className="breadcrumb" aria-label="Breadcrumb">
-      <ol className="breadcrumb-list">
+    <nav className="text-sm" aria-label="Breadcrumb">
+      <ol className="flex list-none items-center gap-2 flex-wrap">
         {breadcrumbItems.map((item, index) => {
           const isLast = index === breadcrumbItems.length - 1;
 
           return (
-            <li key={item.path} className="breadcrumb-item">
+            <li key={item.path} className="flex items-center gap-2">
               {isLast ? (
-                <span className="breadcrumb-current" aria-current="page">
+                <span className="text-neutral-600 font-medium" aria-current="page">
                   {item.label}
                 </span>
               ) : (
                 <>
-                  <Link to={item.path} className="breadcrumb-link">
+                  <Link
+                    to={item.path}
+                    className="text-accent-400 no-underline transition-colors hover:text-accent-700 hover:underline"
+                  >
                     {item.label}
                   </Link>
-                  <span className="breadcrumb-separator">/</span>
+                  <span className="text-neutral-300">/</span>
                 </>
               )}
             </li>

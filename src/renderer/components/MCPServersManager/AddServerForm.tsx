@@ -290,9 +290,9 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
         style={{ backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '6px' }}
       >
         <p style={{ margin: 0, fontSize: '0.9rem', color: '#6c757d' }}>
-          ℹ️ MCP servers are managed globally at the user level (~/.claude.json) and
-          available to all your projects. To manage project-specific servers, use the Claude CLI
-          or select a project in a future update.
+          ℹ️ MCP servers are managed globally at the user level (~/.claude.json) and available to
+          all your projects. To manage project-specific servers, use the Claude CLI or select a
+          project in a future update.
         </p>
         <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.85rem', color: '#6c757d' }}>
           For project-specific MCP servers, edit your project&apos;s .mcp.json directly.

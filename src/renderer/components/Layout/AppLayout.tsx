@@ -11,15 +11,15 @@ export const AppLayout: React.FC = () => {
   };
 
   return (
-    <div className="app-layout">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggleSidebar} />
 
-      <div className={`app-content ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-        <div className="content-header">
+      <div className="flex-1 flex flex-col overflow-hidden ml-0 transition-all duration-300">
+        <div className="bg-white px-8 py-4 border-b border-neutral-200 flex-shrink-0">
           <Breadcrumb />
         </div>
 
-        <main className="content-main">
+        <main className="flex-1 overflow-y-auto bg-background-secondary">
           <Outlet />
         </main>
       </div>
