@@ -144,7 +144,7 @@ export function CommandConfigForm({
 
         <div className="space-y-2">
           <Label>Location</Label>
-          <RadioGroup value={location} onValueChange={v => onLocationChange(v as 'user' | 'project')}>
+          <RadioGroup value={location} onValueChange={(v: string) => onLocationChange(v as 'user' | 'project')}>
             <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-50 transition-colors">
               <RadioGroupItem value="user" id="location-user" />
               <Label htmlFor="location-user" className="cursor-pointer font-normal flex-1">
