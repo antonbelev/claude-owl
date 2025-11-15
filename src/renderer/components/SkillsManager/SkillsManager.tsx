@@ -116,7 +116,7 @@ export const SkillsManager: React.FC = () => {
         description="Custom skills that extend Claude Code capabilities"
         actions={[
           {
-            label: '+ Create Skill',
+            label: 'Create Skill',
             onClick: handleCreateSkill,
             variant: 'default',
             icon: Plus,

@@ -1,46 +1,47 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import type { PermissionRule } from '@/shared/types';
 import { usePermissionRules } from '../../../../hooks/usePermissionRules';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/renderer/components/ui/dialog';
+import { Button } from '@/renderer/components/ui/button';
+import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/renderer/components/ui/card';
+import { Badge } from '@/renderer/components/ui/badge';
+import { Loader2 } from 'lucide-react';
 
 interface RuleTemplatesModalProps {
   onApply: (rules: PermissionRule[]) => void;
   onCancel: () => void;
+  open: boolean;
 }
 
-const getCategoryColor = (category: string): string => {
+const getCategoryVariant = (category: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
   switch (category) {
     case 'security':
-      return '#ef4444'; // red
+      return 'destructive';
     case 'development':
-      return '#3b82f6'; // blue
+      return 'default';
     case 'deployment':
-      return '#8b5cf6'; // purple
+      return 'secondary';
     default:
-      return '#6b7280'; // gray
+      return 'outline';
   }
 };
 
-export const RuleTemplatesModal: React.FC<RuleTemplatesModalProps> = ({ onApply, onCancel }) => {
+export const RuleTemplatesModal: React.FC<RuleTemplatesModalProps> = ({ onApply, onCancel, open }) => {
   const { templates, loadingTemplates, error, loadTemplates, applyTemplate } = usePermissionRules();
 
-  // Close modal on ESC key
-  const handleEscKey = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onCancel();
-      }
-    },
-    [onCancel]
-  );
-
   useEffect(() => {
-    document.addEventListener('keydown', handleEscKey);
-    return () => document.removeEventListener('keydown', handleEscKey);
-  }, [handleEscKey]);
-
-  useEffect(() => {
-    loadTemplates();
-  }, [loadTemplates]);
+    if (open) {
+      loadTemplates();
+    }
+  }, [open, loadTemplates]);
 
   const handleApplyTemplate = async (templateId: string) => {
     const rules = await applyTemplate(templateId);
@@ -50,87 +51,95 @@ export const RuleTemplatesModal: React.FC<RuleTemplatesModalProps> = ({ onApply,
   };
 
   return (
-    <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal-content modal-large" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>Rule Templates</h2>
-          <button onClick={onCancel} className="btn-close">
-            ×
-          </button>
-        </div>
+    <Dialog open={open} onOpenChange={open => !open && onCancel()}>
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Rule Templates</DialogTitle>
+          <DialogDescription>
+            Choose from pre-configured security templates to quickly set up permissions
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="modal-body">
+        <div className="py-4">
           {loadingTemplates && (
-            <div className="loading-state">
-              <p>Loading templates...</p>
+            <div className="flex flex-col items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-neutral-400 mb-3" />
+              <p className="text-neutral-600">Loading templates...</p>
             </div>
           )}
 
           {error && (
-            <div className="error-state">
-              <p className="error-message">Error: {error}</p>
-            </div>
+            <Alert variant="destructive">
+              <AlertDescription>Error: {error}</AlertDescription>
+            </Alert>
           )}
 
           {!loadingTemplates && !error && (
-            <div className="templates-grid">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {templates.map(template => (
-                <div key={template.id} className="template-card">
-                  <div className="template-header">
-                    <span className="template-icon">{template.icon}</span>
-                    <div className="template-title">
-                      <h3>{template.name}</h3>
-                      <span
-                        className="template-category"
-                        style={{ backgroundColor: getCategoryColor(template.category) }}
-                      >
+                <Card key={template.id} className="flex flex-col">
+                  <CardHeader>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">{template.icon}</span>
+                        <div>
+                          <CardTitle className="text-base">{template.name}</CardTitle>
+                        </div>
+                      </div>
+                      <Badge variant={getCategoryVariant(template.category)}>
                         {template.category}
-                      </span>
+                      </Badge>
                     </div>
-                  </div>
+                    <CardDescription className="text-sm">{template.description}</CardDescription>
+                  </CardHeader>
 
-                  <p className="template-description">{template.description}</p>
+                  <CardContent className="flex-1 space-y-4">
+                    <div className="bg-neutral-50 rounded-md p-3">
+                      <p className="text-xs font-semibold text-neutral-700 mb-2">
+                        Includes {template.rules.length} rules:
+                      </p>
+                      <ul className="space-y-1">
+                        {template.rules.slice(0, 3).map((rule, idx) => (
+                          <li key={idx} className="flex items-center gap-2 text-xs">
+                            <span>
+                              {rule.level === 'allow' && '✅'}
+                              {rule.level === 'ask' && '⚠️'}
+                              {rule.level === 'deny' && '🚫'}
+                            </span>
+                            <code className="text-xs bg-white px-1 py-0.5 rounded">
+                              {rule.tool}
+                              {rule.pattern && `(${rule.pattern})`}
+                            </code>
+                          </li>
+                        ))}
+                        {template.rules.length > 3 && (
+                          <li className="text-xs text-neutral-500 italic">
+                            ...and {template.rules.length - 3} more
+                          </li>
+                        )}
+                      </ul>
+                    </div>
 
-                  <div className="template-rules-preview">
-                    <p className="preview-label">Includes {template.rules.length} rules:</p>
-                    <ul className="preview-list">
-                      {template.rules.slice(0, 3).map((rule, idx) => (
-                        <li key={idx}>
-                          <span className={`rule-level-badge level-${rule.level}`}>
-                            {rule.level === 'allow' && '✅'}
-                            {rule.level === 'ask' && '⚠️'}
-                            {rule.level === 'deny' && '🚫'}
-                          </span>
-                          <code>
-                            {rule.tool}
-                            {rule.pattern && `(${rule.pattern})`}
-                          </code>
-                        </li>
-                      ))}
-                      {template.rules.length > 3 && (
-                        <li className="preview-more">...and {template.rules.length - 3} more</li>
-                      )}
-                    </ul>
-                  </div>
-
-                  <button
-                    onClick={() => handleApplyTemplate(template.id)}
-                    className="btn-primary btn-block"
-                  >
-                    Apply Template
-                  </button>
-                </div>
+                    <Button
+                      onClick={() => handleApplyTemplate(template.id)}
+                      className="w-full"
+                      variant="default"
+                    >
+                      Apply Template
+                    </Button>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}
         </div>
 
-        <div className="modal-footer">
-          <button onClick={onCancel} className="btn-secondary">
+        <DialogFooter>
+          <Button onClick={onCancel} variant="secondary">
             Close
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

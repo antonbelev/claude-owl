@@ -1,5 +1,16 @@
 import React from 'react';
 import type { ClaudeSettings } from '@/shared/types';
+import { Input } from '@/renderer/components/ui/input';
+import { Textarea } from '@/renderer/components/ui/textarea';
+import { Label } from '@/renderer/components/ui/label';
+import { Checkbox } from '@/renderer/components/ui/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/renderer/components/ui/select';
 
 interface CoreConfigEditorProps {
   settings: ClaudeSettings;
@@ -7,34 +18,56 @@ interface CoreConfigEditorProps {
   readOnly?: boolean;
 }
 
+const AVAILABLE_MODELS = [
+  { value: 'claude-sonnet-4-5-20250929', label: 'Claude Sonnet 4.5 (Default)' },
+  { value: 'claude-opus-4-1-20250805', label: 'Claude Opus 4.1' },
+  { value: 'claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5' },
+];
+
 export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
   settings,
   updateSettings,
   readOnly = false,
 }) => {
   return (
-    <div className="core-config-editor">
-      <div className="editor-section">
-        <h3>Model Configuration</h3>
-        <div className="form-group">
-          <label htmlFor="model">Default Model</label>
-          <input
-            id="model"
-            type="text"
-            value={settings.model || ''}
-            onChange={e => updateSettings({ model: e.target.value })}
-            placeholder="e.g., claude-sonnet-4-5-20250929"
+    <div className="space-y-6">
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Model Configuration</h3>
+        <div className="space-y-2">
+          <Label htmlFor="model">Default Model</Label>
+          <Select
+            value={settings.model || '__default__'}
+            onValueChange={value => {
+              if (value === '__default__') {
+                const { model: _removed, ...rest } = settings;
+                updateSettings(rest);
+              } else {
+                updateSettings({ model: value });
+              }
+            }}
             disabled={readOnly}
-          />
-          <p className="form-help">Override the default Claude model</p>
+          >
+            <SelectTrigger id="model">
+              <SelectValue placeholder="Select a model (default: Sonnet 4.5)" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__default__">Use default</SelectItem>
+              {AVAILABLE_MODELS.map(model => (
+                <SelectItem key={model.value} value={model.value}>
+                  {model.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-sm text-neutral-600">Override the default Claude model</p>
         </div>
       </div>
 
-      <div className="editor-section">
-        <h3>Output Style</h3>
-        <div className="form-group">
-          <label htmlFor="outputStyle">Output Style</label>
-          <textarea
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Output Style</h3>
+        <div className="space-y-2">
+          <Label htmlFor="outputStyle">Output Style</Label>
+          <Textarea
             id="outputStyle"
             value={settings.outputStyle || ''}
             onChange={e => updateSettings({ outputStyle: e.target.value })}
@@ -42,15 +75,15 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
             disabled={readOnly}
             rows={4}
           />
-          <p className="form-help">Adjust Claude&apos;s system prompt behavior</p>
+          <p className="text-sm text-neutral-600">Adjust Claude&apos;s system prompt behavior</p>
         </div>
       </div>
 
-      <div className="editor-section">
-        <h3>Authentication</h3>
-        <div className="form-group">
-          <label htmlFor="apiKeyHelper">API Key Helper Script</label>
-          <input
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Authentication</h3>
+        <div className="space-y-2">
+          <Label htmlFor="apiKeyHelper">API Key Helper Script</Label>
+          <Input
             id="apiKeyHelper"
             type="text"
             value={settings.apiKeyHelper || ''}
@@ -58,18 +91,15 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
             placeholder="Path to script for generating credentials"
             disabled={readOnly}
           />
-          <p className="form-help">Custom credential generation script</p>
+          <p className="text-sm text-neutral-600">Custom credential generation script</p>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="forceLoginMethod">Force Login Method</label>
-          <select
-            id="forceLoginMethod"
-            value={settings.forceLoginMethod || ''}
-            onChange={e => {
-              const value = e.target.value;
-              if (value === '') {
-                // Remove the property entirely instead of setting to undefined
+        <div className="space-y-2">
+          <Label htmlFor="forceLoginMethod">Force Login Method</Label>
+          <Select
+            value={settings.forceLoginMethod || '__none__'}
+            onValueChange={value => {
+              if (value === '__none__') {
                 const { forceLoginMethod: _removed, ...rest } = settings;
                 updateSettings(rest);
               } else {
@@ -80,16 +110,21 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
             }}
             disabled={readOnly}
           >
-            <option value="">No restriction</option>
-            <option value="claudeai">Claude.ai</option>
-            <option value="console">Anthropic Console</option>
-          </select>
-          <p className="form-help">Restrict login method to specific account type</p>
+            <SelectTrigger id="forceLoginMethod">
+              <SelectValue placeholder="No restriction" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__none__">No restriction</SelectItem>
+              <SelectItem value="claudeai">Claude.ai</SelectItem>
+              <SelectItem value="console">Anthropic Console</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-sm text-neutral-600">Restrict login method to specific account type</p>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="forceLoginOrgUUID">Force Organization UUID</label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="forceLoginOrgUUID">Force Organization UUID</Label>
+          <Input
             id="forceLoginOrgUUID"
             type="text"
             value={settings.forceLoginOrgUUID || ''}
@@ -97,28 +132,28 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
             placeholder="Organization UUID"
             disabled={readOnly}
           />
-          <p className="form-help">Auto-select organization during login</p>
+          <p className="text-sm text-neutral-600">Auto-select organization during login</p>
         </div>
       </div>
 
-      <div className="editor-section">
-        <h3>Maintenance</h3>
-        <div className="form-group">
-          <label htmlFor="cleanupPeriodDays">Cleanup Period (Days)</label>
-          <input
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Maintenance</h3>
+        <div className="space-y-2">
+          <Label htmlFor="cleanupPeriodDays">Cleanup Period (Days)</Label>
+          <Input
             id="cleanupPeriodDays"
             type="number"
             value={settings.cleanupPeriodDays || 30}
             onChange={e => updateSettings({ cleanupPeriodDays: parseInt(e.target.value) || 30 })}
-            min="1"
+            min={1}
             disabled={readOnly}
           />
-          <p className="form-help">Chat transcript retention period (default: 30 days)</p>
+          <p className="text-sm text-neutral-600">Chat transcript retention period (default: 30 days)</p>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="companyAnnouncements">Company Announcements</label>
-          <textarea
+        <div className="space-y-2">
+          <Label htmlFor="companyAnnouncements">Company Announcements</Label>
+          <Textarea
             id="companyAnnouncements"
             value={settings.companyAnnouncements || ''}
             onChange={e => updateSettings({ companyAnnouncements: e.target.value })}
@@ -126,56 +161,68 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
             disabled={readOnly}
             rows={3}
           />
-          <p className="form-help">Messages shown on startup</p>
+          <p className="text-sm text-neutral-600">Messages shown on startup</p>
         </div>
       </div>
 
-      <div className="editor-section">
-        <h3>Git Integration</h3>
-        <div className="form-group">
-          <label>
-            <input
-              type="checkbox"
-              checked={settings.includeCoAuthoredBy !== false}
-              onChange={e => updateSettings({ includeCoAuthoredBy: e.target.checked })}
-              disabled={readOnly}
-            />
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Git Integration</h3>
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="includeCoAuthoredBy"
+            checked={settings.includeCoAuthoredBy !== false}
+            onCheckedChange={checked => updateSettings({ includeCoAuthoredBy: checked as boolean })}
+            disabled={readOnly}
+          />
+          <Label
+            htmlFor="includeCoAuthoredBy"
+            className="text-sm font-normal cursor-pointer"
+          >
             Include Claude co-authored attribution in commits
-          </label>
-          <p className="form-help">
-            Add &quot;Co-Authored-By: Claude&quot; to git commits (default: true)
-          </p>
+          </Label>
         </div>
+        <p className="text-sm text-neutral-600 ml-6">
+          Add &quot;Co-Authored-By: Claude&quot; to git commits (default: true)
+        </p>
       </div>
 
-      <div className="editor-section">
-        <h3>MCP Server Management</h3>
-        <div className="form-group">
-          <label>
-            <input
-              type="checkbox"
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">MCP Server Management</h3>
+        <div className="space-y-3">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="enableAllProjectMcpServers"
               checked={settings.enableAllProjectMcpServers || false}
-              onChange={e => updateSettings({ enableAllProjectMcpServers: e.target.checked })}
+              onCheckedChange={checked =>
+                updateSettings({ enableAllProjectMcpServers: checked as boolean })
+              }
               disabled={readOnly}
             />
-            Auto-approve all project MCP servers
-          </label>
-          <p className="form-help">
+            <Label
+              htmlFor="enableAllProjectMcpServers"
+              className="text-sm font-normal cursor-pointer"
+            >
+              Auto-approve all project MCP servers
+            </Label>
+          </div>
+          <p className="text-sm text-neutral-600 ml-6">
             Automatically enable all MCP servers defined in project .mcp.json
           </p>
-        </div>
 
-        <div className="form-group">
-          <label>
-            <input
-              type="checkbox"
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="disableAllHooks"
               checked={settings.disableAllHooks || false}
-              onChange={e => updateSettings({ disableAllHooks: e.target.checked })}
+              onCheckedChange={checked => updateSettings({ disableAllHooks: checked as boolean })}
               disabled={readOnly}
             />
-            Disable all hooks
-          </label>
-          <p className="form-help">Prevent all pre/post tool execution hooks from running</p>
+            <Label htmlFor="disableAllHooks" className="text-sm font-normal cursor-pointer">
+              Disable all hooks
+            </Label>
+          </div>
+          <p className="text-sm text-neutral-600 ml-6">
+            Prevent all pre/post tool execution hooks from running
+          </p>
         </div>
       </div>
     </div>

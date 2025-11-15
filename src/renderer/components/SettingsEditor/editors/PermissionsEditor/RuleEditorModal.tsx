@@ -1,12 +1,34 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { PermissionRule, ToolType, PermissionLevel } from '@/shared/types';
 import { TOOL_PATTERN_HELP, TOOLS_WITHOUT_PATTERNS } from '@/shared/types/permissions.types';
 import { usePermissionRules } from '../../../../hooks/usePermissionRules';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/renderer/components/ui/dialog';
+import { Button } from '@/renderer/components/ui/button';
+import { Input } from '@/renderer/components/ui/input';
+import { Label } from '@/renderer/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/renderer/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/renderer/components/ui/radio-group';
+import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface RuleEditorModalProps {
   rule?: PermissionRule; // If provided, we're editing; otherwise creating
   onSave: (rule: Omit<PermissionRule, 'id'>) => void;
   onCancel: () => void;
+  open: boolean;
 }
 
 const TOOLS: ToolType[] = [
@@ -20,7 +42,12 @@ const TOOLS: ToolType[] = [
   'SlashCommand',
 ];
 
-export const RuleEditorModal: React.FC<RuleEditorModalProps> = ({ rule, onSave, onCancel }) => {
+export const RuleEditorModal: React.FC<RuleEditorModalProps> = ({
+  rule,
+  onSave,
+  onCancel,
+  open,
+}) => {
   const { validateRule, validatePattern } = usePermissionRules();
 
   const [tool, setTool] = useState<ToolType>(rule?.tool || 'Bash');
@@ -36,21 +63,6 @@ export const RuleEditorModal: React.FC<RuleEditorModalProps> = ({ rule, onSave, 
 
   const requiresPattern = !TOOLS_WITHOUT_PATTERNS.includes(tool);
   const helpText = TOOL_PATTERN_HELP[tool];
-
-  // Close modal on ESC key
-  const handleEscKey = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onCancel();
-      }
-    },
-    [onCancel]
-  );
-
-  useEffect(() => {
-    document.addEventListener('keydown', handleEscKey);
-    return () => document.removeEventListener('keydown', handleEscKey);
-  }, [handleEscKey]);
 
   // Validate pattern when it changes
   useEffect(() => {
@@ -99,75 +111,87 @@ export const RuleEditorModal: React.FC<RuleEditorModalProps> = ({ rule, onSave, 
   };
 
   return (
-    <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>{rule ? 'Edit Permission Rule' : 'Create Permission Rule'}</h2>
-          <button onClick={onCancel} className="btn-close">
-            ×
-          </button>
-        </div>
+    <Dialog open={open} onOpenChange={open => !open && onCancel()}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{rule ? 'Edit Permission Rule' : 'Create Permission Rule'}</DialogTitle>
+          <DialogDescription>
+            Configure tool permissions for Claude Code with custom patterns
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="modal-body">
+        <div className="space-y-6 py-4">
           {/* Permission Level */}
-          <div className="form-group">
-            <label>Permission Level</label>
-            <div className="permission-level-selector">
-              <label className={`level-option level-allow ${level === 'allow' ? 'active' : ''}`}>
-                <input
-                  type="radio"
-                  name="level"
-                  value="allow"
-                  checked={level === 'allow'}
-                  onChange={() => setLevel('allow')}
-                />
-                <span className="level-icon">✅</span>
-                <span className="level-label">Allow</span>
-              </label>
-              <label className={`level-option level-ask ${level === 'ask' ? 'active' : ''}`}>
-                <input
-                  type="radio"
-                  name="level"
-                  value="ask"
-                  checked={level === 'ask'}
-                  onChange={() => setLevel('ask')}
-                />
-                <span className="level-icon">⚠️</span>
-                <span className="level-label">Ask</span>
-              </label>
-              <label className={`level-option level-deny ${level === 'deny' ? 'active' : ''}`}>
-                <input
-                  type="radio"
-                  name="level"
-                  value="deny"
-                  checked={level === 'deny'}
-                  onChange={() => setLevel('deny')}
-                />
-                <span className="level-icon">🚫</span>
-                <span className="level-label">Deny</span>
-              </label>
-            </div>
+          <div className="space-y-3">
+            <Label>Permission Level</Label>
+            <RadioGroup value={level} onValueChange={value => setLevel(value as PermissionLevel)}>
+              <div className="grid grid-cols-3 gap-4">
+                <label
+                  className={`flex flex-col items-center gap-2 p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    level === 'allow'
+                      ? 'border-green-500 bg-green-50'
+                      : 'border-neutral-200 hover:bg-neutral-50'
+                  }`}
+                >
+                  <RadioGroupItem value="allow" id="level-allow" className="sr-only" />
+                  <span className="text-2xl">✅</span>
+                  <span className="text-sm font-semibold uppercase text-green-700">Allow</span>
+                </label>
+                <label
+                  className={`flex flex-col items-center gap-2 p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    level === 'ask'
+                      ? 'border-amber-500 bg-amber-50'
+                      : 'border-neutral-200 hover:bg-neutral-50'
+                  }`}
+                >
+                  <RadioGroupItem value="ask" id="level-ask" className="sr-only" />
+                  <span className="text-2xl">⚠️</span>
+                  <span className="text-sm font-semibold uppercase text-amber-700">Ask</span>
+                </label>
+                <label
+                  className={`flex flex-col items-center gap-2 p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    level === 'deny'
+                      ? 'border-red-500 bg-red-50'
+                      : 'border-neutral-200 hover:bg-neutral-50'
+                  }`}
+                >
+                  <RadioGroupItem value="deny" id="level-deny" className="sr-only" />
+                  <span className="text-2xl">🚫</span>
+                  <span className="text-sm font-semibold uppercase text-red-700">Deny</span>
+                </label>
+              </div>
+            </RadioGroup>
           </div>
 
           {/* Tool Type */}
-          <div className="form-group">
-            <label htmlFor="tool">Tool Type</label>
-            <select id="tool" value={tool} onChange={e => setTool(e.target.value as ToolType)}>
-              {TOOLS.map(t => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-            {helpText && <p className="form-help">ℹ️ {helpText}</p>}
+          <div className="space-y-2">
+            <Label htmlFor="tool">Tool Type</Label>
+            <Select value={tool} onValueChange={value => setTool(value as ToolType)}>
+              <SelectTrigger id="tool">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TOOLS.map(t => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {helpText && (
+              <p className="text-sm text-neutral-600 flex items-start gap-1">
+                <span>ℹ️</span>
+                <span>{helpText}</span>
+              </p>
+            )}
           </div>
 
           {/* Pattern */}
-          <div className="form-group">
-            <label htmlFor="pattern">
-              Pattern {requiresPattern && <span className="required">*</span>}
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="pattern">
+              Pattern {requiresPattern && <span className="text-red-500">*</span>}
+            </Label>
+            <Input
               id="pattern"
               type="text"
               value={pattern}
@@ -185,42 +209,47 @@ export const RuleEditorModal: React.FC<RuleEditorModalProps> = ({ rule, onSave, 
 
             {/* Validation Feedback */}
             {validationResult && (
-              <div
-                className={`validation-feedback ${validationResult.valid ? 'valid' : 'invalid'}`}
-              >
-                {validationResult.valid && <span className="validation-icon">✅</span>}
-                {!validationResult.valid && validationResult.error && (
-                  <span className="validation-error">❌ {validationResult.error}</span>
+              <Alert variant={validationResult.valid ? 'default' : 'destructive'}>
+                {validationResult.valid ? (
+                  <CheckCircle2 className="h-4 w-4" />
+                ) : (
+                  <AlertCircle className="h-4 w-4" />
                 )}
-                {validationResult.warnings && validationResult.warnings.length > 0 && (
-                  <div className="validation-warnings">
-                    {validationResult.warnings.map((warning, idx) => (
-                      <div key={idx} className="validation-warning">
-                        ⚠️ {warning}
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {validationResult.examples && validationResult.examples.length > 0 && (
-                  <div className="validation-examples">
-                    <p>📋 Example matches:</p>
-                    <ul>
-                      {validationResult.examples.map((example, idx) => (
-                        <li key={idx}>
-                          <code>{example}</code>
-                        </li>
+                <AlertDescription>
+                  {validationResult.valid && <span>✅ Pattern is valid</span>}
+                  {!validationResult.valid && validationResult.error && (
+                    <span>❌ {validationResult.error}</span>
+                  )}
+                  {validationResult.warnings && validationResult.warnings.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {validationResult.warnings.map((warning, idx) => (
+                        <div key={idx}>⚠️ {warning}</div>
                       ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
+                    </div>
+                  )}
+                  {validationResult.examples && validationResult.examples.length > 0 && (
+                    <div className="mt-2">
+                      <p className="font-semibold mb-1">📋 Example matches:</p>
+                      <ul className="list-disc list-inside space-y-1">
+                        {validationResult.examples.map((example, idx) => (
+                          <li key={idx}>
+                            <code className="bg-neutral-100 px-1 py-0.5 rounded text-xs">
+                              {example}
+                            </code>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </AlertDescription>
+              </Alert>
             )}
           </div>
 
           {/* Description */}
-          <div className="form-group">
-            <label htmlFor="description">Description (optional)</label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="description">Description (optional)</Label>
+            <Input
               id="description"
               type="text"
               value={description}
@@ -230,19 +259,18 @@ export const RuleEditorModal: React.FC<RuleEditorModalProps> = ({ rule, onSave, 
           </div>
         </div>
 
-        <div className="modal-footer">
-          <button onClick={onCancel} className="btn-secondary">
+        <DialogFooter>
+          <Button onClick={onCancel} variant="secondary">
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSave}
-            className="btn-primary"
             disabled={validationResult ? !validationResult.valid : false}
           >
             {rule ? 'Save Changes' : 'Create Rule'}
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import { Input } from '@/renderer/components/ui/input';
+import { Button } from '@/renderer/components/ui/button';
+import { Label } from '@/renderer/components/ui/label';
+import { Eye, EyeOff, X, Plus } from 'lucide-react';
 
 interface EnvironmentEditorProps {
   env: Record<string, string>;
@@ -50,61 +54,65 @@ export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
   const entries = Object.entries(env);
 
   return (
-    <div className="environment-editor">
-      <div className="editor-intro">
-        <p>
+    <div className="space-y-6">
+      <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+        <p className="text-sm text-neutral-700">
           Environment variables are available to Claude and can be used to configure models, API
-          keys, and other settings. Common variables include <code>ANTHROPIC_API_KEY</code>,{' '}
-          <code>ANTHROPIC_MODEL</code>, etc.
+          keys, and other settings. Common variables include <code className="bg-white px-1 py-0.5 rounded text-sm">ANTHROPIC_API_KEY</code>,{' '}
+          <code className="bg-white px-1 py-0.5 rounded text-sm">ANTHROPIC_MODEL</code>, etc.
         </p>
       </div>
 
-      <div className="editor-section">
-        <h3>Environment Variables ({entries.length})</h3>
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Environment Variables ({entries.length})</h3>
 
         {entries.length === 0 ? (
-          <p className="empty-message">No environment variables configured</p>
+          <p className="text-neutral-500 italic text-sm">No environment variables configured</p>
         ) : (
-          <div className="env-variables-list">
+          <div className="space-y-2">
             {entries.map(([key, value]) => (
-              <div key={key} className="env-variable-item">
-                <div className="env-variable-key">
-                  <code>{key}</code>
+              <div key={key} className="flex items-center gap-2 bg-neutral-50 border border-neutral-200 rounded-md p-3">
+                <div className="min-w-0 flex-shrink-0 w-48">
+                  <code className="text-sm font-semibold text-neutral-900">{key}</code>
                 </div>
-                <div className="env-variable-value">
+                <div className="flex-1 min-w-0">
                   {readOnly ? (
-                    <div className="readonly-value">
-                      {showValues[key] ? (
-                        <code>{value}</code>
-                      ) : (
-                        <code>{'•'.repeat(Math.min(value.length, 20))}</code>
-                      )}
-                    </div>
+                    <code className="text-sm text-neutral-700">
+                      {showValues[key] ? value : '•'.repeat(Math.min(value.length, 20))}
+                    </code>
                   ) : (
-                    <input
+                    <Input
                       type={showValues[key] ? 'text' : 'password'}
                       value={value}
                       onChange={e => updateVariable(key, e.target.value)}
-                      className="env-input"
+                      className="h-8 text-sm font-mono"
                     />
                   )}
                 </div>
-                <div className="env-variable-actions">
-                  <button
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <Button
                     onClick={() => toggleShowValue(key)}
-                    className="btn-icon"
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
                     title={showValues[key] ? 'Hide value' : 'Show value'}
                   >
-                    {showValues[key] ? '👁️' : '👁️‍🗨️'}
-                  </button>
+                    {showValues[key] ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
                   {!readOnly && (
-                    <button
+                    <Button
                       onClick={() => removeVariable(key)}
-                      className="btn-icon btn-remove"
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
                       title="Remove variable"
                     >
-                      ×
-                    </button>
+                      <X className="h-4 w-4" />
+                    </Button>
                   )}
                 </div>
               </div>
@@ -114,13 +122,13 @@ export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
       </div>
 
       {!readOnly && (
-        <div className="editor-section">
-          <h3>Add New Variable</h3>
-          <div className="add-variable-form">
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="envKey">Variable Name</label>
-                <input
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Add New Variable</h3>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="envKey">Variable Name</Label>
+                <Input
                   id="envKey"
                   type="text"
                   value={newKey}
@@ -131,12 +139,11 @@ export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
                     }
                   }}
                   placeholder="VARIABLE_NAME"
-                  className="env-key-input"
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor="envValue">Value</label>
-                <input
+              <div className="space-y-2">
+                <Label htmlFor="envValue">Value</Label>
+                <Input
                   id="envValue"
                   type="text"
                   value={newValue}
@@ -147,85 +154,85 @@ export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
                     }
                   }}
                   placeholder="variable value"
-                  className="env-value-input"
                 />
               </div>
             </div>
-            <button onClick={addVariable} className="btn-add" disabled={!newKey.trim()}>
+            <Button onClick={addVariable} disabled={!newKey.trim()}>
+              <Plus className="h-4 w-4 mr-2" />
               Add Variable
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
-      <div className="editor-section">
-        <h3>Common Environment Variables</h3>
-        <div className="common-vars-help">
-          <details>
-            <summary>Authentication</summary>
-            <ul>
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Common Environment Variables</h3>
+        <div className="space-y-3">
+          <details className="bg-neutral-50 border border-neutral-200 rounded-md p-4">
+            <summary className="cursor-pointer font-semibold text-neutral-900">Authentication</summary>
+            <ul className="mt-3 space-y-2 text-sm">
               <li>
-                <code>ANTHROPIC_API_KEY</code> - Your Anthropic API key
+                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_API_KEY</code> - Your Anthropic API key
               </li>
               <li>
-                <code>ANTHROPIC_AUTH_TOKEN</code> - Authentication token
+                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_AUTH_TOKEN</code> - Authentication token
               </li>
               <li>
-                <code>AWS_BEARER_TOKEN_BEDROCK</code> - AWS Bedrock bearer token
-              </li>
-            </ul>
-          </details>
-
-          <details>
-            <summary>Model Configuration</summary>
-            <ul>
-              <li>
-                <code>ANTHROPIC_MODEL</code> - Override default model
-              </li>
-              <li>
-                <code>ANTHROPIC_DEFAULT_HAIKU_MODEL</code> - Default Haiku model
-              </li>
-              <li>
-                <code>ANTHROPIC_DEFAULT_OPUS_MODEL</code> - Default Opus model
-              </li>
-              <li>
-                <code>ANTHROPIC_DEFAULT_SONNET_MODEL</code> - Default Sonnet model
-              </li>
-              <li>
-                <code>MAX_THINKING_TOKENS</code> - Enable extended thinking
+                <code className="bg-white px-1 py-0.5 rounded">AWS_BEARER_TOKEN_BEDROCK</code> - AWS Bedrock bearer token
               </li>
             </ul>
           </details>
 
-          <details>
-            <summary>Bash Execution</summary>
-            <ul>
+          <details className="bg-neutral-50 border border-neutral-200 rounded-md p-4">
+            <summary className="cursor-pointer font-semibold text-neutral-900">Model Configuration</summary>
+            <ul className="mt-3 space-y-2 text-sm">
               <li>
-                <code>BASH_DEFAULT_TIMEOUT_MS</code> - Default timeout for bash commands
+                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_MODEL</code> - Override default model
               </li>
               <li>
-                <code>BASH_MAX_OUTPUT_LENGTH</code> - Maximum output length
+                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_DEFAULT_HAIKU_MODEL</code> - Default Haiku model
               </li>
               <li>
-                <code>BASH_MAX_TIMEOUT_MS</code> - Maximum allowed timeout
+                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_DEFAULT_OPUS_MODEL</code> - Default Opus model
+              </li>
+              <li>
+                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_DEFAULT_SONNET_MODEL</code> - Default Sonnet model
+              </li>
+              <li>
+                <code className="bg-white px-1 py-0.5 rounded">MAX_THINKING_TOKENS</code> - Enable extended thinking
               </li>
             </ul>
           </details>
 
-          <details>
-            <summary>Feature Toggles</summary>
-            <ul>
+          <details className="bg-neutral-50 border border-neutral-200 rounded-md p-4">
+            <summary className="cursor-pointer font-semibold text-neutral-900">Bash Execution</summary>
+            <ul className="mt-3 space-y-2 text-sm">
               <li>
-                <code>DISABLE_TELEMETRY</code> - Disable telemetry
+                <code className="bg-white px-1 py-0.5 rounded">BASH_DEFAULT_TIMEOUT_MS</code> - Default timeout for bash commands
               </li>
               <li>
-                <code>DISABLE_ERROR_REPORTING</code> - Disable error reporting
+                <code className="bg-white px-1 py-0.5 rounded">BASH_MAX_OUTPUT_LENGTH</code> - Maximum output length
               </li>
               <li>
-                <code>DISABLE_AUTOUPDATER</code> - Disable automatic updates
+                <code className="bg-white px-1 py-0.5 rounded">BASH_MAX_TIMEOUT_MS</code> - Maximum allowed timeout
+              </li>
+            </ul>
+          </details>
+
+          <details className="bg-neutral-50 border border-neutral-200 rounded-md p-4">
+            <summary className="cursor-pointer font-semibold text-neutral-900">Feature Toggles</summary>
+            <ul className="mt-3 space-y-2 text-sm">
+              <li>
+                <code className="bg-white px-1 py-0.5 rounded">DISABLE_TELEMETRY</code> - Disable telemetry
               </li>
               <li>
-                <code>DISABLE_COST_WARNINGS</code> - Disable cost warnings
+                <code className="bg-white px-1 py-0.5 rounded">DISABLE_ERROR_REPORTING</code> - Disable error reporting
+              </li>
+              <li>
+                <code className="bg-white px-1 py-0.5 rounded">DISABLE_AUTOUPDATER</code> - Disable automatic updates
+              </li>
+              <li>
+                <code className="bg-white px-1 py-0.5 rounded">DISABLE_COST_WARNINGS</code> - Disable cost warnings
               </li>
             </ul>
           </details>

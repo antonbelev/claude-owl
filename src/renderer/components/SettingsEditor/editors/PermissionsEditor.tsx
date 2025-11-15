@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 import type { PermissionsConfig } from '@/shared/types';
+import { Input } from '@/renderer/components/ui/input';
+import { Button } from '@/renderer/components/ui/button';
+import { Label } from '@/renderer/components/ui/label';
+import { Checkbox } from '@/renderer/components/ui/checkbox';
+import { X } from 'lucide-react';
 
 interface PermissionsEditorProps {
   permissions: PermissionsConfig;
@@ -61,39 +66,47 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({
   };
 
   return (
-    <div className="permissions-editor">
-      <div className="editor-intro">
-        <p>
+    <div className="space-y-6">
+      <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+        <p className="text-sm text-neutral-700">
           Permissions control which tools Claude can use. Rules use patterns like{' '}
-          <code>Read(./secrets/**)</code> or <code>Bash(curl:*)</code>.
+          <code className="bg-white px-1 py-0.5 rounded text-sm">Read(./secrets/**)</code> or{' '}
+          <code className="bg-white px-1 py-0.5 rounded text-sm">Bash(curl:*)</code>.
         </p>
       </div>
 
       {/* Allow Rules */}
-      <div className="editor-section">
-        <h3>Allow Rules</h3>
-        <p className="section-help">Tools and commands that are always permitted</p>
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-semibold text-green-700">Allow Rules</h3>
+          <p className="text-sm text-neutral-600">Tools and commands that are always permitted</p>
+        </div>
 
-        <div className="rules-list">
+        <div className="space-y-2">
           {(permissions.allow || []).map((rule, index) => (
-            <div key={index} className="rule-item">
-              <code>{rule}</code>
+            <div
+              key={index}
+              className="flex items-center justify-between bg-green-50 border border-green-200 rounded-md px-3 py-2"
+            >
+              <code className="text-sm text-neutral-800">{rule}</code>
               {!readOnly && (
-                <button
+                <Button
                   onClick={() => removeRule('allow', index)}
-                  className="btn-remove"
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
                   title="Remove rule"
                 >
-                  ×
-                </button>
+                  <X className="h-4 w-4" />
+                </Button>
               )}
             </div>
           ))}
         </div>
 
         {!readOnly && (
-          <div className="add-rule">
-            <input
+          <div className="flex gap-2">
+            <Input
               type="text"
               value={newAllowRule}
               onChange={e => setNewAllowRule(e.target.value)}
@@ -103,39 +116,45 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({
                 }
               }}
               placeholder="e.g., Read(./src/**), Bash(git:*)"
+              className="flex-1"
             />
-            <button onClick={() => addRule('allow', newAllowRule)} className="btn-add">
-              Add Allow Rule
-            </button>
+            <Button onClick={() => addRule('allow', newAllowRule)}>Add Allow Rule</Button>
           </div>
         )}
       </div>
 
       {/* Deny Rules */}
-      <div className="editor-section">
-        <h3>Deny Rules</h3>
-        <p className="section-help">Tools and commands that are always blocked</p>
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-semibold text-red-700">Deny Rules</h3>
+          <p className="text-sm text-neutral-600">Tools and commands that are always blocked</p>
+        </div>
 
-        <div className="rules-list">
+        <div className="space-y-2">
           {(permissions.deny || []).map((rule, index) => (
-            <div key={index} className="rule-item">
-              <code>{rule}</code>
+            <div
+              key={index}
+              className="flex items-center justify-between bg-red-50 border border-red-200 rounded-md px-3 py-2"
+            >
+              <code className="text-sm text-neutral-800">{rule}</code>
               {!readOnly && (
-                <button
+                <Button
                   onClick={() => removeRule('deny', index)}
-                  className="btn-remove"
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
                   title="Remove rule"
                 >
-                  ×
-                </button>
+                  <X className="h-4 w-4" />
+                </Button>
               )}
             </div>
           ))}
         </div>
 
         {!readOnly && (
-          <div className="add-rule">
-            <input
+          <div className="flex gap-2">
+            <Input
               type="text"
               value={newDenyRule}
               onChange={e => setNewDenyRule(e.target.value)}
@@ -145,41 +164,47 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({
                 }
               }}
               placeholder="e.g., Read(./.env), Bash(curl:*)"
+              className="flex-1"
             />
-            <button onClick={() => addRule('deny', newDenyRule)} className="btn-add">
-              Add Deny Rule
-            </button>
+            <Button onClick={() => addRule('deny', newDenyRule)}>Add Deny Rule</Button>
           </div>
         )}
       </div>
 
       {/* Ask Rules */}
-      <div className="editor-section">
-        <h3>Ask Rules</h3>
-        <p className="section-help">
-          Tools and commands that require confirmation before execution
-        </p>
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-semibold text-amber-700">Ask Rules</h3>
+          <p className="text-sm text-neutral-600">
+            Tools and commands that require confirmation before execution
+          </p>
+        </div>
 
-        <div className="rules-list">
+        <div className="space-y-2">
           {(permissions.ask || []).map((rule, index) => (
-            <div key={index} className="rule-item">
-              <code>{rule}</code>
+            <div
+              key={index}
+              className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-md px-3 py-2"
+            >
+              <code className="text-sm text-neutral-800">{rule}</code>
               {!readOnly && (
-                <button
+                <Button
                   onClick={() => removeRule('ask', index)}
-                  className="btn-remove"
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
                   title="Remove rule"
                 >
-                  ×
-                </button>
+                  <X className="h-4 w-4" />
+                </Button>
               )}
             </div>
           ))}
         </div>
 
         {!readOnly && (
-          <div className="add-rule">
-            <input
+          <div className="flex gap-2">
+            <Input
               type="text"
               value={newAskRule}
               onChange={e => setNewAskRule(e.target.value)}
@@ -189,39 +214,45 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({
                 }
               }}
               placeholder="e.g., Write(**), Bash(rm:*)"
+              className="flex-1"
             />
-            <button onClick={() => addRule('ask', newAskRule)} className="btn-add">
-              Add Ask Rule
-            </button>
+            <Button onClick={() => addRule('ask', newAskRule)}>Add Ask Rule</Button>
           </div>
         )}
       </div>
 
       {/* Additional Directories */}
-      <div className="editor-section">
-        <h3>Additional Directories</h3>
-        <p className="section-help">Extra working directories accessible to Claude</p>
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-semibold">Additional Directories</h3>
+          <p className="text-sm text-neutral-600">Extra working directories accessible to Claude</p>
+        </div>
 
-        <div className="rules-list">
+        <div className="space-y-2">
           {(permissions.additionalDirectories || []).map((dir, index) => (
-            <div key={index} className="rule-item">
-              <code>{dir}</code>
+            <div
+              key={index}
+              className="flex items-center justify-between bg-neutral-50 border border-neutral-200 rounded-md px-3 py-2"
+            >
+              <code className="text-sm text-neutral-800">{dir}</code>
               {!readOnly && (
-                <button
+                <Button
                   onClick={() => removeDirectory(index)}
-                  className="btn-remove"
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
                   title="Remove directory"
                 >
-                  ×
-                </button>
+                  <X className="h-4 w-4" />
+                </Button>
               )}
             </div>
           ))}
         </div>
 
         {!readOnly && (
-          <div className="add-rule">
-            <input
+          <div className="flex gap-2">
+            <Input
               type="text"
               value={newDirectory}
               onChange={e => setNewDirectory(e.target.value)}
@@ -231,20 +262,19 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({
                 }
               }}
               placeholder="/path/to/directory"
+              className="flex-1"
             />
-            <button onClick={() => addDirectory(newDirectory)} className="btn-add">
-              Add Directory
-            </button>
+            <Button onClick={() => addDirectory(newDirectory)}>Add Directory</Button>
           </div>
         )}
       </div>
 
       {/* Default Mode */}
-      <div className="editor-section">
-        <h3>Permission Mode</h3>
-        <div className="form-group">
-          <label htmlFor="defaultMode">Default Permission Mode</label>
-          <input
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Permission Mode</h3>
+        <div className="space-y-2">
+          <Label htmlFor="defaultMode">Default Permission Mode</Label>
+          <Input
             id="defaultMode"
             type="text"
             value={permissions.defaultMode || ''}
@@ -257,26 +287,33 @@ export const PermissionsEditor: React.FC<PermissionsEditorProps> = ({
             placeholder="e.g., acceptEdits"
             disabled={readOnly}
           />
-          <p className="form-help">Initial permission mode (e.g., &quot;acceptEdits&quot;)</p>
+          <p className="text-sm text-neutral-600">
+            Initial permission mode (e.g., &quot;acceptEdits&quot;)
+          </p>
         </div>
 
-        <div className="form-group">
-          <label>
-            <input
-              type="checkbox"
-              checked={permissions.disableBypassPermissionsMode || false}
-              onChange={e =>
-                updatePermissions({
-                  ...permissions,
-                  disableBypassPermissionsMode: e.target.checked,
-                })
-              }
-              disabled={readOnly}
-            />
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="disableBypassPermissionsMode"
+            checked={permissions.disableBypassPermissionsMode || false}
+            onCheckedChange={checked =>
+              updatePermissions({
+                ...permissions,
+                disableBypassPermissionsMode: checked as boolean,
+              })
+            }
+            disabled={readOnly}
+          />
+          <Label
+            htmlFor="disableBypassPermissionsMode"
+            className="text-sm font-normal cursor-pointer"
+          >
             Disable bypass permissions mode
-          </label>
-          <p className="form-help">Prevent the --dangerously-skip-permissions flag from working</p>
+          </Label>
         </div>
+        <p className="text-sm text-neutral-600 ml-6">
+          Prevent the --dangerously-skip-permissions flag from working
+        </p>
       </div>
     </div>
   );

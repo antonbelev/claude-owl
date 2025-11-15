@@ -5,6 +5,12 @@ import { PermissionRuleItem } from './PermissionRule';
 import { RuleEditorModal } from './RuleEditorModal';
 import { RuleTemplatesModal } from './RuleTemplatesModal';
 import { RuleTester } from './RuleTester';
+import { Button } from '@/renderer/components/ui/button';
+import { Input } from '@/renderer/components/ui/input';
+import { Textarea } from '@/renderer/components/ui/textarea';
+import { Label } from '@/renderer/components/ui/label';
+import { Checkbox } from '@/renderer/components/ui/checkbox';
+import { Plus, FileText, FlaskConical, ShieldBan, ShieldAlert, ShieldCheck } from 'lucide-react';
 import './PermissionsEditor.css';
 
 interface EnhancedPermissionsEditorProps {
@@ -172,15 +178,18 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
 
         {!readOnly && (
           <div className="editor-actions">
-            <button onClick={handleAddRule} className="btn-primary">
-              + Add Rule
-            </button>
-            <button onClick={() => setShowTemplates(true)} className="btn-secondary">
-              📋 Templates
-            </button>
-            <button onClick={() => setShowTester(!showTester)} className="btn-secondary">
-              🧪 Test Rules
-            </button>
+            <Button onClick={handleAddRule} variant="default">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Rule
+            </Button>
+            <Button onClick={() => setShowTemplates(true)} variant="secondary">
+              <FileText className="h-4 w-4 mr-2" />
+              Templates
+            </Button>
+            <Button onClick={() => setShowTester(!showTester)} variant="secondary">
+              <FlaskConical className="h-4 w-4 mr-2" />
+              Test Rules
+            </Button>
           </div>
         )}
       </div>
@@ -191,7 +200,10 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
       {/* Deny Rules */}
       <div className="rules-section">
         <div className="section-header">
-          <h4 className="section-title deny">🚫 DENY Rules ({denyRules.length})</h4>
+          <h4 className="section-title deny flex items-center gap-2">
+            <ShieldBan className="h-5 w-5" />
+            DENY Rules ({denyRules.length})
+          </h4>
           <p className="section-description">Highest priority - always blocked</p>
         </div>
         <div className="rules-list">
@@ -211,7 +223,10 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
       {/* Ask Rules */}
       <div className="rules-section">
         <div className="section-header">
-          <h4 className="section-title ask">⚠️ ASK Rules ({askRules.length})</h4>
+          <h4 className="section-title ask flex items-center gap-2">
+            <ShieldAlert className="h-5 w-5" />
+            ASK Rules ({askRules.length})
+          </h4>
           <p className="section-description">Require confirmation before execution</p>
         </div>
         <div className="rules-list">
@@ -231,7 +246,10 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
       {/* Allow Rules */}
       <div className="rules-section">
         <div className="section-header">
-          <h4 className="section-title allow">✅ ALLOW Rules ({allowRules.length})</h4>
+          <h4 className="section-title allow flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5" />
+            ALLOW Rules ({allowRules.length})
+          </h4>
           <p className="section-description">Auto-approved operations</p>
         </div>
         <div className="rules-list">
@@ -249,81 +267,90 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
       </div>
 
       {/* Additional Settings */}
-      <div className="additional-settings">
-        <h4>Additional Settings</h4>
+      <div className="space-y-6 mt-8 pt-6 border-t border-neutral-200">
+        <h4 className="text-lg font-semibold">Additional Settings</h4>
 
-        <div className="form-group">
-          <label htmlFor="additionalDirectories">Additional Directories</label>
-          <p className="form-help">Extra working directories accessible to Claude</p>
-          <textarea
-            id="additionalDirectories"
-            value={(permissions.additionalDirectories || []).join('\n')}
-            onChange={e =>
-              updatePermissions({
-                ...permissions,
-                additionalDirectories: e.target.value.split('\n').filter(d => d.trim()),
-              })
-            }
-            placeholder="/path/to/directory&#10;/another/path"
-            rows={3}
-            disabled={readOnly}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="defaultMode">Default Permission Mode</label>
-          <input
-            id="defaultMode"
-            type="text"
-            value={permissions.defaultMode || ''}
-            onChange={e =>
-              updatePermissions({
-                ...permissions,
-                defaultMode: e.target.value,
-              })
-            }
-            placeholder="e.g., acceptEdits"
-            disabled={readOnly}
-          />
-          <p className="form-help">
-            Initial permission mode (e.g., &quot;acceptEdits&quot;, &quot;bypassPermissions&quot;)
-          </p>
-        </div>
-
-        <div className="form-group">
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={permissions.disableBypassPermissionsMode || false}
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="additionalDirectories">Additional Directories</Label>
+            <Textarea
+              id="additionalDirectories"
+              value={(permissions.additionalDirectories || []).join('\n')}
               onChange={e =>
                 updatePermissions({
                   ...permissions,
-                  disableBypassPermissionsMode: e.target.checked,
+                  additionalDirectories: e.target.value.split('\n').filter(d => d.trim()),
                 })
               }
+              placeholder="/path/to/directory&#10;/another/path"
+              rows={3}
               disabled={readOnly}
             />
-            <span>Disable bypass permissions mode</span>
-          </label>
-          <p className="form-help">Prevent the --dangerously-skip-permissions flag from working</p>
+            <p className="text-sm text-neutral-600">
+              Extra working directories accessible to Claude (one per line)
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="defaultMode">Default Permission Mode</Label>
+            <Input
+              id="defaultMode"
+              type="text"
+              value={permissions.defaultMode || ''}
+              onChange={e =>
+                updatePermissions({
+                  ...permissions,
+                  defaultMode: e.target.value,
+                })
+              }
+              placeholder="e.g., acceptEdits"
+              disabled={readOnly}
+            />
+            <p className="text-sm text-neutral-600">
+              Initial permission mode (e.g., &quot;acceptEdits&quot;, &quot;bypassPermissions&quot;)
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="disableBypassPermissionsMode"
+                checked={permissions.disableBypassPermissionsMode || false}
+                onCheckedChange={checked =>
+                  updatePermissions({
+                    ...permissions,
+                    disableBypassPermissionsMode: checked as boolean,
+                  })
+                }
+                disabled={readOnly}
+              />
+              <Label
+                htmlFor="disableBypassPermissionsMode"
+                className="text-sm font-normal cursor-pointer"
+              >
+                Disable bypass permissions mode
+              </Label>
+            </div>
+            <p className="text-sm text-neutral-600 ml-6">
+              Prevent the --dangerously-skip-permissions flag from working
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Modals */}
-      {showRuleEditor && (
-        <RuleEditorModal
-          {...(editingRule ? { rule: editingRule } : {})}
-          onSave={handleSaveRule}
-          onCancel={() => setShowRuleEditor(false)}
-        />
-      )}
+      <RuleEditorModal
+        {...(editingRule ? { rule: editingRule } : {})}
+        onSave={handleSaveRule}
+        onCancel={() => setShowRuleEditor(false)}
+        open={showRuleEditor}
+      />
 
-      {showTemplates && (
-        <RuleTemplatesModal
-          onApply={handleApplyTemplate}
-          onCancel={() => setShowTemplates(false)}
-        />
-      )}
+      <RuleTemplatesModal
+        onApply={handleApplyTemplate}
+        onCancel={() => setShowTemplates(false)}
+        open={showTemplates}
+      />
     </div>
   );
 };
