@@ -160,9 +160,6 @@ export const AboutPage: React.FC = () => {
               <strong>Commands</strong> - Custom slash commands editor
             </li>
             <li>
-              <strong>MCP Servers</strong> - Model Context Protocol server configuration
-            </li>
-            <li>
               <strong>Test Runner</strong> - Built-in test execution interface
             </li>
           </ul>
