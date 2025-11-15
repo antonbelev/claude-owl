@@ -130,7 +130,7 @@ export const SkillsManager: React.FC = () => {
             <FileCode className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">No Skills Yet</h3>
             <p className="text-neutral-600 mb-6">
-              Create your first skill to extend Claude Code's capabilities!
+              Create your first skill to extend Claude Code&apos;s capabilities!
             </p>
             <Button onClick={handleCreateSkill} size="lg">
               Create Your First Skill
@@ -377,7 +377,7 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
                 <AlertDescription className="text-amber-900">
                   <strong>Warnings:</strong>
                   {validationWarnings.map((warning, i) => (
-                    <div key={i}>" {warning}</div>
+                    <div key={i}>• {warning}</div>
                   ))}
                 </AlertDescription>
               </Alert>
