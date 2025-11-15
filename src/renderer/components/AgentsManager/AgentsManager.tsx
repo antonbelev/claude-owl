@@ -14,6 +14,15 @@ import {
 import { Button } from '@/renderer/components/ui/button';
 import { Badge } from '@/renderer/components/ui/badge';
 import { Input } from '@/renderer/components/ui/input';
+import { Textarea } from '@/renderer/components/ui/textarea';
+import { Label } from '@/renderer/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/renderer/components/ui/select';
 import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
 import { EmptyState } from '../common/EmptyState';
 
@@ -416,114 +425,124 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
         </div>
 
         <div className="modal-body">
-          {validationError && <div className="validation-error">{validationError}</div>}
+          {validationError && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{validationError}</AlertDescription>
+            </Alert>
+          )}
 
-          <div className="form-group">
-            <label htmlFor="agent-name">
-              Name <span className="required">*</span>
-            </label>
-            <input
-              id="agent-name"
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder="my-custom-agent"
-              disabled={isEditing} // Can't change name when editing
-              className="input-field"
-            />
-            <p className="field-help">Lowercase with hyphens only</p>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="agent-description">
-              Description <span className="required">*</span>
-            </label>
-            <textarea
-              id="agent-description"
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              placeholder="What does this agent do?"
-              rows={3}
-              className="input-field"
-            />
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="agent-location">
-                Location <span className="required">*</span>
-              </label>
-              <select
-                id="agent-location"
-                value={location}
-                onChange={e => setLocation(e.target.value as 'user' | 'project')}
-                disabled={isEditing} // Can't change location when editing
-                className="input-field"
-              >
-                <option value="user">User (~/.claude/agents/)</option>
-                <option value="project">Project (.claude/agents/)</option>
-              </select>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="agent-name">
+                Name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="agent-name"
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder="my-custom-agent"
+                disabled={isEditing}
+              />
+              <p className="text-xs text-muted-foreground">Lowercase with hyphens only</p>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="agent-model">Model</label>
-              <select
-                id="agent-model"
-                value={model}
-                onChange={e =>
-                  setModel(e.target.value as 'sonnet' | 'opus' | 'haiku' | 'inherit' | '')
-                }
-                className="input-field"
-              >
-                <option value="">Default</option>
-                <option value="sonnet">Sonnet</option>
-                <option value="opus">Opus</option>
-                <option value="haiku">Haiku</option>
-                <option value="inherit">Inherit</option>
-              </select>
+            <div className="space-y-2">
+              <Label htmlFor="agent-description">
+                Description <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                id="agent-description"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                placeholder="What does this agent do?"
+                rows={3}
+              />
             </div>
-          </div>
 
-          <div className="form-group">
-            <label htmlFor="agent-tools">Tools (optional)</label>
-            <input
-              id="agent-tools"
-              type="text"
-              value={tools}
-              onChange={e => setTools(e.target.value)}
-              placeholder="Read, Write, Bash (comma-separated)"
-              className="input-field"
-            />
-            <p className="field-help">
-              Comma-separated tool names. Leave empty to allow all tools.
-            </p>
-          </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="agent-location">
+                  Location <span className="text-destructive">*</span>
+                </Label>
+                <Select
+                  value={location}
+                  onValueChange={value => setLocation(value as 'user' | 'project')}
+                  disabled={isEditing}
+                >
+                  <SelectTrigger id="agent-location">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="user">User (~/.claude/agents/)</SelectItem>
+                    <SelectItem value="project">Project (.claude/agents/)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="form-group">
-            <label htmlFor="agent-content">
-              System Prompt <span className="required">*</span>
-            </label>
-            <textarea
-              id="agent-content"
-              value={content}
-              onChange={e => setContent(e.target.value)}
-              placeholder="Enter the system prompt for this agent..."
-              rows={12}
-              className="input-field code-input"
-            />
-            <p className="field-help">
-              The more specific and detailed your prompt, the better the agent will perform.
-            </p>
+              <div className="space-y-2">
+                <Label htmlFor="agent-model">Model</Label>
+                <Select
+                  value={model}
+                  onValueChange={value =>
+                    setModel(value as 'sonnet' | 'opus' | 'haiku' | 'inherit' | '')
+                  }
+                >
+                  <SelectTrigger id="agent-model">
+                    <SelectValue placeholder="Default" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Default</SelectItem>
+                    <SelectItem value="sonnet">Sonnet</SelectItem>
+                    <SelectItem value="opus">Opus</SelectItem>
+                    <SelectItem value="haiku">Haiku</SelectItem>
+                    <SelectItem value="inherit">Inherit</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="agent-tools">Tools (optional)</Label>
+              <Input
+                id="agent-tools"
+                type="text"
+                value={tools}
+                onChange={e => setTools(e.target.value)}
+                placeholder="Read, Write, Bash (comma-separated)"
+              />
+              <p className="text-xs text-muted-foreground">
+                Comma-separated tool names. Leave empty to allow all tools.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="agent-content">
+                System Prompt <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                id="agent-content"
+                value={content}
+                onChange={e => setContent(e.target.value)}
+                placeholder="Enter the system prompt for this agent..."
+                rows={12}
+                className="font-mono"
+              />
+              <p className="text-xs text-muted-foreground">
+                The more specific and detailed your prompt, the better the agent will perform.
+              </p>
+            </div>
           </div>
         </div>
 
         <div className="modal-footer">
-          <button onClick={onClose} className="btn-secondary" disabled={saving}>
+          <Button onClick={onClose} variant="outline" disabled={saving}>
             Cancel
-          </button>
-          <button onClick={handleSave} className="btn-primary" disabled={saving}>
+          </Button>
+          <Button onClick={handleSave} variant="default" disabled={saving}>
             {saving ? 'Saving...' : isEditing ? 'Save Changes' : 'Create Subagent'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -629,12 +648,12 @@ const AgentDetailModal: React.FC<AgentDetailModalProps> = ({
 
         {canEdit && (
           <div className="modal-footer">
-            <button onClick={handleDelete} className="btn-danger">
+            <Button onClick={handleDelete} variant="destructive">
               Delete Subagent
-            </button>
-            <button onClick={handleEdit} className="btn-primary">
+            </Button>
+            <Button onClick={handleEdit} variant="default">
               Edit Subagent
-            </button>
+            </Button>
           </div>
         )}
       </div>
