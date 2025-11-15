@@ -29,10 +29,10 @@ describe('ClaudeStatusCard', () => {
     render(<ClaudeStatusCard />);
 
     await waitFor(() => {
-      expect(screen.getByText('✓ Claude Code is installed')).toBeInTheDocument();
+      expect(screen.getByText('Installed')).toBeInTheDocument();
     });
 
-    expect(screen.getByTestId('version-info')).toHaveTextContent('Version: 1.0.0');
+    expect(screen.getByTestId('version-info')).toHaveTextContent('1.0.0');
     expect(screen.getByTestId('path-info')).toHaveTextContent('/usr/local/bin/claude');
     expect(screen.getByTestId('refresh-button')).toBeInTheDocument();
   });
@@ -66,7 +66,7 @@ describe('ClaudeStatusCard', () => {
     render(<ClaudeStatusCard />);
 
     await waitFor(() => {
-      expect(screen.getByText('Error: Network error')).toBeInTheDocument();
+      expect(screen.getByText('Network error')).toBeInTheDocument();
     });
 
     expect(screen.getByTestId('retry-button')).toBeInTheDocument();
