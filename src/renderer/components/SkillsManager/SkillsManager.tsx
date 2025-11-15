@@ -183,11 +183,7 @@ interface SkillCardProps {
 
 const SkillCard: React.FC<SkillCardProps> = ({ skill, onView }) => {
   const locationVariant =
-    skill.location === 'user'
-      ? 'default'
-      : skill.location === 'project'
-        ? 'secondary'
-        : 'outline';
+    skill.location === 'user' ? 'default' : skill.location === 'project' ? 'secondary' : 'outline';
 
   return (
     <Card
@@ -462,7 +458,9 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
                 required
                 data-testid="skill-content-input"
               />
-              <p className="text-sm text-neutral-600">Markdown content with detailed instructions</p>
+              <p className="text-sm text-neutral-600">
+                Markdown content with detailed instructions
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -475,9 +473,7 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="user">User (~/.claude/skills/) - Personal skills</SelectItem>
-                  <SelectItem value="project">
-                    Project (.claude/skills/) - Team skills
-                  </SelectItem>
+                  <SelectItem value="project">Project (.claude/skills/) - Team skills</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -555,11 +551,7 @@ interface SkillDetailModalProps {
 
 const SkillDetailModal: React.FC<SkillDetailModalProps> = ({ skill, onClose, onDelete }) => {
   const locationVariant =
-    skill.location === 'user'
-      ? 'default'
-      : skill.location === 'project'
-        ? 'secondary'
-        : 'outline';
+    skill.location === 'user' ? 'default' : skill.location === 'project' ? 'secondary' : 'outline';
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -655,7 +647,11 @@ const SkillDetailModal: React.FC<SkillDetailModalProps> = ({ skill, onClose, onD
               Delete Skill
             </Button>
           )}
-          <Button onClick={onClose} variant="secondary" className={skill.location === 'plugin' ? 'ml-auto' : ''}>
+          <Button
+            onClick={onClose}
+            variant="secondary"
+            className={skill.location === 'plugin' ? 'ml-auto' : ''}
+          >
             Close
           </Button>
         </div>

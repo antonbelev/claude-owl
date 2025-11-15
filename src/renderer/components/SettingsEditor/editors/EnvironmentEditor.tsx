@@ -58,7 +58,8 @@ export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
       <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
         <p className="text-sm text-neutral-700">
           Environment variables are available to Claude and can be used to configure models, API
-          keys, and other settings. Common variables include <code className="bg-white px-1 py-0.5 rounded text-sm">ANTHROPIC_API_KEY</code>,{' '}
+          keys, and other settings. Common variables include{' '}
+          <code className="bg-white px-1 py-0.5 rounded text-sm">ANTHROPIC_API_KEY</code>,{' '}
           <code className="bg-white px-1 py-0.5 rounded text-sm">ANTHROPIC_MODEL</code>, etc.
         </p>
       </div>
@@ -71,7 +72,10 @@ export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
         ) : (
           <div className="space-y-2">
             {entries.map(([key, value]) => (
-              <div key={key} className="flex items-center gap-2 bg-neutral-50 border border-neutral-200 rounded-md p-3">
+              <div
+                key={key}
+                className="flex items-center gap-2 bg-neutral-50 border border-neutral-200 rounded-md p-3"
+              >
                 <div className="min-w-0 flex-shrink-0 w-48">
                   <code className="text-sm font-semibold text-neutral-900">{key}</code>
                 </div>
@@ -97,11 +101,7 @@ export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
                     className="h-8 w-8 p-0"
                     title={showValues[key] ? 'Hide value' : 'Show value'}
                   >
-                    {showValues[key] ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    {showValues[key] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                   {!readOnly && (
                     <Button
@@ -169,70 +169,93 @@ export const EnvironmentEditor: React.FC<EnvironmentEditorProps> = ({
         <h3 className="text-lg font-semibold">Common Environment Variables</h3>
         <div className="space-y-3">
           <details className="bg-neutral-50 border border-neutral-200 rounded-md p-4">
-            <summary className="cursor-pointer font-semibold text-neutral-900">Authentication</summary>
+            <summary className="cursor-pointer font-semibold text-neutral-900">
+              Authentication
+            </summary>
             <ul className="mt-3 space-y-2 text-sm">
               <li>
-                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_API_KEY</code> - Your Anthropic API key
+                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_API_KEY</code> - Your
+                Anthropic API key
               </li>
               <li>
-                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_AUTH_TOKEN</code> - Authentication token
+                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_AUTH_TOKEN</code> -
+                Authentication token
               </li>
               <li>
-                <code className="bg-white px-1 py-0.5 rounded">AWS_BEARER_TOKEN_BEDROCK</code> - AWS Bedrock bearer token
+                <code className="bg-white px-1 py-0.5 rounded">AWS_BEARER_TOKEN_BEDROCK</code> - AWS
+                Bedrock bearer token
               </li>
             </ul>
           </details>
 
           <details className="bg-neutral-50 border border-neutral-200 rounded-md p-4">
-            <summary className="cursor-pointer font-semibold text-neutral-900">Model Configuration</summary>
+            <summary className="cursor-pointer font-semibold text-neutral-900">
+              Model Configuration
+            </summary>
             <ul className="mt-3 space-y-2 text-sm">
               <li>
-                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_MODEL</code> - Override default model
+                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_MODEL</code> - Override
+                default model
               </li>
               <li>
-                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_DEFAULT_HAIKU_MODEL</code> - Default Haiku model
+                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_DEFAULT_HAIKU_MODEL</code>{' '}
+                - Default Haiku model
               </li>
               <li>
-                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_DEFAULT_OPUS_MODEL</code> - Default Opus model
+                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_DEFAULT_OPUS_MODEL</code> -
+                Default Opus model
               </li>
               <li>
-                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_DEFAULT_SONNET_MODEL</code> - Default Sonnet model
+                <code className="bg-white px-1 py-0.5 rounded">ANTHROPIC_DEFAULT_SONNET_MODEL</code>{' '}
+                - Default Sonnet model
               </li>
               <li>
-                <code className="bg-white px-1 py-0.5 rounded">MAX_THINKING_TOKENS</code> - Enable extended thinking
+                <code className="bg-white px-1 py-0.5 rounded">MAX_THINKING_TOKENS</code> - Enable
+                extended thinking
               </li>
             </ul>
           </details>
 
           <details className="bg-neutral-50 border border-neutral-200 rounded-md p-4">
-            <summary className="cursor-pointer font-semibold text-neutral-900">Bash Execution</summary>
+            <summary className="cursor-pointer font-semibold text-neutral-900">
+              Bash Execution
+            </summary>
             <ul className="mt-3 space-y-2 text-sm">
               <li>
-                <code className="bg-white px-1 py-0.5 rounded">BASH_DEFAULT_TIMEOUT_MS</code> - Default timeout for bash commands
+                <code className="bg-white px-1 py-0.5 rounded">BASH_DEFAULT_TIMEOUT_MS</code> -
+                Default timeout for bash commands
               </li>
               <li>
-                <code className="bg-white px-1 py-0.5 rounded">BASH_MAX_OUTPUT_LENGTH</code> - Maximum output length
+                <code className="bg-white px-1 py-0.5 rounded">BASH_MAX_OUTPUT_LENGTH</code> -
+                Maximum output length
               </li>
               <li>
-                <code className="bg-white px-1 py-0.5 rounded">BASH_MAX_TIMEOUT_MS</code> - Maximum allowed timeout
+                <code className="bg-white px-1 py-0.5 rounded">BASH_MAX_TIMEOUT_MS</code> - Maximum
+                allowed timeout
               </li>
             </ul>
           </details>
 
           <details className="bg-neutral-50 border border-neutral-200 rounded-md p-4">
-            <summary className="cursor-pointer font-semibold text-neutral-900">Feature Toggles</summary>
+            <summary className="cursor-pointer font-semibold text-neutral-900">
+              Feature Toggles
+            </summary>
             <ul className="mt-3 space-y-2 text-sm">
               <li>
-                <code className="bg-white px-1 py-0.5 rounded">DISABLE_TELEMETRY</code> - Disable telemetry
+                <code className="bg-white px-1 py-0.5 rounded">DISABLE_TELEMETRY</code> - Disable
+                telemetry
               </li>
               <li>
-                <code className="bg-white px-1 py-0.5 rounded">DISABLE_ERROR_REPORTING</code> - Disable error reporting
+                <code className="bg-white px-1 py-0.5 rounded">DISABLE_ERROR_REPORTING</code> -
+                Disable error reporting
               </li>
               <li>
-                <code className="bg-white px-1 py-0.5 rounded">DISABLE_AUTOUPDATER</code> - Disable automatic updates
+                <code className="bg-white px-1 py-0.5 rounded">DISABLE_AUTOUPDATER</code> - Disable
+                automatic updates
               </li>
               <li>
-                <code className="bg-white px-1 py-0.5 rounded">DISABLE_COST_WARNINGS</code> - Disable cost warnings
+                <code className="bg-white px-1 py-0.5 rounded">DISABLE_COST_WARNINGS</code> -
+                Disable cost warnings
               </li>
             </ul>
           </details>

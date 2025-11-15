@@ -11,6 +11,8 @@
  * - ipc.skills.types - Skills
  * - ipc.plugins.types - Plugins and marketplaces
  * - ipc.hooks.types - Hooks
+ * - ipc.mcp.types - MCP server management
+ * - ipc.projects.types - Project discovery
  * - ipc.system.types - System, CLI, and CCUsage
  * - ipc.status.types - Service status and debug logs
  */
@@ -141,6 +143,20 @@ export type {
   GetMCPServerRequest,
   GetMCPServerResponse,
 } from './ipc.mcp.types';
+
+// Re-export project discovery types
+export type {
+  GetProjectsRequest,
+  GetProjectsResponse,
+  GetProjectInfoRequest,
+  GetProjectInfoResponse,
+  GetProjectMCPServersRequest,
+  GetProjectMCPServersResponse,
+  CheckClaudeConfigRequest,
+  CheckClaudeConfigResponse,
+  ReadClaudeConfigRequest,
+  ReadClaudeConfigResponse,
+} from './ipc.projects.types';
 
 // Re-export system types
 export type {

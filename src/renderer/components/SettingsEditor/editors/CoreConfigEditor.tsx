@@ -148,7 +148,9 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
             min={1}
             disabled={readOnly}
           />
-          <p className="text-sm text-neutral-600">Chat transcript retention period (default: 30 days)</p>
+          <p className="text-sm text-neutral-600">
+            Chat transcript retention period (default: 30 days)
+          </p>
         </div>
 
         <div className="space-y-2">
@@ -174,10 +176,7 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
             onCheckedChange={checked => updateSettings({ includeCoAuthoredBy: checked as boolean })}
             disabled={readOnly}
           />
-          <Label
-            htmlFor="includeCoAuthoredBy"
-            className="text-sm font-normal cursor-pointer"
-          >
+          <Label htmlFor="includeCoAuthoredBy" className="text-sm font-normal cursor-pointer">
             Include Claude co-authored attribution in commits
           </Label>
         </div>

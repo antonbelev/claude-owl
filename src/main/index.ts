@@ -13,6 +13,7 @@ import { registerMCPHandlers } from './ipc/mcpHandlers';
 import { registerStatusHandlers } from './ipc/statusHandlers';
 import { registerDebugLogsHandlers } from './ipc/debugLogsHandlers';
 import { registerGitHubImportHandlers } from './ipc/githubImportHandlers';
+import { registerProjectsHandlers } from './ipc/projectsHandlers';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -129,6 +130,7 @@ app.whenReady().then(() => {
   registerStatusHandlers();
   registerDebugLogsHandlers();
   registerGitHubImportHandlers();
+  registerProjectsHandlers();
 
   createWindow();
 

@@ -59,7 +59,11 @@ export function HooksPage() {
           </AlertDescription>
         </Alert>
       ) : (
-        <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as 'hooks' | 'templates')} className="flex-1">
+        <Tabs
+          value={activeTab}
+          onValueChange={val => setActiveTab(val as 'hooks' | 'templates')}
+          className="flex-1"
+        >
           <TabsList className="mb-4">
             <TabsTrigger value="hooks" className="relative">
               Configured Hooks

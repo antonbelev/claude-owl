@@ -92,6 +92,15 @@ const GITHUB_CHANNELS = {
   IMPORT_GITHUB_COMMANDS: 'github:import-commands',
 } as const;
 
+// Define project discovery channel strings directly to avoid tree-shaking
+const PROJECTS_CHANNELS = {
+  GET_PROJECTS: 'projects:get-all',
+  GET_PROJECT_INFO: 'projects:get-info',
+  GET_PROJECT_MCP_SERVERS: 'projects:get-mcp-servers',
+  CHECK_CLAUDE_CONFIG: 'projects:check-config',
+  READ_CLAUDE_CONFIG: 'projects:read-config',
+} as const;
+
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -205,6 +214,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   deleteDebugLog: (args: unknown) => ipcRenderer.invoke(LOGS_CHANNELS.DELETE_DEBUG_LOG, args),
   searchDebugLogs: (args: unknown) => ipcRenderer.invoke(LOGS_CHANNELS.SEARCH_DEBUG_LOGS, args),
 
+  // Project Discovery
+  getProjects: () => ipcRenderer.invoke(PROJECTS_CHANNELS.GET_PROJECTS),
+  getProjectInfo: (args: unknown) => ipcRenderer.invoke(PROJECTS_CHANNELS.GET_PROJECT_INFO, args),
+  getProjectMCPServers: (args: unknown) =>
+    ipcRenderer.invoke(PROJECTS_CHANNELS.GET_PROJECT_MCP_SERVERS, args),
+  checkClaudeConfig: () => ipcRenderer.invoke(PROJECTS_CHANNELS.CHECK_CLAUDE_CONFIG),
+  readClaudeConfig: () => ipcRenderer.invoke(PROJECTS_CHANNELS.READ_CLAUDE_CONFIG),
+
   // Claude CLI
   executeCLI: (args: unknown) => ipcRenderer.invoke(IPC_CHANNELS.EXECUTE_CLI, args),
   stopCLI: (args: unknown) => ipcRenderer.invoke(IPC_CHANNELS.STOP_CLI, args),
@@ -306,4 +323,9 @@ export interface ElectronAPI {
   getDebugLog: (args: unknown) => Promise<unknown>;
   deleteDebugLog: (args: unknown) => Promise<unknown>;
   searchDebugLogs: (args: unknown) => Promise<unknown>;
+  getProjects: () => Promise<unknown>;
+  getProjectInfo: (args: unknown) => Promise<unknown>;
+  getProjectMCPServers: (args: unknown) => Promise<unknown>;
+  checkClaudeConfig: () => Promise<unknown>;
+  readClaudeConfig: () => Promise<unknown>;
 }

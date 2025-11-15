@@ -128,15 +128,8 @@ export const RuleTester: React.FC = () => {
       </div>
 
       {result && (
-        <Alert
-          variant={result.matches ? 'default' : 'destructive'}
-          className="mt-4"
-        >
-          {result.matches ? (
-            <CheckCircle2 className="h-4 w-4" />
-          ) : (
-            <XCircle className="h-4 w-4" />
-          )}
+        <Alert variant={result.matches ? 'default' : 'destructive'} className="mt-4">
+          {result.matches ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
           <AlertDescription>
             <div className="space-y-3">
               <div className="flex items-center gap-2">
@@ -156,7 +149,8 @@ export const RuleTester: React.FC = () => {
                   {pattern && `(${pattern})`} - {level}
                 </p>
                 <p>
-                  <strong>Test Input:</strong> <code className="bg-white px-1 py-0.5 rounded">{testInput}</code>
+                  <strong>Test Input:</strong>{' '}
+                  <code className="bg-white px-1 py-0.5 rounded">{testInput}</code>
                 </p>
               </div>
             </div>

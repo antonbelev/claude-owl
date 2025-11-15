@@ -11,7 +11,13 @@ import {
 } from '@/renderer/components/ui/dialog';
 import { Button } from '@/renderer/components/ui/button';
 import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/renderer/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/renderer/components/ui/card';
 import { Badge } from '@/renderer/components/ui/badge';
 import { Loader2 } from 'lucide-react';
 
@@ -21,7 +27,9 @@ interface RuleTemplatesModalProps {
   open: boolean;
 }
 
-const getCategoryVariant = (category: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
+const getCategoryVariant = (
+  category: string
+): 'default' | 'secondary' | 'destructive' | 'outline' => {
   switch (category) {
     case 'security':
       return 'destructive';
@@ -34,7 +42,11 @@ const getCategoryVariant = (category: string): 'default' | 'secondary' | 'destru
   }
 };
 
-export const RuleTemplatesModal: React.FC<RuleTemplatesModalProps> = ({ onApply, onCancel, open }) => {
+export const RuleTemplatesModal: React.FC<RuleTemplatesModalProps> = ({
+  onApply,
+  onCancel,
+  open,
+}) => {
   const { templates, loadingTemplates, error, loadTemplates, applyTemplate } = usePermissionRules();
 
   useEffect(() => {

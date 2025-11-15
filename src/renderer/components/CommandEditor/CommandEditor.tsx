@@ -146,8 +146,14 @@ export function CommandEditor({ command, onSave, onCancel, isLoading }: CommandE
   const totalSteps = 2;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onCancel}>
-      <div className="flex flex-col bg-white rounded-lg shadow-2xl w-full max-w-5xl max-h-[90vh] m-4" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={onCancel}
+    >
+      <div
+        className="flex flex-col bg-white rounded-lg shadow-2xl w-full max-w-5xl max-h-[90vh] m-4"
+        onClick={e => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between p-6 border-b border-neutral-200">
           <h2 className="text-xl font-semibold">{displayTitle}</h2>
           <div className="flex items-center gap-4">

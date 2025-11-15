@@ -8,4 +8,5 @@ export * from './agent.types';
 export * from './hook.types';
 export * from './plugin.types';
 export * from './permissions.types';
+export * from './project.types';
 export * from './ipc.types';

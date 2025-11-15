@@ -5,7 +5,13 @@ import { Textarea } from '@/renderer/components/ui/textarea';
 import { Label } from '@/renderer/components/ui/label';
 import { Button } from '@/renderer/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/renderer/components/ui/radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/renderer/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/renderer/components/ui/select';
 import { Checkbox } from '@/renderer/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
 import { AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react';
@@ -105,7 +111,8 @@ export function CommandConfigForm({
             />
           </div>
           <p className="text-sm text-gray-500">
-            Use lowercase letters, numbers, and hyphens (e.g., <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">review-pr</code>)
+            Use lowercase letters, numbers, and hyphens (e.g.,{' '}
+            <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">review-pr</code>)
           </p>
         </div>
 
@@ -121,7 +128,8 @@ export function CommandConfigForm({
             rows={3}
           />
           <p className="text-sm text-gray-500">
-            This is shown in Claude Code when users type <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">/{name || 'command'}</code>
+            This is shown in Claude Code when users type{' '}
+            <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">/{name || 'command'}</code>
           </p>
         </div>
 
@@ -134,7 +142,9 @@ export function CommandConfigForm({
             onChange={e => onArgumentHintChange(e.target.value)}
             placeholder="[branch-name] [message]"
           />
-          <p className="text-sm text-gray-500">Optional hint showing what arguments the command expects</p>
+          <p className="text-sm text-gray-500">
+            Optional hint showing what arguments the command expects
+          </p>
         </div>
       </div>
 
@@ -144,7 +154,10 @@ export function CommandConfigForm({
 
         <div className="space-y-2">
           <Label>Location</Label>
-          <RadioGroup value={location} onValueChange={(v: string) => onLocationChange(v as 'user' | 'project')}>
+          <RadioGroup
+            value={location}
+            onValueChange={(v: string) => onLocationChange(v as 'user' | 'project')}
+          >
             <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-50 transition-colors">
               <RadioGroupItem value="user" id="location-user" />
               <Label htmlFor="location-user" className="cursor-pointer font-normal flex-1">
@@ -173,8 +186,13 @@ export function CommandConfigForm({
             placeholder="workflows, tools, git"
           />
           <p className="text-sm text-gray-500">
-            Organize commands in subdirectories (e.g., <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">workflows/feature-dev</code> →{' '}
-            <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">/workflows:feature-dev</code>)
+            Organize commands in subdirectories (e.g.,{' '}
+            <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">workflows/feature-dev</code>{' '}
+            →{' '}
+            <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">
+              /workflows:feature-dev
+            </code>
+            )
           </p>
         </div>
       </div>
@@ -184,7 +202,8 @@ export function CommandConfigForm({
         <h3 className="text-lg font-semibold text-gray-900">Allowed Tools</h3>
         <CommandToolSelector selectedTools={allowedTools} onChange={onToolsChange} />
         <p className="text-sm text-gray-500">
-          Select which Claude Code tools this command is allowed to use. The more specific, the safer.
+          Select which Claude Code tools this command is allowed to use. The more specific, the
+          safer.
         </p>
       </div>
 
@@ -197,10 +216,30 @@ export function CommandConfigForm({
             <div className="text-sm space-y-1">
               <div className="font-semibold mb-2">Syntax Guide:</div>
               <div className="space-y-1">
-                <div><code className="bg-gray-100 px-2 py-0.5 rounded text-xs font-mono">$ARGUMENTS</code> - All arguments as one string</div>
-                <div><code className="bg-gray-100 px-2 py-0.5 rounded text-xs font-mono">$1, $2, $3, ...</code> - Individual arguments</div>
-                <div><code className="bg-gray-100 px-2 py-0.5 rounded text-xs font-mono">!`git status`</code> - Execute bash command</div>
-                <div><code className="bg-gray-100 px-2 py-0.5 rounded text-xs font-mono">@src/main.ts</code> - Include file contents</div>
+                <div>
+                  <code className="bg-gray-100 px-2 py-0.5 rounded text-xs font-mono">
+                    $ARGUMENTS
+                  </code>{' '}
+                  - All arguments as one string
+                </div>
+                <div>
+                  <code className="bg-gray-100 px-2 py-0.5 rounded text-xs font-mono">
+                    $1, $2, $3, ...
+                  </code>{' '}
+                  - Individual arguments
+                </div>
+                <div>
+                  <code className="bg-gray-100 px-2 py-0.5 rounded text-xs font-mono">
+                    !`git status`
+                  </code>{' '}
+                  - Execute bash command
+                </div>
+                <div>
+                  <code className="bg-gray-100 px-2 py-0.5 rounded text-xs font-mono">
+                    @src/main.ts
+                  </code>{' '}
+                  - Include file contents
+                </div>
               </div>
             </div>
           </AlertDescription>
@@ -274,7 +313,11 @@ export function CommandConfigForm({
           onClick={() => setShowAdvanced(!showAdvanced)}
           className="justify-start text-left font-medium"
         >
-          {showAdvanced ? <ChevronDown className="h-4 w-4 mr-2" /> : <ChevronRight className="h-4 w-4 mr-2" />}
+          {showAdvanced ? (
+            <ChevronDown className="h-4 w-4 mr-2" />
+          ) : (
+            <ChevronRight className="h-4 w-4 mr-2" />
+          )}
           Advanced Options
         </Button>
 
@@ -294,7 +337,8 @@ export function CommandConfigForm({
                 </SelectContent>
               </Select>
               <p className="text-sm text-gray-500">
-                Specify which Claude model should run this command. Defaults to user&apos;s current model.
+                Specify which Claude model should run this command. Defaults to user&apos;s current
+                model.
               </p>
             </div>
 
@@ -309,7 +353,8 @@ export function CommandConfigForm({
               </Label>
             </div>
             <p className="text-sm text-gray-500 ml-6">
-              If checked, Claude cannot invoke this command programmatically. Users must type it manually.
+              If checked, Claude cannot invoke this command programmatically. Users must type it
+              manually.
             </p>
           </div>
         )}

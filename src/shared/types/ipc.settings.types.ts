@@ -18,6 +18,7 @@ import type {
 
 export interface GetSettingsRequest {
   level: 'user' | 'project' | 'local' | 'managed';
+  projectPath?: string; // Required when level is 'project' or 'local'
 }
 
 export interface GetSettingsResponse
@@ -31,6 +32,7 @@ export interface GetSettingsResponse
 export interface SaveSettingsRequest {
   level: 'user' | 'project' | 'local';
   settings: ClaudeSettings;
+  projectPath?: string; // Required when level is 'project' or 'local'
 }
 
 export interface SaveSettingsResponse extends IPCResponse {}
@@ -50,6 +52,7 @@ export interface GetEffectiveSettingsResponse extends IPCResponse<EffectiveConfi
 
 export interface SettingsFileExistsRequest {
   level: 'user' | 'project' | 'local' | 'managed';
+  projectPath?: string; // Required when level is 'project' or 'local'
 }
 
 export interface SettingsFileExistsResponse
@@ -59,12 +62,14 @@ export interface SettingsFileExistsResponse
 
 export interface EnsureSettingsFileRequest {
   level: 'user' | 'project' | 'local';
+  projectPath?: string; // Required when level is 'project' or 'local'
 }
 
 export interface EnsureSettingsFileResponse extends IPCResponse {}
 
 export interface DeleteSettingsRequest {
   level: 'user' | 'project' | 'local';
+  projectPath?: string; // Required when level is 'project' or 'local'
 }
 
 export interface DeleteSettingsResponse extends IPCResponse {}
@@ -134,6 +139,7 @@ export interface ApplyTemplateResponse extends IPCResponse<{ rules: PermissionRu
 
 export interface CreateBackupRequest {
   level: 'user' | 'project' | 'local';
+  projectPath?: string; // Required when level is 'project' or 'local'
 }
 
 export interface CreateBackupResponse extends IPCResponse<{ backupPath: string }> {}
@@ -141,6 +147,7 @@ export interface CreateBackupResponse extends IPCResponse<{ backupPath: string }
 export interface RestoreBackupRequest {
   backupPath: string;
   level: 'user' | 'project' | 'local';
+  projectPath?: string; // Required when level is 'project' or 'local'
 }
 
 export interface RestoreBackupResponse extends IPCResponse {}

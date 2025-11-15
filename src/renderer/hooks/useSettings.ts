@@ -320,7 +320,7 @@ export function useSettings() {
  * Hook for managing settings at a specific level
  * Useful for editing settings at a specific level (user, project, or local)
  */
-export function useLevelSettings(level: ConfigLevel) {
+export function useLevelSettings(level: ConfigLevel, projectPath?: string) {
   const [settings, setSettings] = useState<ClaudeSettings>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -341,7 +341,10 @@ export function useLevelSettings(level: ConfigLevel) {
     }
 
     try {
-      const response = (await window.electronAPI.getSettings({ level })) as GetSettingsResponse;
+      const response = (await window.electronAPI.getSettings({
+        level,
+        projectPath
+      })) as GetSettingsResponse;
 
       if (response.success && response.data) {
         const loadedSettings = response.data.content;
@@ -356,7 +359,7 @@ export function useLevelSettings(level: ConfigLevel) {
     } finally {
       setLoading(false);
     }
-  }, [level]);
+  }, [level, projectPath]);
 
   /**
    * Update settings (in memory only)
@@ -390,6 +393,7 @@ export function useLevelSettings(level: ConfigLevel) {
       const response = (await window.electronAPI.saveSettings({
         level,
         settings,
+        projectPath,
       })) as SaveSettingsResponse;
 
       if (response.success) {
@@ -404,7 +408,7 @@ export function useLevelSettings(level: ConfigLevel) {
       setError(err instanceof Error ? err.message : 'Failed to save settings');
       return false;
     }
-  }, [level, settings]);
+  }, [level, settings, projectPath]);
 
   /**
    * Discard changes and revert to original settings

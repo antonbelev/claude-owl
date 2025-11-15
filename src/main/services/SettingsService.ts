@@ -14,28 +14,33 @@ import type {
  * Service for managing Claude Code settings
  * Handles reading, writing, merging, and validating settings from all levels:
  * - User: ~/.claude/settings.json
- * - Project: .claude/settings.json
- * - Local: .claude/settings.local.json
+ * - Project: {PROJECT}/.claude/settings.json
+ * - Local: {PROJECT}/.claude/settings.local.json
  * - Managed: Platform-specific managed settings
+ *
+ * IMPORTANT: For project-level settings, you MUST provide an explicit projectPath.
+ * Do NOT rely on process.cwd() as Claude Owl is a standalone app.
  */
 export class SettingsService {
   private userSettingsPath: string;
-  private projectSettingsPath: string;
-  private localSettingsPath: string;
+  private projectPath: string | null;
   private managedSettingsPath: string;
 
-  constructor(projectDir?: string) {
-    const projectRoot = projectDir || process.cwd();
-
-    // User-level settings
+  constructor(projectPath?: string) {
+    // User-level settings (always available)
     this.userSettingsPath = path.join(homedir(), '.claude', 'settings.json');
 
-    // Project-level settings
-    this.projectSettingsPath = path.join(projectRoot, '.claude', 'settings.json');
-    this.localSettingsPath = path.join(projectRoot, '.claude', 'settings.local.json');
+    // Project path (null means user-level only)
+    this.projectPath = projectPath || null;
 
     // Managed settings (platform-specific)
     this.managedSettingsPath = this.getManagedSettingsPath();
+
+    console.log('[SettingsService] Initialized:', {
+      userSettingsPath: this.userSettingsPath,
+      projectPath: this.projectPath,
+      managedSettingsPath: this.managedSettingsPath,
+    });
   }
 
   /**
@@ -58,15 +63,28 @@ export class SettingsService {
 
   /**
    * Get the path for a specific settings level
+   * @throws Error if trying to access project/local level without projectPath
    */
   getSettingsPath(level: ConfigLevel): string {
     switch (level) {
       case 'user':
         return this.userSettingsPath;
       case 'project':
-        return this.projectSettingsPath;
+        if (!this.projectPath) {
+          throw new Error(
+            'Cannot access project-level settings without projectPath. ' +
+              'Create a new SettingsService instance with projectPath parameter.'
+          );
+        }
+        return path.join(this.projectPath, '.claude', 'settings.json');
       case 'local':
-        return this.localSettingsPath;
+        if (!this.projectPath) {
+          throw new Error(
+            'Cannot access local settings without projectPath. ' +
+              'Create a new SettingsService instance with projectPath parameter.'
+          );
+        }
+        return path.join(this.projectPath, '.claude', 'settings.local.json');
       case 'managed':
         return this.managedSettingsPath;
       default:

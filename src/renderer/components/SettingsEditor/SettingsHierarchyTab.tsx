@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { useLevelSettings } from '../../hooks/useSettings';
+import { useProjectContext } from '../../contexts/ProjectContext';
 import type { ConfigLevel } from '@/shared/types';
 import { EnhancedPermissionsEditor } from './editors/PermissionsEditor/EnhancedPermissionsEditor';
 import { EnvironmentEditor } from './editors/EnvironmentEditor';
@@ -24,8 +25,10 @@ type EditorSection =
   | 'raw';
 
 export const SettingsHierarchyTab: React.FC<SettingsHierarchyTabProps> = ({ level }) => {
+  const { selectedProject } = useProjectContext();
+  const projectPath = level === 'project' || level === 'local' ? selectedProject?.path : undefined;
   const { settings, loading, error, hasChanges, updateSettings, save, discard, validate } =
-    useLevelSettings(level);
+    useLevelSettings(level, projectPath);
   const [activeSection, setActiveSection] = useState<EditorSection>('core');
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);

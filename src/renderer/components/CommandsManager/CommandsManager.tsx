@@ -272,50 +272,50 @@ export const CommandsManager: React.FC = () => {
         <CommandEditor
           command={editingCommand || undefined}
           onSave={async commandData => {
-              if (editingCommand) {
-                // Update existing command
-                const updateOptions: {
-                  filePath: string;
-                  frontmatter: any;
-                  content: string;
-                  namespace?: string;
-                } = {
-                  filePath: editingCommand.filePath,
-                  frontmatter: commandData.frontmatter,
-                  content: commandData.content,
-                };
-                if (commandData.namespace) {
-                  updateOptions.namespace = commandData.namespace;
-                }
-                const result = await updateCommand(updateOptions);
-                if (result.success) {
-                  handleCloseModal();
-                }
-              } else {
-                // Create new command
-                const createOptions: {
-                  name: string;
-                  location: 'user' | 'project';
-                  namespace?: string;
-                  frontmatter: any;
-                  content: string;
-                } = {
-                  name: commandData.name,
-                  location: commandData.location,
-                  frontmatter: commandData.frontmatter,
-                  content: commandData.content,
-                };
-                if (commandData.namespace) {
-                  createOptions.namespace = commandData.namespace;
-                }
-                const result = await createCommand(createOptions);
-                if (result.success) {
-                  handleCloseModal();
-                }
+            if (editingCommand) {
+              // Update existing command
+              const updateOptions: {
+                filePath: string;
+                frontmatter: any;
+                content: string;
+                namespace?: string;
+              } = {
+                filePath: editingCommand.filePath,
+                frontmatter: commandData.frontmatter,
+                content: commandData.content,
+              };
+              if (commandData.namespace) {
+                updateOptions.namespace = commandData.namespace;
               }
-            }}
-            onCancel={handleCloseModal}
-          />
+              const result = await updateCommand(updateOptions);
+              if (result.success) {
+                handleCloseModal();
+              }
+            } else {
+              // Create new command
+              const createOptions: {
+                name: string;
+                location: 'user' | 'project';
+                namespace?: string;
+                frontmatter: any;
+                content: string;
+              } = {
+                name: commandData.name,
+                location: commandData.location,
+                frontmatter: commandData.frontmatter,
+                content: commandData.content,
+              };
+              if (commandData.namespace) {
+                createOptions.namespace = commandData.namespace;
+              }
+              const result = await createCommand(createOptions);
+              if (result.success) {
+                handleCloseModal();
+              }
+            }
+          }}
+          onCancel={handleCloseModal}
+        />
       )}
 
       {selectedCommand && (

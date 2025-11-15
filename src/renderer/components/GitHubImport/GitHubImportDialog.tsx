@@ -349,7 +349,8 @@ export function GitHubImportDialog({ onClose, onImportComplete }: GitHubImportDi
             <Alert variant="default">
               <Info className="h-4 w-4" />
               <AlertDescription className="text-sm">
-                Supports repo root, folders, and single files. Custom branches detected automatically.
+                Supports repo root, folders, and single files. Custom branches detected
+                automatically.
               </AlertDescription>
             </Alert>
           </div>
@@ -358,10 +359,7 @@ export function GitHubImportDialog({ onClose, onImportComplete }: GitHubImportDi
             <Button variant="outline" onClick={onClose} disabled={isValidating}>
               Cancel
             </Button>
-            <Button
-              onClick={handleBrowseRepository}
-              disabled={isValidating || !repoUrl.trim()}
-            >
+            <Button onClick={handleBrowseRepository} disabled={isValidating || !repoUrl.trim()}>
               {isValidating ? 'Loading...' : 'Browse Repository'}
             </Button>
           </div>
