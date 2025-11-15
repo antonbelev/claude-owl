@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { PermissionRule, ToolType, PermissionLevel } from '@/shared/types';
 import { TOOL_PATTERN_HELP, TOOLS_WITHOUT_PATTERNS } from '@/shared/types/permissions.types';
 import { usePermissionRules } from '../../../../hooks/usePermissionRules';

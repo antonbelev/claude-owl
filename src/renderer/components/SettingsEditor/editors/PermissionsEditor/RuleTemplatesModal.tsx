@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import type { PermissionRule } from '@/shared/types';
 import { usePermissionRules } from '../../../../hooks/usePermissionRules';
 import {
