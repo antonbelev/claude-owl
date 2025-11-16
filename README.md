@@ -24,19 +24,9 @@ Claude Owl is a desktop application for managing [Claude Code](https://code.clau
 
 ## Current Features (Beta)
 
-Currently available and functional:
-
-- **Dashboard** - Check your Claude Code installation status at a glance
-- **Settings Editor** - Visual configuration of environment variables, permissions rules, and core settings
-- **Subagents Manager** - Create, edit, and delete custom agents with system prompts and tool restrictions
-- **Skills Manager** - Browse and manage available agent skills
-- **Plugins Manager** - Browse and manage installed plugins
-- **Debug Logs** - View detailed debug logs from Claude Code operations
-- **Hooks Manager** - View, validate, and test hooks with security insights
+For a complete list of features, see [SCREENSHOTS.md](SCREENSHOTS.md) and [CHANGELOG.md](CHANGELOG.md).
 
 ![Claude Owl Dashboard](screenshots/claude-owl-dashboard.png)
-
-**[View all feature screenshots →](SCREENSHOTS.md)**
 
 ## Installation
 
@@ -53,7 +43,7 @@ Claude Owl is currently in Beta and available for development/testing:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/claude-owl.git
+git clone https://github.com/antonbelev/claude-owl.git
 cd claude-owl
 
 # Install dependencies
@@ -78,24 +68,9 @@ Pre-built binaries for macOS are coming soon.
 - [Contributing Guide](CONTRIBUTING.md) - How to contribute
 - [Code of Conduct](CODE_OF_CONDUCT.md) - Community guidelines
 - [Development Notes](CLAUDE.md) - Development commands and project structure
+- [CHANGELOG.md](CHANGELOG.md) - List of changes and updates
 
-## Development
-
-### Project Structure
-
-```
-claude-owl/
-├── src/
-│   ├── main/           # Electron main process (Node.js)
-│   ├── renderer/       # React frontend UI
-│   ├── preload/        # Preload scripts (IPC bridge)
-│   └── shared/         # Shared code (types, utils)
-├── tests/              # Test files
-├── docs/               # Documentation
-└── public/             # Static assets
-```
-
-### Tech Stack
+## Tech Stack
 
 - **Desktop Framework**: Electron
 - **Frontend**: React 18 + TypeScript
@@ -103,10 +78,6 @@ claude-owl/
 - **State Management**: Zustand
 - **Styling**: Tailwind CSS + shadcn/ui
 - **Testing**: Vitest + React Testing Library
-
-### Development Scripts
-
-See [CLAUDE.md](CLAUDE.md) for the complete list of development commands.
 
 ## Contributing
 
@@ -126,51 +97,6 @@ npm install
 npm run dev:electron
 ```
 
-## Development Status
-
-Currently in **Beta** with core features available on macOS.
-
-**Completed:**
-- ✅ Foundation and project setup
-- ✅ Claude Code detection
-- ✅ Subagents manager (create, edit, delete)
-- ✅ Skills and plugins manager
-- ✅ Settings editor with permissions rules
-- ✅ Debug logs viewer
-- ✅ Hooks manager (read-only with templates and validation)
-
-**Next:**
-- Commands manager
-- MCP servers manager
-- Windows/Linux support
-
-## Architecture
-
-Claude Owl uses a layered architecture:
-
-```
-┌─────────────────────────────────────────┐
-│         React Frontend (Renderer)       │
-│  Components • State • UI Logic          │
-└─────────────────────────────────────────┘
-                    ↕ IPC
-┌─────────────────────────────────────────┐
-│      Electron Main Process (Backend)    │
-│  Services • File Operations • CLI       │
-└─────────────────────────────────────────┘
-                    ↕
-┌─────────────────────────────────────────┐
-│         Claude Code CLI & Configs       │
-│  ~/.claude/ • .claude/ • claude CLI     │
-└─────────────────────────────────────────┘
-```
-
-See [architecture.md](docs/architecture.md) for detailed diagrams and design decisions.
-
-## Screenshots
-
-See [SCREENSHOTS.md](SCREENSHOTS.md) for feature screenshots and UI walkthroughs.
-
 ## FAQ
 
 ### Does Claude Owl replace Claude Code?
@@ -180,10 +106,6 @@ No, Claude Owl is a UI companion for Claude Code. It manages configurations visu
 ### Is my data safe?
 
 Yes! Claude Owl is completely local-first. All configurations and data stay on your machine. No data is sent to external servers, and no telemetry is collected.
-
-### Can I use Claude Owl with my team?
-
-Yes! Project-level configurations (`.claude/`) can be committed to git and shared with your team. Team features are planned for future releases.
 
 ### What platforms are currently supported?
 
@@ -198,12 +120,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 ## License
 
 Claude Owl is open-source software licensed under the [MIT License](LICENSE).
-
-## Acknowledgments
-
-- Built for the [Claude Code](https://code.claude.com) community
-- Inspired by the need for better developer tools
-- Special thanks to all contributors
 
 ## Support
 
