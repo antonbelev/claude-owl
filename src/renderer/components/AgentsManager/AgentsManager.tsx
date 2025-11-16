@@ -33,6 +33,9 @@ export const AgentsManager: React.FC = () => {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [locationFilter, setLocationFilter] = useState<'all' | 'user' | 'project' | 'plugin'>(
+    'all'
+  );
   const [deleteConfirm, setDeleteConfirm] = useState<Agent | null>(null);
 
   const handleCreateAgent = () => {
@@ -79,19 +82,28 @@ export const AgentsManager: React.FC = () => {
     setDeleteConfirm(null);
   };
 
-  // Filter agents based on search query
+  // Filter agents based on search query and location filter
   const filteredAgents = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return agents;
+    let filtered = agents;
+
+    // Apply location filter
+    if (locationFilter !== 'all') {
+      filtered = filtered.filter(agent => agent.location === locationFilter);
     }
 
-    const query = searchQuery.toLowerCase();
-    return agents.filter(
-      agent =>
-        agent.frontmatter.name.toLowerCase().includes(query) ||
-        agent.frontmatter.description.toLowerCase().includes(query)
-    );
-  }, [agents, searchQuery]);
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        agent =>
+          agent.frontmatter.name.toLowerCase().includes(query) ||
+          agent.frontmatter.description.toLowerCase().includes(query) ||
+          agent.content.toLowerCase().includes(query)
+      );
+    }
+
+    return filtered;
+  }, [agents, searchQuery, locationFilter]);
 
   if (loading) {
     return (
@@ -145,30 +157,57 @@ export const AgentsManager: React.FC = () => {
       />
 
       {agents.length > 0 && (
-        <div className="relative mb-6">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
-          <Input
-            type="text"
-            placeholder="Search agents by name or description..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="pl-10 pr-10"
-          />
-          {searchQuery && (
-            <Button
-              onClick={() => setSearchQuery('')}
-              variant="ghost"
-              size="sm"
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0"
-              title="Clear search"
+        <div className="flex flex-col sm:flex-row gap-4 mt-8">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Search subagents by name, description, or content..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="pl-10 pr-10"
+            />
+            {searchQuery && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
+                title="Clear search"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="location-filter" className="shrink-0">
+              Location:
+            </Label>
+            <Select
+              value={locationFilter}
+              onValueChange={v => setLocationFilter(v as 'all' | 'user' | 'project' | 'plugin')}
             >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
+              <SelectTrigger id="location-filter" className="w-[200px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All ({agents.length})</SelectItem>
+                <SelectItem value="user">
+                  User ({agents.filter(a => a.location === 'user').length})
+                </SelectItem>
+                <SelectItem value="project">
+                  Project ({agents.filter(a => a.location === 'project').length})
+                </SelectItem>
+                <SelectItem value="plugin">
+                  Plugin ({agents.filter(a => a.location === 'plugin').length})
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       )}
 
-      <div className="flex-1">
+      <div className="flex-1 mt-8">
         {agents.length === 0 ? (
           <EmptyState
             icon={Bot}
@@ -180,15 +219,23 @@ export const AgentsManager: React.FC = () => {
             }}
           />
         ) : filteredAgents.length === 0 ? (
-          <EmptyState
-            icon={Search}
-            title="No Agents Found"
-            description={`No agents match your search query "${searchQuery}"`}
-            action={{
-              label: 'Clear Search',
-              onClick: () => setSearchQuery(''),
-            }}
-          />
+          <div className="text-center py-16">
+            <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">No Subagents Found</h3>
+            <p className="text-gray-600 mb-6">
+              No subagents match your search criteria
+              {searchQuery && ` "${searchQuery}"`}
+              {locationFilter !== 'all' && ` in ${locationFilter} location`}
+            </p>
+            <Button
+              onClick={() => {
+                setSearchQuery('');
+                setLocationFilter('all');
+              }}
+            >
+              Clear Filters
+            </Button>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredAgents.map(agent => (

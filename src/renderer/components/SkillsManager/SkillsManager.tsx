@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSkills } from '../../hooks/useSkills';
 import type { Skill, ProjectInfo } from '@/shared/types';
 import { parseMarkdownWithFrontmatter, validateSkillMarkdown } from '@/shared/utils/markdown.utils';
@@ -11,6 +11,13 @@ import { Badge } from '@/renderer/components/ui/badge';
 import { Input } from '@/renderer/components/ui/input';
 import { Textarea } from '@/renderer/components/ui/textarea';
 import { Label } from '@/renderer/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/renderer/components/ui/select';
 import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
 import {
   FileCode,
@@ -22,6 +29,7 @@ import {
   Trash2,
   Clock,
   Plus,
+  Search,
 } from 'lucide-react';
 
 export const SkillsManager: React.FC = () => {
@@ -29,6 +37,10 @@ export const SkillsManager: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<Skill | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [locationFilter, setLocationFilter] = useState<'all' | 'user' | 'project' | 'plugin'>(
+    'all'
+  );
 
   const handleCreateSkill = () => {
     setShowCreateModal(true);
@@ -66,6 +78,29 @@ export const SkillsManager: React.FC = () => {
     }
     setDeleteConfirm(null);
   };
+
+  // Filter skills based on search query and location filter
+  const filteredSkills = useMemo(() => {
+    let filtered = skills;
+
+    // Apply location filter
+    if (locationFilter !== 'all') {
+      filtered = filtered.filter(skill => skill.location === locationFilter);
+    }
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        skill =>
+          skill.frontmatter.name.toLowerCase().includes(query) ||
+          skill.frontmatter.description.toLowerCase().includes(query) ||
+          skill.content.toLowerCase().includes(query)
+      );
+    }
+
+    return filtered;
+  }, [skills, searchQuery, locationFilter]);
 
   if (loading) {
     return (
@@ -119,6 +154,57 @@ export const SkillsManager: React.FC = () => {
         ]}
       />
 
+      {skills.length > 0 && (
+        <div className="flex flex-col sm:flex-row gap-4 mt-8">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Search skills by name, description, or content..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="pl-10 pr-10"
+            />
+            {searchQuery && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
+                title="Clear search"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="location-filter" className="shrink-0">
+              Location:
+            </Label>
+            <Select
+              value={locationFilter}
+              onValueChange={v => setLocationFilter(v as 'all' | 'user' | 'project' | 'plugin')}
+            >
+              <SelectTrigger id="location-filter" className="w-[200px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All ({skills.length})</SelectItem>
+                <SelectItem value="user">
+                  User ({skills.filter(s => s.location === 'user').length})
+                </SelectItem>
+                <SelectItem value="project">
+                  Project ({skills.filter(s => s.location === 'project').length})
+                </SelectItem>
+                <SelectItem value="plugin">
+                  Plugin ({skills.filter(s => s.location === 'plugin').length})
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
       <div className="flex-1 mt-8">
         {skills.length === 0 ? (
           <div className="text-center py-16">
@@ -131,9 +217,27 @@ export const SkillsManager: React.FC = () => {
               Create Your First Skill
             </Button>
           </div>
+        ) : filteredSkills.length === 0 ? (
+          <div className="text-center py-16">
+            <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">No Skills Found</h3>
+            <p className="text-gray-600 mb-6">
+              No skills match your search criteria
+              {searchQuery && ` "${searchQuery}"`}
+              {locationFilter !== 'all' && ` in ${locationFilter} location`}
+            </p>
+            <Button
+              onClick={() => {
+                setSearchQuery('');
+                setLocationFilter('all');
+              }}
+            >
+              Clear Filters
+            </Button>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {skills.map(skill => (
+            {filteredSkills.map(skill => (
               <SkillCard
                 key={`${skill.location}-${skill.frontmatter.name}`}
                 skill={skill}
