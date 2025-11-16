@@ -13,14 +13,7 @@
 
 ## What is Claude Owl?
 
-Claude Owl is a desktop application for managing [Claude Code](https://code.claude.com) configurations through an intuitive visual interface. Instead of manually editing JSON and YAML configuration files in your text editor, Claude Owl provides:
-
-- **Visual Settings Editor** - Configure environment variables, permissions, and core settings
-- **Subagents Manager** - Create, edit, and manage custom agents with system prompts and tool access
-- **Skills & Plugins Manager** - Browse and manage your agent skills and plugins
-- **Debug Logs Viewer** - View detailed logs from Claude Code operations
-- **Hooks Manager** - View and validate your configured hooks with security insights
-- **Local-First** - All configurations stay on your machine with no external data collection
+Claude Owl is a desktop application for managing [Claude Code](https://code.claude.com) configurations through an intuitive visual interface. Instead of manually editing JSON and YAML configuration files in your text editor or through the Claude Code CLI.
 
 ## Current Features (Beta)
 
