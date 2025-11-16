@@ -315,11 +315,11 @@ export const EnhancedPermissionsEditor: React.FC<EnhancedPermissionsEditorProps>
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="disableBypassPermissionsMode"
-                checked={permissions.disableBypassPermissionsMode || false}
+                checked={permissions.disableBypassPermissionsMode === 'disable'}
                 onCheckedChange={checked =>
                   updatePermissions({
                     ...permissions,
-                    disableBypassPermissionsMode: checked as boolean,
+                    disableBypassPermissionsMode: checked ? 'disable' : undefined,
                   })
                 }
                 disabled={readOnly}

@@ -71,7 +71,7 @@ export interface PermissionsConfig {
   ask?: string[];
   additionalDirectories?: string[];
   defaultMode?: string;
-  disableBypassPermissionsMode?: boolean;
+  disableBypassPermissionsMode?: 'disable';
 }
 
 /**
