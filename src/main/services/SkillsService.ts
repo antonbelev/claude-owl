@@ -126,8 +126,8 @@ export class SkillsService {
   /**
    * List all skills from a specific location
    */
-  async listSkills(location: 'user' | 'project'): Promise<Skill[]> {
-    const skillsPath = this.getSkillsPath(location);
+  async listSkills(location: 'user' | 'project', projectPath?: string): Promise<Skill[]> {
+    const skillsPath = this.getSkillsPath(location, projectPath);
 
     try {
       // Check if directory exists
@@ -161,6 +161,7 @@ export class SkillsService {
             filePath: skillPath,
             location,
             lastModified: stat.mtime,
+            ...(location === 'project' && projectPath && { projectPath }),
           };
 
           if (supportingFiles.length > 0) {
@@ -193,8 +194,8 @@ export class SkillsService {
   /**
    * Get a specific skill by name and location
    */
-  async getSkill(name: string, location: 'user' | 'project'): Promise<Skill> {
-    const skillsPath = this.getSkillsPath(location);
+  async getSkill(name: string, location: 'user' | 'project', projectPath?: string): Promise<Skill> {
+    const skillsPath = this.getSkillsPath(location, projectPath);
     const skillPath = path.join(skillsPath, name, 'SKILL.md');
 
     try {
@@ -213,6 +214,7 @@ export class SkillsService {
         filePath: skillPath,
         location,
         lastModified: stat.mtime,
+        ...(location === 'project' && projectPath && { projectPath }),
       };
 
       if (supportingFiles.length > 0) {
@@ -286,14 +288,14 @@ export class SkillsService {
     await fs.writeFile(skillFilePath, fileContent, 'utf-8');
 
     // Return the created skill
-    return this.getSkill(name, location);
+    return this.getSkill(name, location, projectPath);
   }
 
   /**
    * Delete a skill
    */
-  async deleteSkill(name: string, location: 'user' | 'project'): Promise<void> {
-    const skillsPath = this.getSkillsPath(location);
+  async deleteSkill(name: string, location: 'user' | 'project', projectPath?: string): Promise<void> {
+    const skillsPath = this.getSkillsPath(location, projectPath);
     const skillDirPath = path.join(skillsPath, name);
 
     try {

@@ -58,7 +58,8 @@ export const SkillsManager: React.FC = () => {
 
     const success = await deleteSkill(
       deleteConfirm.frontmatter.name,
-      deleteConfirm.location as 'user' | 'project'
+      deleteConfirm.location as 'user' | 'project',
+      deleteConfirm.projectPath
     );
     if (success) {
       setSelectedSkill(null);

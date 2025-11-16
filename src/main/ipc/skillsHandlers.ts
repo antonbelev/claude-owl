@@ -38,7 +38,7 @@ export function registerSkillsHandlers() {
     IPC_CHANNELS.GET_SKILL,
     async (_event, request: GetSkillRequest): Promise<GetSkillResponse> => {
       try {
-        const skill = await skillsService.getSkill(request.name, request.location);
+        const skill = await skillsService.getSkill(request.name, request.location, request.projectPath);
         return {
           success: true,
           data: skill,
@@ -100,7 +100,7 @@ export function registerSkillsHandlers() {
     IPC_CHANNELS.DELETE_SKILL,
     async (_event, request: DeleteSkillRequest): Promise<DeleteSkillResponse> => {
       try {
-        await skillsService.deleteSkill(request.name, request.location);
+        await skillsService.deleteSkill(request.name, request.location, request.projectPath);
         return {
           success: true,
         };

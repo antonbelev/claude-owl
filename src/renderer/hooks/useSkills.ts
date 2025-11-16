@@ -19,7 +19,7 @@ export interface UseSkillsResult {
     allowedTools?: string[],
     projectPath?: string
   ) => Promise<boolean>;
-  deleteSkill: (name: string, location: 'user' | 'project') => Promise<boolean>;
+  deleteSkill: (name: string, location: 'user' | 'project', projectPath?: string) => Promise<boolean>;
 }
 
 /**
@@ -98,7 +98,7 @@ export function useSkills(): UseSkillsResult {
   );
 
   const deleteSkill = useCallback(
-    async (name: string, location: 'user' | 'project'): Promise<boolean> => {
+    async (name: string, location: 'user' | 'project', projectPath?: string): Promise<boolean> => {
       if (!window.electronAPI) {
         setError('Not running in Electron');
         return false;
@@ -108,6 +108,7 @@ export function useSkills(): UseSkillsResult {
         const response = (await window.electronAPI.deleteSkill({
           name,
           location,
+          ...(projectPath ? { projectPath } : {}),
         })) as DeleteSkillResponse;
 
         if (response.success) {
