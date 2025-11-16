@@ -221,6 +221,57 @@ export const StatusLineManager: React.FC = () => {
         </p>
       </div>
 
+      {/* Community Projects */}
+      <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm">
+        <div className="flex items-start gap-2 mb-2">
+          <svg
+            className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <div className="flex-1">
+            <p className="font-semibold text-amber-900 mb-1">Community Projects</p>
+            <p className="text-amber-800 mb-3">
+              The following open-source projects provide additional statusline implementations. Use
+              at your own discretion - review the code before installing:
+            </p>
+            <ul className="space-y-2 text-amber-800">
+              <li>
+                <a
+                  href="https://github.com/sirmalloc/ccstatusline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-amber-900 font-mono text-xs"
+                >
+                  github.com/sirmalloc/ccstatusline
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/rz1989s/claude-code-statusline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-amber-900 font-mono text-xs"
+                >
+                  github.com/rz1989s/claude-code-statusline
+                </a>
+              </li>
+            </ul>
+            <p className="text-xs text-amber-700 mt-3">
+              ⚠️ Always review third-party scripts before executing them on your system.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Success Modal */}
       {showSuccessModal && appliedScriptInfo && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
