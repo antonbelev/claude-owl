@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useStatusLine } from '../../hooks/useStatusLine';
+import { useSettings } from '../../hooks/useSettings';
 import type { StatusLineTemplate } from '@/shared/types/statusline.types';
 
 export const StatusLineManager: React.FC = () => {
   const { activeConfig, templates, loading, error, setTemplate, preview, disable } =
     useStatusLine();
+  const { effectiveConfig } = useSettings();
 
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [previewOutput, setPreviewOutput] = useState<string>('');
@@ -82,6 +84,41 @@ export const StatusLineManager: React.FC = () => {
           Customize your Claude Code terminal footer with pre-built templates or custom scripts.
         </p>
       </div>
+
+      {/* Warning Banner - Hooks Disabled */}
+      {effectiveConfig?.config.disableAllHooks && (
+        <div className="mb-6 p-4 bg-red-50 border-2 border-red-400 rounded-lg">
+          <div className="flex items-start gap-3">
+            <svg
+              className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <div className="flex-1">
+              <h3 className="font-semibold text-red-900 mb-1 text-lg">
+                Status Lines Won't Work - Hooks Are Disabled
+              </h3>
+              <p className="text-red-800 mb-3">
+                Your settings have <strong>"disableAllHooks"</strong> enabled. This prevents status
+                lines from displaying because they rely on hooks to show session information.
+              </p>
+              <p className="text-red-800">
+                To enable status lines: Go to{' '}
+                <strong>Settings → User Settings → Core Config → MCP Server Management</strong> and
+                uncheck "Disable all hooks".
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Active Configuration */}
       {activeConfig && activeConfig.command && (

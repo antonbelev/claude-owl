@@ -11,6 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/renderer/components/ui/select';
+import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
 
 interface CoreConfigEditorProps {
   settings: ClaudeSettings;
@@ -222,6 +224,17 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
           <p className="text-sm text-neutral-600 ml-6">
             Prevent all pre/post tool execution hooks from running
           </p>
+
+          {settings.disableAllHooks && (
+            <Alert variant="destructive" className="ml-6 mt-2">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Warning:</strong> Disabling all hooks will prevent your status line from
+                working. Status lines rely on hooks to display session information. If you want to
+                use status lines, keep hooks enabled.
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
       </div>
     </div>
