@@ -21,8 +21,17 @@ export class AgentsService {
   /**
    * Get the path for a specific location
    */
-  private getAgentsPath(location: 'user' | 'project'): string {
-    return location === 'user' ? this.userAgentsPath : this.projectAgentsPath;
+  private getAgentsPath(location: 'user' | 'project', projectPath?: string): string {
+    if (location === 'user') {
+      return this.userAgentsPath;
+    }
+
+    if (projectPath) {
+      return path.join(projectPath, '.claude', 'agents');
+    }
+
+    // Fallback to process.cwd() for backwards compatibility
+    return this.projectAgentsPath;
   }
 
   /**
@@ -208,11 +217,16 @@ export class AgentsService {
    * Create or update an agent
    */
   async saveAgent(agent: Omit<Agent, 'lastModified'>): Promise<Agent> {
-    const { frontmatter, content, location } = agent;
+    const { frontmatter, content, location, projectPath } = agent;
 
     // Plugin agents cannot be saved
     if (location === 'plugin') {
       throw new Error('Cannot save plugin agents');
+    }
+
+    // Validate projectPath for project-level agents
+    if (location === 'project' && !projectPath) {
+      throw new Error('projectPath is required when location is "project"');
     }
 
     // Validate agent name
@@ -228,8 +242,15 @@ export class AgentsService {
       throw new Error('Invalid description: must be 1024 characters or less');
     }
 
-    const agentsPath = this.getAgentsPath(location);
+    const agentsPath = this.getAgentsPath(location, projectPath);
     const agentFilePath = path.join(agentsPath, `${frontmatter.name}.md`);
+
+    console.log('[AgentsService] Saving agent:', {
+      name: frontmatter.name,
+      location,
+      projectPath,
+      agentsPath,
+    });
 
     // Create agents directory if it doesn't exist
     await fs.mkdir(agentsPath, { recursive: true });

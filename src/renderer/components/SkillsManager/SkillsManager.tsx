@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSkills } from '../../hooks/useSkills';
-import type { Skill } from '@/shared/types';
+import type { Skill, ProjectInfo } from '@/shared/types';
 import { parseMarkdownWithFrontmatter, validateSkillMarkdown } from '@/shared/utils/markdown.utils';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { PageHeader } from '../common/PageHeader';
+import { ScopeSelector } from '../common/ScopeSelector';
 import { Card, CardContent, CardHeader } from '@/renderer/components/ui/card';
 import { Button } from '@/renderer/components/ui/button';
 import { Badge } from '@/renderer/components/ui/badge';
@@ -230,7 +231,8 @@ interface SkillCreateModalProps {
     description: string,
     content: string,
     location: 'user' | 'project',
-    allowedTools?: string[]
+    allowedTools?: string[],
+    projectPath?: string
   ) => Promise<boolean>;
 }
 
@@ -239,6 +241,7 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
   const [description, setDescription] = useState('');
   const [content, setContent] = useState('');
   const [location, setLocation] = useState<'user' | 'project'>('user');
+  const [selectedProject, setSelectedProject] = useState<ProjectInfo | null>(null);
   const [allowedTools, setAllowedTools] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -316,6 +319,13 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate project selection when location is 'project'
+    if (location === 'project' && !selectedProject) {
+      setError('Please select a project');
+      return;
+    }
+
     setCreating(true);
     setError(null);
 
@@ -326,7 +336,8 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
           .filter(t => t)
       : undefined;
 
-    const success = await onCreate(name, description, content, location, toolsArray);
+    const projectPath = location === 'project' ? selectedProject?.path : undefined;
+    const success = await onCreate(name, description, content, location, toolsArray, projectPath);
 
     if (success) {
       setHasUnsavedChanges(false);
@@ -463,20 +474,17 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
               </p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="skill-location">
-                Location <span className="text-red-500">*</span>
-              </Label>
-              <Select value={location} onValueChange={v => setLocation(v as 'user' | 'project')}>
-                <SelectTrigger id="skill-location" data-testid="skill-location-select">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="user">User (~/.claude/skills/) - Personal skills</SelectItem>
-                  <SelectItem value="project">Project (.claude/skills/) - Team skills</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <ScopeSelector
+              scope={location}
+              selectedProject={selectedProject}
+              onScopeChange={setLocation}
+              onProjectChange={setSelectedProject}
+              compact={true}
+              userLabel="User Skills"
+              projectLabel="Project Skills"
+              userDescription="Personal skills in ~/.claude/skills/"
+              projectDescription="Team skills in .claude/skills/"
+            />
 
             <div className="space-y-2">
               <Label htmlFor="skill-tools">Allowed Tools (optional)</Label>

@@ -25,6 +25,7 @@ export interface SaveSkillRequest {
     'allowed-tools'?: string[];
     content: string;
     location: 'user' | 'project';
+    projectPath?: string;
   };
 }
 

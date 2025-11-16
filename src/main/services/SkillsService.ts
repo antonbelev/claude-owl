@@ -21,8 +21,17 @@ export class SkillsService {
   /**
    * Get the path for a specific location
    */
-  private getSkillsPath(location: 'user' | 'project'): string {
-    return location === 'user' ? this.userSkillsPath : this.projectSkillsPath;
+  private getSkillsPath(location: 'user' | 'project', projectPath?: string): string {
+    if (location === 'user') {
+      return this.userSkillsPath;
+    }
+
+    if (projectPath) {
+      return path.join(projectPath, '.claude', 'skills');
+    }
+
+    // Fallback to process.cwd() for backwards compatibility
+    return this.projectSkillsPath;
   }
 
   /**
@@ -226,8 +235,14 @@ export class SkillsService {
     description: string,
     content: string,
     location: 'user' | 'project',
-    allowedTools?: string[]
+    allowedTools?: string[],
+    projectPath?: string
   ): Promise<Skill> {
+    // Validate projectPath for project-level skills
+    if (location === 'project' && !projectPath) {
+      throw new Error('projectPath is required when location is "project"');
+    }
+
     // Validate skill name
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(name)) {
       throw new Error('Invalid skill name: must be lowercase with hyphens only');
@@ -241,9 +256,16 @@ export class SkillsService {
       throw new Error('Invalid description: must be 1024 characters or less');
     }
 
-    const skillsPath = this.getSkillsPath(location);
+    const skillsPath = this.getSkillsPath(location, projectPath);
     const skillDirPath = path.join(skillsPath, name);
     const skillFilePath = path.join(skillDirPath, 'SKILL.md');
+
+    console.log('[SkillsService] Saving skill:', {
+      name,
+      location,
+      projectPath,
+      skillsPath,
+    });
 
     // Create skills directory if it doesn't exist
     await fs.mkdir(skillsPath, { recursive: true });

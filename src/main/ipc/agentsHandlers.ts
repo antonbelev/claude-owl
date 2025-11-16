@@ -56,12 +56,29 @@ export function registerAgentsHandlers() {
   ipcMain.handle(
     IPC_CHANNELS.SAVE_AGENT,
     async (_event, request: SaveAgentRequest): Promise<SaveAgentResponse> => {
+      console.log('[AgentsHandlers] Save agent request:', {
+        name: request.agent.frontmatter.name,
+        location: request.agent.location,
+        projectPath: request.agent.projectPath,
+      });
+
       try {
         await agentsService.saveAgent(request.agent);
+
+        console.log('[AgentsHandlers] Agent saved successfully:', {
+          name: request.agent.frontmatter.name,
+          location: request.agent.location,
+        });
+
         return {
           success: true,
         };
       } catch (error) {
+        console.error('[AgentsHandlers] Save agent error:', {
+          name: request.agent.frontmatter.name,
+          error: error instanceof Error ? error.message : String(error),
+        });
+
         return {
           success: false,
           error: error instanceof Error ? error.message : 'Failed to save agent',

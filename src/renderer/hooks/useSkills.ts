@@ -16,7 +16,8 @@ export interface UseSkillsResult {
     description: string,
     content: string,
     location: 'user' | 'project',
-    allowedTools?: string[]
+    allowedTools?: string[],
+    projectPath?: string
   ) => Promise<boolean>;
   deleteSkill: (name: string, location: 'user' | 'project') => Promise<boolean>;
 }
@@ -60,7 +61,8 @@ export function useSkills(): UseSkillsResult {
       description: string,
       content: string,
       location: 'user' | 'project',
-      allowedTools?: string[]
+      allowedTools?: string[],
+      projectPath?: string
     ): Promise<boolean> => {
       if (!window.electronAPI) {
         setError('Not running in Electron');
@@ -75,6 +77,7 @@ export function useSkills(): UseSkillsResult {
             'allowed-tools': allowedTools,
             content,
             location,
+            ...(projectPath ? { projectPath } : {}),
           },
         })) as SaveSkillResponse;
 

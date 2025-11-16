@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { Bot, Plus, Search, X, Edit2, Trash2, AlertCircle } from 'lucide-react';
 import { useAgents } from '../../hooks/useAgents';
-import type { Agent, AgentFrontmatter } from '@/shared/types';
+import type { Agent, AgentFrontmatter, ProjectInfo } from '@/shared/types';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { PageHeader } from '../common/PageHeader';
+import { ScopeSelector } from '../common/ScopeSelector';
 import {
   Card,
   CardHeader,
@@ -332,6 +333,7 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
   const [location, setLocation] = useState<'user' | 'project'>(
     (agent?.location as 'user' | 'project') || 'user'
   );
+  const [selectedProject, setSelectedProject] = useState<ProjectInfo | null>(null);
   const [model, setModel] = useState<'sonnet' | 'opus' | 'haiku' | 'inherit' | 'default'>(
     agent?.frontmatter.model || 'default'
   );
@@ -373,6 +375,12 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
       return;
     }
 
+    // Validate project selection when location is 'project'
+    if (location === 'project' && !selectedProject) {
+      setValidationError('Please select a project');
+      return;
+    }
+
     setSaving(true);
     setValidationError('');
 
@@ -397,6 +405,7 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
       content: content.trim(),
       filePath: agent?.filePath || '',
       location,
+      ...(location === 'project' && selectedProject?.path ? { projectPath: selectedProject.path } : {}),
     };
 
     const success = await onSave(agentData);
@@ -461,46 +470,38 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="agent-location">
-                  Location <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                  value={location}
-                  onValueChange={value => setLocation(value as 'user' | 'project')}
-                  disabled={isEditing}
-                >
-                  <SelectTrigger id="agent-location">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="z-[1100]">
-                    <SelectItem value="user">User (~/.claude/agents/)</SelectItem>
-                    <SelectItem value="project">Project (.claude/agents/)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <ScopeSelector
+              scope={location}
+              selectedProject={selectedProject}
+              onScopeChange={setLocation}
+              onProjectChange={setSelectedProject}
+              compact={true}
+              disabled={isEditing}
+              userLabel="User Subagents"
+              projectLabel="Project Subagents"
+              userDescription="Stored in ~/.claude/agents/"
+              projectDescription="Stored in .claude/agents/"
+            />
 
-              <div className="space-y-2">
-                <Label htmlFor="agent-model">Model</Label>
-                <Select
-                  value={model}
-                  onValueChange={value =>
-                    setModel(value as 'sonnet' | 'opus' | 'haiku' | 'inherit' | 'default')
-                  }
-                >
-                  <SelectTrigger id="agent-model">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="z-[1100]">
-                    <SelectItem value="default">Default</SelectItem>
-                    <SelectItem value="sonnet">Sonnet</SelectItem>
-                    <SelectItem value="opus">Opus</SelectItem>
-                    <SelectItem value="haiku">Haiku</SelectItem>
-                    <SelectItem value="inherit">Inherit</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="agent-model">Model</Label>
+              <Select
+                value={model}
+                onValueChange={value =>
+                  setModel(value as 'sonnet' | 'opus' | 'haiku' | 'inherit' | 'default')
+                }
+              >
+                <SelectTrigger id="agent-model">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="z-[1100]">
+                  <SelectItem value="default">Default</SelectItem>
+                  <SelectItem value="sonnet">Sonnet</SelectItem>
+                  <SelectItem value="opus">Opus</SelectItem>
+                  <SelectItem value="haiku">Haiku</SelectItem>
+                  <SelectItem value="inherit">Inherit</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
