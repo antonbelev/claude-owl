@@ -439,6 +439,105 @@ npm run build             # Build all
 npm run test:coverage     # Coverage report
 ```
 
+## Working with Scoped Features
+
+**⚠️ IMPORTANT:** When adding features that support both user-level and project-level configurations (e.g., MCP servers, slash commands, subagents, skills, hooks), you MUST use the unified project selection pattern defined in **[ADR-005: Project Selection UX](./docs/adr/adr-005-project-selection-ux.md)**.
+
+### Quick Reference
+
+```typescript
+import { ScopeSelector } from '@/renderer/components/common/ScopeSelector';
+import type { ProjectInfo } from '@/shared/types';
+
+// In your form component:
+const [scope, setScope] = useState<'user' | 'project'>('user');
+const [selectedProject, setSelectedProject] = useState<ProjectInfo | null>(null);
+
+// Add to form:
+<ScopeSelector
+  scope={scope}
+  selectedProject={selectedProject}
+  onScopeChange={setScope}
+  onProjectChange={setSelectedProject}
+  compact={true}
+/>
+
+// Validate before submission:
+if (scope === 'project' && !selectedProject) {
+  setError('Please select a project');
+  return;
+}
+
+// Include in IPC request:
+const request = {
+  // ... other fields
+  scope,
+  projectPath: scope === 'project' ? selectedProject?.path : undefined,
+};
+```
+
+### Backend Service Pattern
+
+```typescript
+import { validateScopedRequest } from '@/shared/utils/validation.utils';
+
+async addFeature(options: FeatureOptions): Promise<Result> {
+  console.log('[Service] Adding feature:', {
+    name: options.name,
+    scope: options.scope,
+    projectPath: options.projectPath,
+  });
+
+  // Validate project path when scope is 'project'
+  if (options.scope === 'project' && !options.projectPath) {
+    return {
+      success: false,
+      error: 'projectPath is required when scope is "project"',
+    };
+  }
+
+  // Execute CLI command with proper working directory
+  const cwd = options.scope === 'project' && options.projectPath
+    ? options.projectPath
+    : undefined;
+
+  const { stdout, stderr } = await execAsync(command, { cwd });
+  // ... handle result
+}
+```
+
+### Complete Implementation Checklist
+
+When adding a new scoped feature:
+
+1. **Update IPC Types** (`src/shared/types/ipc.*.types.ts`):
+   - Add `projectPath?: string` to request types
+
+2. **Frontend Component**:
+   - Import `ScopeSelector` component
+   - Add state: `scope` and `selectedProject`
+   - Add `<ScopeSelector>` to form
+   - Validate project selection before submit
+   - Include `projectPath` in IPC request
+
+3. **Backend Service**:
+   - Add validation for `projectPath` when scope is 'project'
+   - Use `projectPath` as `cwd` when executing CLI commands
+   - Add logging for debugging
+
+4. **IPC Handler**:
+   - Log `projectPath` in request
+   - Pass full request to service method
+
+5. **Tests**:
+   - Test both user and project scopes
+   - Test validation (error when project not selected)
+   - Test correct file path resolution
+
+### See Also
+- [ADR-005: Unified Project Selection UX](./docs/adr/adr-005-project-selection-ux.md) - Complete architecture
+- [Project Selection Implementation Guide](./docs/PROJECT_SELECTION_IMPLEMENTATION.md) - Detailed checklist
+
 ## Critical Design Constraint
 
 **⚠️ IMPORTANT: Claude Owl is a standalone desktop application, NOT a project-aware tool**

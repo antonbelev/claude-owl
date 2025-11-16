@@ -223,13 +223,29 @@ export class ClaudeService {
    * Add a new MCP server via `claude mcp add` command
    */
   async addMCPServer(options: MCPAddOptions): Promise<MCPCommandResult> {
-    console.log('[ClaudeService] Adding MCP server:', options.name);
+    console.log('[ClaudeService] Adding MCP server:', {
+      name: options.name,
+      scope: options.scope,
+      projectPath: options.projectPath,
+    });
+
+    // Validate project path if scope is 'project'
+    if (options.scope === 'project' && !options.projectPath) {
+      return {
+        success: false,
+        error: 'projectPath is required when scope is "project"',
+      };
+    }
 
     try {
       const command = this.buildMCPAddCommand(options);
-      console.log('[ClaudeService] Executing command:', command);
+      const cwd = options.scope === 'project' && options.projectPath
+        ? options.projectPath
+        : undefined;
 
-      const { stdout, stderr } = await execAsync(command);
+      console.log('[ClaudeService] Executing command:', command, { cwd });
+
+      const { stdout, stderr } = await execAsync(command, { cwd });
 
       // Parse output to determine success
       const output = stdout + stderr;
@@ -261,17 +277,27 @@ export class ClaudeService {
    * Note: We don't pass --scope because the CLI automatically finds the server
    * across all config files (.claude.json, .mcp.json, etc.)
    */
-  async removeMCPServer(name: string, scope: MCPScope): Promise<MCPCommandResult> {
-    console.log('[ClaudeService] Removing MCP server:', { name, scope });
+  async removeMCPServer(name: string, scope: MCPScope, projectPath?: string): Promise<MCPCommandResult> {
+    console.log('[ClaudeService] Removing MCP server:', { name, scope, projectPath });
+
+    // Validate project path if scope is 'project'
+    if (scope === 'project' && !projectPath) {
+      return {
+        success: false,
+        error: 'projectPath is required when scope is "project"',
+      };
+    }
 
     try {
       // Don't pass --scope - let the CLI find and remove the server automatically
       // This fixes the issue where --scope project looks in .mcp.json,
       // but project servers are actually in .claude.json under projects[path].mcpServers
       const command = `claude mcp remove ${this.escapeArg(name)}`;
-      console.log('[ClaudeService] Executing command:', command);
+      const cwd = scope === 'project' && projectPath ? projectPath : undefined;
 
-      const { stdout, stderr } = await execAsync(command);
+      console.log('[ClaudeService] Executing command:', command, { cwd });
+
+      const { stdout, stderr } = await execAsync(command, { cwd });
 
       const output = stdout + stderr;
       const success =

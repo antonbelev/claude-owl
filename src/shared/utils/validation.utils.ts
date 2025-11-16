@@ -2,6 +2,9 @@
  * Validation utility functions
  */
 
+import pathModule from 'path';
+import type { ScopedRequest, ValidationResult } from '../types/validation.types';
+
 /**
  * Validate agent name format (lowercase-with-hyphens)
  */
@@ -57,4 +60,43 @@ export function isValidDescriptionLength(description: string, maxLength = 1024):
  */
 export function hasPathTraversal(path: string): boolean {
   return path.includes('../') || path.includes('..\\');
+}
+
+/**
+ * Validates a scoped request to ensure projectPath is provided when scope/location is 'project'
+ * @param request - The request object to validate
+ * @returns Validation result with error message if invalid
+ */
+export function validateScopedRequest(request: ScopedRequest): ValidationResult {
+  const scope = request.scope || request.location;
+
+  if (scope === 'project' && !request.projectPath) {
+    return {
+      valid: false,
+      error: 'projectPath is required when scope/location is "project"',
+    };
+  }
+
+  if (scope === 'project' && request.projectPath) {
+    return validateProjectPath(request.projectPath);
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Validates a project path
+ * @param projectPath - The project path to validate
+ * @returns Validation result with error message if invalid
+ */
+export function validateProjectPath(projectPath: string): ValidationResult {
+  // Validate that projectPath is absolute
+  if (!pathModule.isAbsolute(projectPath)) {
+    return {
+      valid: false,
+      error: 'projectPath must be an absolute path',
+    };
+  }
+
+  return { valid: true };
 }

@@ -14,6 +14,7 @@ export interface Agent {
   content: string;
   filePath: string;
   location: 'user' | 'project' | 'plugin';
+  projectPath?: string; // Required if location === 'project'
   lastModified: Date;
 }
 
@@ -29,6 +30,7 @@ export interface Skill {
   filePath: string;
   supportingFiles?: string[];
   location: 'user' | 'project' | 'plugin';
+  projectPath?: string; // Required if location === 'project'
   lastModified: Date;
 }
 
@@ -46,5 +48,6 @@ export interface Command {
   content: string;
   filePath: string;
   location: 'user' | 'project' | 'plugin' | 'mcp';
+  projectPath?: string; // Required if location === 'project'
   lastModified: Date;
 }

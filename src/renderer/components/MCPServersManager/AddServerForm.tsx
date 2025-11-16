@@ -4,7 +4,8 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Alert, AlertDescription } from '../ui/alert';
-import type { AddMCPServerRequest } from '@/shared/types';
+import { ScopeSelector } from '../common/ScopeSelector';
+import type { AddMCPServerRequest, ProjectInfo } from '@/shared/types';
 
 interface AddServerFormProps {
   onSubmit: (config: AddMCPServerRequest) => Promise<void>;
@@ -20,6 +21,8 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
   const [envVars, setEnvVars] = useState<Record<string, string>>({});
   const [envKey, setEnvKey] = useState('');
   const [envValue, setEnvValue] = useState('');
+  const [scope, setScope] = useState<'user' | 'project'>('user');
+  const [selectedProject, setSelectedProject] = useState<ProjectInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -42,6 +45,13 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
 
     if (transport === 'http' && !url.trim()) {
       errors.url = 'URL is required for HTTP servers';
+    }
+
+    // Validate project selection when scope is 'project'
+    if (scope === 'project' && !selectedProject) {
+      setError('Please select a project');
+      setValidationErrors(errors);
+      return false;
     }
 
     setValidationErrors(errors);
@@ -103,7 +113,8 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
       const config: AddMCPServerRequest = {
         name: name.trim(),
         transport,
-        scope: 'user', // Default to user scope
+        scope,
+        projectPath: scope === 'project' ? selectedProject?.path : undefined,
       };
 
       // Add transport-specific fields
@@ -251,6 +262,15 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
         </div>
       )}
 
+      {/* Scope Selector */}
+      <ScopeSelector
+        scope={scope}
+        selectedProject={selectedProject}
+        onScopeChange={setScope}
+        onProjectChange={setSelectedProject}
+        compact={true}
+      />
+
       {/* Environment Variables */}
       <div className="space-y-2">
         <Label>Environment Variables</Label>
@@ -302,19 +322,6 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
           </Button>
         </div>
       </div>
-
-      {/* Note: Servers are always stored in user-level config */}
-      <Alert>
-        <Info className="h-4 w-4" />
-        <AlertDescription className="text-xs">
-          <p className="mb-2">
-            MCP servers are managed globally at the user level (~/.claude.json) and available to all
-            your projects. To manage project-specific servers, use the Claude CLI or select a
-            project in a future update.
-          </p>
-          <p>For project-specific MCP servers, edit your project&apos;s .mcp.json directly.</p>
-        </AlertDescription>
-      </Alert>
 
       {/* Buttons */}
       <div className="flex gap-4">

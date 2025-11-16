@@ -32,6 +32,7 @@ export function registerMCPHandlers(): void {
         name: request.name,
         transport: request.transport,
         scope: request.scope,
+        projectPath: request.projectPath,
       });
 
       try {
@@ -65,10 +66,11 @@ export function registerMCPHandlers(): void {
       console.log('[MCPHandlers] Remove MCP server request:', {
         name: request.name,
         scope: request.scope,
+        projectPath: request.projectPath,
       });
 
       try {
-        const result = await claudeService.removeMCPServer(request.name, request.scope);
+        const result = await claudeService.removeMCPServer(request.name, request.scope, request.projectPath);
 
         console.log('[MCPHandlers] Remove MCP server result:', {
           success: result.success,
