@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import {
   BarChart3,
   Settings,
+  AlignLeft,
   Bot,
   Zap,
   Package,
@@ -34,6 +35,7 @@ interface NavItem {
 const allNavItems: NavItem[] = [
   { path: '/', label: 'Dashboard', icon: BarChart3 },
   { path: '/settings', label: 'Settings', icon: Settings },
+  { path: '/statusline', label: 'Status Line', icon: AlignLeft },
   { path: '/agents', label: 'Subagents', icon: Bot },
   { path: '/skills', label: 'Skills', icon: Zap },
   { path: '/plugins', label: 'Plugins', icon: Package, underDevelopment: true },

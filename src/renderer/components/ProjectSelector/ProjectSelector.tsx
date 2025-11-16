@@ -4,7 +4,15 @@ import { useProjectContext } from '../../contexts/ProjectContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { Button } from '../ui/button';
 import { Alert, AlertDescription } from '../ui/alert';
-import { FolderIcon, ServerIcon, AlertCircleIcon, RefreshCwIcon, CheckIcon, SearchIcon, XIcon } from 'lucide-react';
+import {
+  FolderIcon,
+  ServerIcon,
+  AlertCircleIcon,
+  RefreshCwIcon,
+  CheckIcon,
+  SearchIcon,
+  XIcon,
+} from 'lucide-react';
 import type { ProjectInfo } from '@/shared/types';
 
 export const ProjectSelector: React.FC = () => {
@@ -189,35 +197,33 @@ export const ProjectSelector: React.FC = () => {
         </Card>
 
         {/* Project cards */}
-        {filteredProjects.length > 0 ? (
-          filteredProjects.map(project => (
-            <ProjectCard
-              key={project.path}
-              project={project}
-              isSelected={selectedProject?.path === project.path}
-              onSelect={() => selectProject(project)}
-            />
-          ))
-        ) : (
-          searchQuery && (
-            <Card className="border-gray-200">
-              <CardContent className="p-8 text-center">
-                <SearchIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-sm text-gray-600">
-                  No projects found matching &quot;{searchQuery}&quot;
-                </p>
-                <Button
-                  onClick={() => setSearchQuery('')}
-                  variant="outline"
-                  size="sm"
-                  className="mt-3"
-                >
-                  Clear Search
-                </Button>
-              </CardContent>
-            </Card>
-          )
-        )}
+        {filteredProjects.length > 0
+          ? filteredProjects.map(project => (
+              <ProjectCard
+                key={project.path}
+                project={project}
+                isSelected={selectedProject?.path === project.path}
+                onSelect={() => selectProject(project)}
+              />
+            ))
+          : searchQuery && (
+              <Card className="border-gray-200">
+                <CardContent className="p-8 text-center">
+                  <SearchIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-sm text-gray-600">
+                    No projects found matching &quot;{searchQuery}&quot;
+                  </p>
+                  <Button
+                    onClick={() => setSearchQuery('')}
+                    variant="outline"
+                    size="sm"
+                    className="mt-3"
+                  >
+                    Clear Search
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
       </div>
     </div>
   );

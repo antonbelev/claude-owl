@@ -101,6 +101,18 @@ const PROJECTS_CHANNELS = {
   READ_CLAUDE_CONFIG: 'projects:read-config',
 } as const;
 
+// Define statusline channel strings directly to avoid tree-shaking
+const STATUSLINE_CHANNELS = {
+  GET_ACTIVE_STATUSLINE: 'statusline:get-active',
+  LIST_STATUSLINE_TEMPLATES: 'statusline:list-templates',
+  SET_STATUSLINE_TEMPLATE: 'statusline:set-template',
+  SET_CUSTOM_STATUSLINE: 'statusline:set-custom',
+  PREVIEW_STATUSLINE: 'statusline:preview',
+  DISABLE_STATUSLINE: 'statusline:disable',
+  SCAN_STATUSLINE_SCRIPT: 'statusline:scan-script',
+  EXPORT_STATUSLINE_SCRIPT: 'statusline:export-script',
+} as const;
+
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -222,6 +234,21 @@ contextBridge.exposeInMainWorld('electronAPI', {
   checkClaudeConfig: () => ipcRenderer.invoke(PROJECTS_CHANNELS.CHECK_CLAUDE_CONFIG),
   readClaudeConfig: () => ipcRenderer.invoke(PROJECTS_CHANNELS.READ_CLAUDE_CONFIG),
 
+  // Status Line
+  getActiveStatusLine: () => ipcRenderer.invoke(STATUSLINE_CHANNELS.GET_ACTIVE_STATUSLINE),
+  listStatusLineTemplates: () => ipcRenderer.invoke(STATUSLINE_CHANNELS.LIST_STATUSLINE_TEMPLATES),
+  setStatusLineTemplate: (args: unknown) =>
+    ipcRenderer.invoke(STATUSLINE_CHANNELS.SET_STATUSLINE_TEMPLATE, args),
+  setCustomStatusLine: (args: unknown) =>
+    ipcRenderer.invoke(STATUSLINE_CHANNELS.SET_CUSTOM_STATUSLINE, args),
+  previewStatusLine: (args: unknown) =>
+    ipcRenderer.invoke(STATUSLINE_CHANNELS.PREVIEW_STATUSLINE, args),
+  disableStatusLine: () => ipcRenderer.invoke(STATUSLINE_CHANNELS.DISABLE_STATUSLINE),
+  scanStatusLineScript: (args: unknown) =>
+    ipcRenderer.invoke(STATUSLINE_CHANNELS.SCAN_STATUSLINE_SCRIPT, args),
+  exportStatusLineScript: (args: unknown) =>
+    ipcRenderer.invoke(STATUSLINE_CHANNELS.EXPORT_STATUSLINE_SCRIPT, args),
+
   // Claude CLI
   executeCLI: (args: unknown) => ipcRenderer.invoke(IPC_CHANNELS.EXECUTE_CLI, args),
   stopCLI: (args: unknown) => ipcRenderer.invoke(IPC_CHANNELS.STOP_CLI, args),
@@ -328,4 +355,12 @@ export interface ElectronAPI {
   getProjectMCPServers: (args: unknown) => Promise<unknown>;
   checkClaudeConfig: () => Promise<unknown>;
   readClaudeConfig: () => Promise<unknown>;
+  getActiveStatusLine: () => Promise<unknown>;
+  listStatusLineTemplates: () => Promise<unknown>;
+  setStatusLineTemplate: (args: unknown) => Promise<unknown>;
+  setCustomStatusLine: (args: unknown) => Promise<unknown>;
+  previewStatusLine: (args: unknown) => Promise<unknown>;
+  disableStatusLine: () => Promise<unknown>;
+  scanStatusLineScript: (args: unknown) => Promise<unknown>;
+  exportStatusLineScript: (args: unknown) => Promise<unknown>;
 }

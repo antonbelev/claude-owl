@@ -88,16 +88,15 @@ Timestamp: ${new Date().toISOString()}
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">Something went wrong</h1>
-                  <p className="text-gray-600">
-                    The application encountered an unexpected error
-                  </p>
+                  <p className="text-gray-600">The application encountered an unexpected error</p>
                 </div>
               </div>
 
               <Alert variant="destructive" className="mb-6">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  <strong className="font-semibold">Error:</strong> {error?.message || 'Unknown error'}
+                  <strong className="font-semibold">Error:</strong>{' '}
+                  {error?.message || 'Unknown error'}
                 </AlertDescription>
               </Alert>
 
@@ -137,8 +136,8 @@ Timestamp: ${new Date().toISOString()}
 
               <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-900">
-                  <strong className="font-semibold">Need help?</strong> Please copy the error details
-                  above and report this issue on{' '}
+                  <strong className="font-semibold">Need help?</strong> Please copy the error
+                  details above and report this issue on{' '}
                   <a
                     href="https://github.com/anthropics/claude-owl/issues"
                     target="_blank"

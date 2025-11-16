@@ -343,7 +343,7 @@ export function useLevelSettings(level: ConfigLevel, projectPath?: string) {
     try {
       const response = (await window.electronAPI.getSettings({
         level,
-        projectPath
+        projectPath,
       })) as GetSettingsResponse;
 
       if (response.success && response.data) {

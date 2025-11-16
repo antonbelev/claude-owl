@@ -6,6 +6,7 @@ import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { AppLayout } from './components/Layout/AppLayout';
 import { Dashboard } from './pages/Dashboard';
 import { SettingsPage } from './pages/SettingsPage';
+import { StatusLinePage } from './pages/StatusLinePage';
 import { AgentsPage } from './pages/AgentsPage';
 import { SkillsPage } from './pages/SkillsPage';
 import { PluginsPage } from './pages/PluginsPage';
@@ -37,6 +38,7 @@ export const App: React.FC = () => {
               <Route path="/" element={<AppLayout />}>
                 <Route index element={<Dashboard />} />
                 <Route path="settings" element={<SettingsPage />} />
+                <Route path="statusline" element={<StatusLinePage />} />
                 <Route path="agents" element={<AgentsPage />} />
                 <Route path="skills" element={<SkillsPage />} />
                 <Route path="plugins" element={<PluginsPage />} />

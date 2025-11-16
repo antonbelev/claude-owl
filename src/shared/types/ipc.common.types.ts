@@ -85,6 +85,16 @@ export const IPC_CHANNELS = {
   GET_SETTINGS_PATH: 'hooks:get-settings-path',
   OPEN_SETTINGS_FILE: 'hooks:open-settings',
 
+  // Status Line
+  GET_ACTIVE_STATUSLINE: 'statusline:get-active',
+  LIST_STATUSLINE_TEMPLATES: 'statusline:list-templates',
+  SET_STATUSLINE_TEMPLATE: 'statusline:set-template',
+  SET_CUSTOM_STATUSLINE: 'statusline:set-custom',
+  PREVIEW_STATUSLINE: 'statusline:preview',
+  DISABLE_STATUSLINE: 'statusline:disable',
+  SCAN_STATUSLINE_SCRIPT: 'statusline:scan-script',
+  EXPORT_STATUSLINE_SCRIPT: 'statusline:export-script',
+
   // MCP Servers
   ADD_MCP_SERVER: 'mcp:add',
   REMOVE_MCP_SERVER: 'mcp:remove',

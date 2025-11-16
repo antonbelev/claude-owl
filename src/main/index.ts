@@ -11,6 +11,7 @@ import { registerPluginsHandlers } from './ipc/pluginsHandlers';
 import { registerHooksHandlers } from './ipc/hooksHandlers';
 import { registerMCPHandlers } from './ipc/mcpHandlers';
 import { registerStatusHandlers } from './ipc/statusHandlers';
+import { registerStatusLineHandlers } from './ipc/statuslineHandlers';
 import { registerDebugLogsHandlers } from './ipc/debugLogsHandlers';
 import { registerGitHubImportHandlers } from './ipc/githubImportHandlers';
 import { registerProjectsHandlers } from './ipc/projectsHandlers';
@@ -128,6 +129,7 @@ app.whenReady().then(() => {
   registerHooksHandlers();
   registerMCPHandlers();
   registerStatusHandlers();
+  registerStatusLineHandlers();
   registerDebugLogsHandlers();
   registerGitHubImportHandlers();
   registerProjectsHandlers();

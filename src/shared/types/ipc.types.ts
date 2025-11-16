@@ -186,3 +186,20 @@ export type {
   SearchDebugLogsRequest,
   SearchDebugLogsResponse,
 } from './ipc.status.types';
+
+// Re-export statusline types
+export type {
+  GetActiveStatusLineResponse,
+  ListTemplatesResponse,
+  SetTemplateRequest,
+  SetTemplateResponse,
+  SetCustomScriptRequest,
+  SetCustomScriptResponse,
+  PreviewStatusLineRequest,
+  PreviewStatusLineResponse,
+  DisableStatusLineResponse,
+  ScanScriptRequest,
+  ScanScriptResponse,
+  ExportScriptRequest,
+  ExportScriptResponse,
+} from './ipc.statusline.types';

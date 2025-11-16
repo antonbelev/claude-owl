@@ -47,7 +47,10 @@ function getSettingsService(
   projectPath?: string
 ): SettingsService {
   if ((level === 'project' || level === 'local') && projectPath) {
-    console.log(`[SettingsHandlers] Creating SettingsService for ${level} level with projectPath:`, projectPath);
+    console.log(
+      `[SettingsHandlers] Creating SettingsService for ${level} level with projectPath:`,
+      projectPath
+    );
     return new SettingsService(projectPath);
   }
   return settingsService;
@@ -78,7 +81,10 @@ export function registerSettingsHandlers() {
   ipcMain.handle(
     CHANNELS.GET_SETTINGS,
     async (_event, request: GetSettingsRequest): Promise<GetSettingsResponse> => {
-      console.log('[SettingsHandlers] Get settings request:', { level: request.level, projectPath: request.projectPath });
+      console.log('[SettingsHandlers] Get settings request:', {
+        level: request.level,
+        projectPath: request.projectPath,
+      });
 
       try {
         const service = getSettingsService(request.level, request.projectPath);
@@ -102,7 +108,10 @@ export function registerSettingsHandlers() {
   ipcMain.handle(
     CHANNELS.SAVE_SETTINGS,
     async (_event, request: SaveSettingsRequest): Promise<SaveSettingsResponse> => {
-      console.log('[SettingsHandlers] Save settings request:', { level: request.level, projectPath: request.projectPath });
+      console.log('[SettingsHandlers] Save settings request:', {
+        level: request.level,
+        projectPath: request.projectPath,
+      });
 
       try {
         const service = getSettingsService(request.level, request.projectPath);
@@ -166,7 +175,10 @@ export function registerSettingsHandlers() {
   ipcMain.handle(
     CHANNELS.SETTINGS_FILE_EXISTS,
     async (_event, request: SettingsFileExistsRequest): Promise<SettingsFileExistsResponse> => {
-      console.log('[SettingsHandlers] Settings file exists request:', { level: request.level, projectPath: request.projectPath });
+      console.log('[SettingsHandlers] Settings file exists request:', {
+        level: request.level,
+        projectPath: request.projectPath,
+      });
 
       try {
         const service = getSettingsService(request.level, request.projectPath);
@@ -190,7 +202,10 @@ export function registerSettingsHandlers() {
   ipcMain.handle(
     CHANNELS.ENSURE_SETTINGS_FILE,
     async (_event, request: EnsureSettingsFileRequest): Promise<EnsureSettingsFileResponse> => {
-      console.log('[SettingsHandlers] Ensure settings file request:', { level: request.level, projectPath: request.projectPath });
+      console.log('[SettingsHandlers] Ensure settings file request:', {
+        level: request.level,
+        projectPath: request.projectPath,
+      });
 
       try {
         const service = getSettingsService(request.level, request.projectPath);
@@ -214,7 +229,10 @@ export function registerSettingsHandlers() {
   ipcMain.handle(
     CHANNELS.DELETE_SETTINGS,
     async (_event, request: DeleteSettingsRequest): Promise<DeleteSettingsResponse> => {
-      console.log('[SettingsHandlers] Delete settings request:', { level: request.level, projectPath: request.projectPath });
+      console.log('[SettingsHandlers] Delete settings request:', {
+        level: request.level,
+        projectPath: request.projectPath,
+      });
 
       try {
         const service = getSettingsService(request.level, request.projectPath);
@@ -238,7 +256,10 @@ export function registerSettingsHandlers() {
   ipcMain.handle(
     CHANNELS.CREATE_BACKUP,
     async (_event, request: CreateBackupRequest): Promise<CreateBackupResponse> => {
-      console.log('[SettingsHandlers] Create backup request:', { level: request.level, projectPath: request.projectPath });
+      console.log('[SettingsHandlers] Create backup request:', {
+        level: request.level,
+        projectPath: request.projectPath,
+      });
 
       try {
         const service = getSettingsService(request.level, request.projectPath);
@@ -263,7 +284,11 @@ export function registerSettingsHandlers() {
   ipcMain.handle(
     CHANNELS.RESTORE_BACKUP,
     async (_event, request: RestoreBackupRequest): Promise<RestoreBackupResponse> => {
-      console.log('[SettingsHandlers] Restore backup request:', { level: request.level, projectPath: request.projectPath, backupPath: request.backupPath });
+      console.log('[SettingsHandlers] Restore backup request:', {
+        level: request.level,
+        projectPath: request.projectPath,
+        backupPath: request.backupPath,
+      });
 
       try {
         const service = getSettingsService(request.level, request.projectPath);
