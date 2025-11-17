@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Installation Guide - Claude Owl</title>
+
+  <meta name="description" content="Step-by-step installation guide for Claude Owl on macOS">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white min-h-screen">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 w-full bg-slate-900/80 backdrop-blur-md border-b border-slate-700 z-50">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="flex items-center space-x-3">
+          <span class="text-3xl">🦉</span>
+          <span class="text-xl font-bold">Claude Owl</span>
+        </a>
+      </div>
+      <div class="hidden md:flex space-x-6">
+        <a href="index.html#features" class="hover:text-blue-400 transition">Features</a>
+        <a href="changelog.html" class="hover:text-blue-400 transition">Changelog</a>
+        <a href="installation.html" class="text-blue-400">Installation</a>
+        <a href="https://github.com/antonbelev/claude-owl" target="_blank" class="hover:text-blue-400 transition">GitHub</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="pt-32 pb-12 px-6">
+    <div class="container mx-auto max-w-4xl">
+      <div class="text-center mb-12">
+        <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+          Installation Guide
+        </h1>
+        <p class="text-xl text-slate-400">
+          Get Claude Owl up and running in minutes
+        </p>
+      </div>
+
+      <!-- Platform Tabs -->
+      <div class="flex justify-center space-x-4 mb-8">
+        <button class="platform-tab active bg-blue-600 px-6 py-3 rounded-lg font-semibold" data-platform="macos">
+          <span class="text-2xl mr-2">🍎</span> macOS
+        </button>
+        <button class="platform-tab bg-slate-700 px-6 py-3 rounded-lg font-semibold opacity-50 cursor-not-allowed" disabled>
+          <span class="text-2xl mr-2">🪟</span> Windows (Coming Soon)
+        </button>
+        <button class="platform-tab bg-slate-700 px-6 py-3 rounded-lg font-semibold opacity-50 cursor-not-allowed" disabled>
+          <span class="text-2xl mr-2">🐧</span> Linux (Coming Soon)
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- macOS Installation -->
+  <section class="pb-20 px-6">
+    <div class="container mx-auto max-w-4xl">
+
+      <!-- System Requirements -->
+      <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 mb-8">
+        <h2 class="text-2xl font-bold mb-4 flex items-center">
+          <span class="mr-3">📋</span> System Requirements
+        </h2>
+        <ul class="space-y-2 text-slate-300">
+          <li class="flex items-start">
+            <span class="text-green-400 mr-2">✓</span>
+            <span><strong>macOS 10.15 (Catalina)</strong> or later</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-green-400 mr-2">✓</span>
+            <span><strong>4 GB RAM</strong> minimum (8 GB recommended)</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-green-400 mr-2">✓</span>
+            <span><strong>200 MB</strong> free disk space</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-green-400 mr-2">✓</span>
+            <span><strong>Intel or Apple Silicon</strong> processor</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Step 1: Download -->
+      <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 mb-8">
+        <div class="flex items-start mb-4">
+          <span class="text-3xl bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center font-bold mr-4">1</span>
+          <div class="flex-1">
+            <h2 class="text-2xl font-bold mb-2">Download Claude Owl</h2>
+            <p class="text-slate-400 mb-4">
+              Choose the correct version for your Mac's processor
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-4">
+              <!-- Apple Silicon -->
+              <div class="bg-slate-900 p-4 rounded-lg border border-slate-600">
+                <h3 class="font-semibold mb-2 flex items-center">
+                  <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 17 2.94 12.45 4.7 9.39C5.57 7.87 7.13 6.91 8.82 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5M13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
+                  </svg>
+                  Apple Silicon (M1/M2/M3)
+                </h3>
+                <p class="text-sm text-slate-400 mb-3">For Macs from 2020 onwards</p>
+                <a href="index.html" class="block bg-blue-600 hover:bg-blue-700 text-center py-2 px-4 rounded-lg transition">
+                  Download ARM64
+                </a>
+              </div>
+
+              <!-- Intel -->
+              <div class="bg-slate-900 p-4 rounded-lg border border-slate-600">
+                <h3 class="font-semibold mb-2 flex items-center">
+                  <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 17 2.94 12.45 4.7 9.39C5.57 7.87 7.13 6.91 8.82 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5M13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
+                  </svg>
+                  Intel Processor
+                </h3>
+                <p class="text-sm text-slate-400 mb-3">For Macs before 2020</p>
+                <a href="index.html" class="block bg-slate-700 hover:bg-slate-600 text-center py-2 px-4 rounded-lg transition">
+                  Download x64
+                </a>
+              </div>
+            </div>
+
+            <div class="mt-4 p-3 bg-blue-900/30 border border-blue-700 rounded-lg">
+              <p class="text-sm text-blue-300">
+                <strong>💡 Not sure which version?</strong>
+                Click  → <strong>About This Mac</strong> → look for "Chip" (Apple M1/M2/M3 = ARM64, Intel = x64)
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Install -->
+      <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 mb-8">
+        <div class="flex items-start mb-4">
+          <span class="text-3xl bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center font-bold mr-4">2</span>
+          <div class="flex-1">
+            <h2 class="text-2xl font-bold mb-2">Install the Application</h2>
+            <p class="text-slate-400 mb-4">
+              Simple drag-and-drop installation
+            </p>
+
+            <ol class="space-y-4 text-slate-300">
+              <li class="flex items-start">
+                <span class="text-blue-400 font-bold mr-3">1.</span>
+                <div>
+                  <p><strong>Open the downloaded .dmg file</strong></p>
+                  <p class="text-sm text-slate-400">It should be in your Downloads folder</p>
+                </div>
+              </li>
+              <li class="flex items-start">
+                <span class="text-blue-400 font-bold mr-3">2.</span>
+                <div>
+                  <p><strong>Drag Claude Owl to Applications</strong></p>
+                  <p class="text-sm text-slate-400">A window will appear with the app icon and Applications folder</p>
+                </div>
+              </li>
+              <li class="flex items-start">
+                <span class="text-blue-400 font-bold mr-3">3.</span>
+                <div>
+                  <p><strong>Wait for the copy to complete</strong></p>
+                  <p class="text-sm text-slate-400">This usually takes a few seconds</p>
+                </div>
+              </li>
+              <li class="flex items-start">
+                <span class="text-blue-400 font-bold mr-3">4.</span>
+                <div>
+                  <p><strong>Eject the disk image</strong></p>
+                  <p class="text-sm text-slate-400">Right-click the disk image icon and select "Eject"</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: First Launch -->
+      <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 mb-8">
+        <div class="flex items-start mb-4">
+          <span class="text-3xl bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center font-bold mr-4">3</span>
+          <div class="flex-1">
+            <h2 class="text-2xl font-bold mb-2">Launch Claude Owl</h2>
+            <p class="text-slate-400 mb-4">
+              First-time setup and security approval
+            </p>
+
+            <ol class="space-y-4 text-slate-300">
+              <li class="flex items-start">
+                <span class="text-blue-400 font-bold mr-3">1.</span>
+                <div>
+                  <p><strong>Open Applications folder</strong></p>
+                  <p class="text-sm text-slate-400">Press <code class="bg-slate-900 px-2 py-1 rounded">⌘ + Shift + A</code> in Finder</p>
+                </div>
+              </li>
+              <li class="flex items-start">
+                <span class="text-blue-400 font-bold mr-3">2.</span>
+                <div>
+                  <p><strong>Double-click Claude Owl</strong></p>
+                  <p class="text-sm text-slate-400">The app will start launching</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- Troubleshooting: macOS Security Warning -->
+      <div class="bg-yellow-900/20 border border-yellow-600 rounded-xl p-6 mb-8">
+        <h2 class="text-2xl font-bold mb-4 flex items-center text-yellow-400">
+          <span class="mr-3">⚠️</span> macOS Security Warning
+        </h2>
+        <p class="text-slate-300 mb-4">
+          When you first open Claude Owl, macOS may show this warning:
+        </p>
+
+        <div class="bg-slate-900 p-4 rounded-lg mb-4 border border-slate-700">
+          <p class="text-center text-slate-300 italic">
+            "Claude Owl cannot be opened because the developer cannot be verified."
+          </p>
+        </div>
+
+        <p class="text-slate-300 mb-4">
+          This is normal for unsigned apps. Here's how to open it:
+        </p>
+
+        <div class="bg-slate-800 p-4 rounded-lg space-y-3">
+          <div class="flex items-start">
+            <span class="text-green-400 mr-3 font-bold">Option 1:</span>
+            <div>
+              <p class="text-slate-300"><strong>Right-click and Open</strong></p>
+              <ol class="text-sm text-slate-400 mt-2 space-y-1 ml-4">
+                <li>1. Right-click (or Control-click) the Claude Owl icon</li>
+                <li>2. Select "Open" from the menu</li>
+                <li>3. Click "Open" in the dialog that appears</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="border-t border-slate-700 pt-3"></div>
+
+          <div class="flex items-start">
+            <span class="text-green-400 mr-3 font-bold">Option 2:</span>
+            <div>
+              <p class="text-slate-300"><strong>System Settings</strong></p>
+              <ol class="text-sm text-slate-400 mt-2 space-y-1 ml-4">
+                <li>1. Open <strong>System Settings</strong> (or System Preferences)</li>
+                <li>2. Go to <strong>Privacy & Security</strong></li>
+                <li>3. Scroll down to see the security warning</li>
+                <li>4. Click <strong>"Open Anyway"</strong></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 p-3 bg-blue-900/30 border border-blue-700 rounded-lg">
+          <p class="text-sm text-blue-300">
+            <strong>📝 Why does this happen?</strong>
+            Claude Owl is currently distributed without Apple code signing (which costs $99/year). This warning will be removed in a future version when we implement code signing.
+          </p>
+        </div>
+      </div>
+
+      <!-- Post-Installation -->
+      <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+        <h2 class="text-2xl font-bold mb-4 flex items-center">
+          <span class="mr-3">✅</span> Next Steps
+        </h2>
+        <div class="space-y-3 text-slate-300">
+          <p>
+            Once Claude Owl is running, you can:
+          </p>
+          <ul class="space-y-2 ml-6">
+            <li class="flex items-start">
+              <span class="text-blue-400 mr-2">•</span>
+              <span><strong>Manage Settings:</strong> Edit user and project-level Claude Code configurations</span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-blue-400 mr-2">•</span>
+              <span><strong>Configure MCP Servers:</strong> Browse and install Model Context Protocol servers</span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-blue-400 mr-2">•</span>
+              <span><strong>Edit Permission Rules:</strong> Use the visual editor to manage file access rules</span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-blue-400 mr-2">•</span>
+              <span><strong>Customize Status Line:</strong> Apply templates to your Claude Code status line</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Need Help? -->
+      <div class="mt-8 text-center">
+        <p class="text-slate-400 mb-4">Need help or found a bug?</p>
+        <div class="flex justify-center space-x-4">
+          <a href="https://github.com/antonbelev/claude-owl/issues" target="_blank" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 px-6 py-3 rounded-lg transition">
+            Report an Issue
+          </a>
+          <a href="https://github.com/antonbelev/claude-owl/discussions" target="_blank" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg transition">
+            Ask a Question
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-8 px-6 border-t border-slate-700">
+    <div class="container mx-auto text-center text-slate-400 text-sm">
+      <p class="mb-2">
+        Made with ❤️ by the Claude Owl community
+      </p>
+      <p>
+        <a href="https://github.com/antonbelev/claude-owl" class="hover:text-blue-400">GitHub</a> •
+        <a href="https://github.com/antonbelev/claude-owl/issues" class="hover:text-blue-400">Issues</a> •
+        <a href="index.html" class="hover:text-blue-400">Home</a> •
+        <a href="https://github.com/antonbelev/claude-owl/blob/main/LICENSE" class="hover:text-blue-400">MIT License</a>
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>

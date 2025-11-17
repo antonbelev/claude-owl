@@ -8,6 +8,12 @@
     "dist/**/*",
     "package.json"
   ],
+  "publish": {
+    "provider": "github",
+    "owner": "antonbelev",
+    "repo": "claude-owl",
+    "releaseType": "draft"
+  },
   "mac": {
     "category": "public.app-category.developer-tools",
     "target": [
@@ -16,15 +22,64 @@
         "arch": ["x64", "arm64"]
       }
     ],
-    "icon": "assets/icon.icns"
+    "icon": "assets/icon.icns",
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "entitlements": "build/entitlements.mac.plist",
+    "entitlementsInherit": "build/entitlements.mac.plist"
+  },
+  "dmg": {
+    "contents": [
+      {
+        "x": 130,
+        "y": 220
+      },
+      {
+        "x": 410,
+        "y": 220,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ],
+    "window": {
+      "width": 540,
+      "height": 380
+    }
   },
   "win": {
-    "target": ["nsis"],
-    "icon": "assets/icon.ico"
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64", "arm64"]
+      }
+    ],
+    "icon": "assets/icon.ico",
+    "publisherName": "Claude Owl Contributors"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Claude Owl"
   },
   "linux": {
-    "target": ["AppImage"],
+    "target": [
+      {
+        "target": "AppImage",
+        "arch": ["x64", "arm64"]
+      },
+      {
+        "target": "deb",
+        "arch": ["x64", "arm64"]
+      }
+    ],
     "category": "Development",
-    "icon": "assets/icon.png"
+    "icon": "assets/icon.png",
+    "maintainer": "Claude Owl Contributors",
+    "vendor": "Claude Owl",
+    "synopsis": "Visual UI for managing Claude Code configurations",
+    "description": "Open-source desktop application for managing Claude Code settings, subagents, MCP servers, and more through an intuitive interface."
   }
 }

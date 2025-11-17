@@ -1,16 +1,54 @@
-name: Release Build
+name: Release Build & Publish
 
 on:
   push:
     tags:
-      - 'v*' # Triggers on version tags like v0.1.0, v0.1.1, etc.
+      - 'v*' # Triggers on version tags like v0.1.0, v0.2.0, etc.
+
+env:
+  NODE_VERSION: '18'
 
 permissions:
-  contents: write # Required to create releases
+  contents: write # Required to create releases and upload assets
 
 jobs:
-  build-and-release:
-    name: Build and Release macOS
+  # Job 1: Quality Gate - Must pass before building
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run type checking
+        run: npm run typecheck
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+      - name: Build all targets
+        run: npm run build
+
+      - name: Quality gate passed
+        run: echo "✅ All quality checks passed - proceeding with release build"
+
+  # Job 2: Build macOS
+  build-macos:
+    name: Build macOS
+    needs: quality-gate
     runs-on: macos-latest
 
     steps:
@@ -20,7 +58,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Install dependencies
@@ -32,27 +70,229 @@ jobs:
       - name: Package macOS app
         run: npm run package:mac
         env:
-          # Prevents electron-builder from publishing automatically
-          GH_TOKEN: ''
+          # Future: Add code signing
+          # APPLE_ID: ${{ secrets.APPLE_ID }}
+          # APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          # CSC_LINK: ${{ secrets.MAC_CERT_BASE64 }}
+          # CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
+      - name: List build artifacts
+        run: |
+          echo "📦 Build artifacts:"
+          find release -type f -name "*.dmg" -o -name "*.yml" -o -name "*.json"
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
         with:
-          files: |
+          name: macos-artifacts
+          path: |
             release/**/*.dmg
             release/**/latest-mac.yml
+          retention-days: 7
+
+  # Job 3: Build Windows
+  build-windows:
+    name: Build Windows
+    needs: quality-gate
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Package Windows app
+        run: npm run package:win
+        env:
+          # Future: Add code signing
+          # WIN_CSC_LINK: ${{ secrets.WIN_CERT_BASE64 }}
+          # WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CERT_PASSWORD }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: List build artifacts
+        run: |
+          echo "📦 Build artifacts:"
+          Get-ChildItem -Path release -Recurse -Include *.exe, *.yml, *.json
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          path: |
+            release/**/*.exe
+            release/**/latest.yml
+          retention-days: 7
+
+  # Job 4: Build Linux
+  build-linux:
+    name: Build Linux
+    needs: quality-gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Package Linux app
+        run: npm run package:linux
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: List build artifacts
+        run: |
+          echo "📦 Build artifacts:"
+          find release -type f \( -name "*.AppImage" -o -name "*.deb" -o -name "*.yml" -o -name "*.json" \)
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-artifacts
+          path: |
+            release/**/*.AppImage
+            release/**/*.deb
+            release/**/latest-linux.yml
+            release/**/latest-linux-arm64.yml
+          retention-days: 7
+
+  # Job 5: Create GitHub Release
+  create-release:
+    name: Create GitHub Release
+    needs: [build-macos, build-windows, build-linux]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for changelog
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List downloaded artifacts
+        run: |
+          echo "📥 Downloaded artifacts:"
+          find artifacts -type f
+
+      - name: Get version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "📌 Release version: $VERSION"
+
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+
+          # Extract changelog section for this version
+          CHANGELOG_SECTION=$(awk "/## \[${VERSION}\]/,/## \[/{print}" CHANGELOG.md | head -n -1)
+
+          # If extraction failed, use a default message
+          if [ -z "$CHANGELOG_SECTION" ]; then
+            CHANGELOG_SECTION="Release ${VERSION}\n\nSee [CHANGELOG.md](https://github.com/antonbelev/claude-owl/blob/main/CHANGELOG.md) for details."
+          fi
+
+          # Save to file for multiline content
+          echo "$CHANGELOG_SECTION" > release_notes.md
+
+          echo "📝 Changelog extracted for version $VERSION"
+
+      - name: Determine if prerelease
+        id: prerelease
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          if [[ "$TAG" =~ (alpha|beta|rc) ]]; then
+            echo "PRERELEASE=true" >> $GITHUB_OUTPUT
+            echo "⚠️  This is a pre-release"
+          else
+            echo "PRERELEASE=false" >> $GITHUB_OUTPUT
+            echo "✅ This is a stable release"
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
           draft: true
-          prerelease: ${{ contains(github.ref, 'beta') || contains(github.ref, 'alpha') }}
-          generate_release_notes: true
+          prerelease: ${{ steps.prerelease.outputs.PRERELEASE }}
+          body_path: release_notes.md
+          files: |
+            artifacts/macos-artifacts/**/*.dmg
+            artifacts/macos-artifacts/**/*.yml
+            artifacts/windows-artifacts/**/*.exe
+            artifacts/windows-artifacts/**/*.yml
+            artifacts/linux-artifacts/**/*.AppImage
+            artifacts/linux-artifacts/**/*.deb
+            artifacts/linux-artifacts/**/*.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        if: failure()
+      - name: Release created successfully
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎉 Release ${{ steps.version.outputs.VERSION }} created!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "📦 Artifacts uploaded:"
+          echo "  • macOS (.dmg) - Intel + Apple Silicon"
+          echo "  • Windows (.exe) - x64 + ARM64"
+          echo "  • Linux (.AppImage, .deb) - x64 + ARM64"
+          echo ""
+          echo "🔗 Release URL:"
+          echo "  https://github.com/antonbelev/claude-owl/releases/tag/${GITHUB_REF#refs/tags/}"
+          echo ""
+          echo "⚠️  Release is in DRAFT mode"
+          echo "   1. Review the release notes"
+          echo "   2. Test download links"
+          echo "   3. Publish when ready"
+
+  # Job 6: Upload build logs on failure
+  upload-logs-on-failure:
+    name: Upload Build Logs
+    needs: [build-macos, build-windows, build-linux]
+    if: failure()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
         with:
-          name: build-logs
+          path: artifacts
+        continue-on-error: true
+
+      - name: Upload debug logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-failure-logs
           path: |
-            release/**/builder-debug.yml
-            release/**/builder-effective-config.yaml
-          retention-days: 7
+            artifacts/**/builder-debug.yml
+            artifacts/**/builder-effective-config.yaml
+          retention-days: 14
+          if-no-files-found: ignore

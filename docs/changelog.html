@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Changelog - Claude Owl</title>
+
+  <meta name="description" content="Claude Owl changelog - See what's new in each release">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Marked.js for Markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white min-h-screen">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 w-full bg-slate-900/80 backdrop-blur-md border-b border-slate-700 z-50">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="flex items-center space-x-3">
+          <span class="text-3xl">🦉</span>
+          <span class="text-xl font-bold">Claude Owl</span>
+        </a>
+      </div>
+      <div class="hidden md:flex space-x-6">
+        <a href="index.html#features" class="hover:text-blue-400 transition">Features</a>
+        <a href="changelog.html" class="text-blue-400">Changelog</a>
+        <a href="installation.html" class="hover:text-blue-400 transition">Installation</a>
+        <a href="https://github.com/antonbelev/claude-owl" target="_blank" class="hover:text-blue-400 transition">GitHub</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="pt-32 pb-12 px-6">
+    <div class="container mx-auto max-w-4xl">
+      <div class="text-center mb-8">
+        <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+          Changelog
+        </h1>
+        <p class="text-xl text-slate-400">
+          All notable changes to Claude Owl
+        </p>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="bg-slate-800 rounded-xl p-4 mb-8 border border-slate-700">
+        <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex-1">
+            <label class="text-sm text-slate-400 block mb-2">Search releases</label>
+            <input
+              type="text"
+              id="search-input"
+              placeholder="Search by version or feature..."
+              class="w-full bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-600 focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+          <div class="md:w-48">
+            <label class="text-sm text-slate-400 block mb-2">Filter by type</label>
+            <select
+              id="filter-select"
+              class="w-full bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-600 focus:border-blue-500 focus:outline-none"
+            >
+              <option value="all">All Changes</option>
+              <option value="features">✨ Features</option>
+              <option value="fixes">🐛 Bug Fixes</option>
+              <option value="performance">⚡ Performance</option>
+              <option value="refactoring">♻️ Refactoring</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Changelog Content -->
+  <section class="pb-20 px-6">
+    <div class="container mx-auto max-w-4xl">
+      <div id="changelog-content" class="space-y-6">
+        <!-- Loading state -->
+        <div class="text-center py-12">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          <p class="text-slate-400 mt-4">Loading changelog...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-8 px-6 border-t border-slate-700">
+    <div class="container mx-auto text-center text-slate-400 text-sm">
+      <p class="mb-2">
+        Made with ❤️ by the Claude Owl community
+      </p>
+      <p>
+        <a href="https://github.com/antonbelev/claude-owl" class="hover:text-blue-400">GitHub</a> •
+        <a href="https://github.com/antonbelev/claude-owl/issues" class="hover:text-blue-400">Issues</a> •
+        <a href="index.html" class="hover:text-blue-400">Home</a> •
+        <a href="https://github.com/antonbelev/claude-owl/blob/main/LICENSE" class="hover:text-blue-400">MIT License</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    const CHANGELOG_URL = 'https://raw.githubusercontent.com/antonbelev/claude-owl/main/CHANGELOG.md';
+
+    // Fetch and parse changelog
+    async function loadChangelog() {
+      try {
+        const response = await fetch(CHANGELOG_URL);
+        if (!response.ok) {
+          throw new Error('Failed to fetch changelog');
+        }
+
+        const markdown = await response.text();
+        renderChangelog(markdown);
+      } catch (error) {
+        console.error('Error loading changelog:', error);
+        document.getElementById('changelog-content').innerHTML = `
+          <div class="bg-red-900/20 border border-red-500 rounded-xl p-8 text-center">
+            <p class="text-red-400">Failed to load changelog</p>
+            <a href="https://github.com/antonbelev/claude-owl/blob/main/CHANGELOG.md"
+               class="text-blue-400 hover:underline mt-2 inline-block">
+              View on GitHub →
+            </a>
+          </div>
+        `;
+      }
+    }
+
+    // Render changelog with custom styling
+    function renderChangelog(markdown) {
+      // Parse markdown
+      const html = marked.parse(markdown);
+
+      // Create container
+      const container = document.getElementById('changelog-content');
+      container.innerHTML = html;
+
+      // Style the output
+      styleChangelog(container);
+
+      // Add version badges
+      addVersionBadges(container);
+    }
+
+    // Apply custom styling to changelog elements
+    function styleChangelog(container) {
+      // Style headings
+      container.querySelectorAll('h2').forEach(h2 => {
+        h2.className = 'text-3xl font-bold mb-4 text-blue-400 pt-6';
+
+        // Wrap in card
+        const card = document.createElement('div');
+        card.className = 'bg-slate-800 rounded-xl p-6 border border-slate-700 mb-6';
+
+        h2.parentNode.insertBefore(card, h2);
+        card.appendChild(h2);
+
+        // Move subsequent elements into card until next h2
+        let next = card.nextSibling;
+        while (next && next.tagName !== 'H2') {
+          const current = next;
+          next = next.nextSibling;
+          card.appendChild(current);
+        }
+      });
+
+      // Style h3 (section headers like "Features", "Bug Fixes")
+      container.querySelectorAll('h3').forEach(h3 => {
+        h3.className = 'text-xl font-semibold mb-3 mt-4 text-slate-200';
+      });
+
+      // Style lists
+      container.querySelectorAll('ul').forEach(ul => {
+        ul.className = 'space-y-2 ml-6';
+      });
+
+      container.querySelectorAll('li').forEach(li => {
+        li.className = 'text-slate-300 leading-relaxed';
+      });
+
+      // Style links
+      container.querySelectorAll('a').forEach(a => {
+        a.className = 'text-blue-400 hover:underline';
+        a.target = '_blank';
+      });
+
+      // Style code blocks
+      container.querySelectorAll('code').forEach(code => {
+        code.className = 'bg-slate-900 px-2 py-1 rounded text-blue-300 text-sm';
+      });
+
+      // Style blockquotes
+      container.querySelectorAll('blockquote').forEach(bq => {
+        bq.className = 'border-l-4 border-blue-500 pl-4 italic text-slate-400';
+      });
+    }
+
+    // Add version badges to release headers
+    function addVersionBadges(container) {
+      container.querySelectorAll('h2').forEach(h2 => {
+        const text = h2.textContent;
+
+        // Extract version from text like "[0.1.0]"
+        const versionMatch = text.match(/\[([^\]]+)\]/);
+        if (versionMatch) {
+          const version = versionMatch[1];
+
+          // Determine badge color
+          let badgeClass = 'bg-green-600';
+          if (version.includes('alpha')) badgeClass = 'bg-yellow-600';
+          if (version.includes('beta')) badgeClass = 'bg-orange-600';
+          if (version.includes('rc')) badgeClass = 'bg-blue-600';
+
+          // Create badge
+          const badge = document.createElement('span');
+          badge.className = `${badgeClass} text-white text-sm px-3 py-1 rounded-full ml-3`;
+          badge.textContent = `v${version}`;
+
+          h2.appendChild(badge);
+        }
+
+        // Add date badge if present
+        const dateMatch = text.match(/\d{4}-\d{2}-\d{2}/);
+        if (dateMatch) {
+          const date = new Date(dateMatch[0]);
+          const formattedDate = date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+
+          const dateBadge = document.createElement('span');
+          dateBadge.className = 'text-slate-400 text-sm ml-3';
+          dateBadge.textContent = formattedDate;
+
+          h2.appendChild(dateBadge);
+        }
+      });
+    }
+
+    // Search and filter functionality
+    function setupFilters() {
+      const searchInput = document.getElementById('search-input');
+      const filterSelect = document.getElementById('filter-select');
+
+      function applyFilters() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filterType = filterSelect.value;
+
+        const cards = document.querySelectorAll('#changelog-content > div');
+
+        cards.forEach(card => {
+          const text = card.textContent.toLowerCase();
+          const matchesSearch = searchTerm === '' || text.includes(searchTerm);
+
+          let matchesFilter = filterType === 'all';
+          if (filterType === 'features') matchesFilter = text.includes('✨') || text.includes('features');
+          if (filterType === 'fixes') matchesFilter = text.includes('🐛') || text.includes('bug fixes');
+          if (filterType === 'performance') matchesFilter = text.includes('⚡') || text.includes('performance');
+          if (filterType === 'refactoring') matchesFilter = text.includes('♻️') || text.includes('refactoring');
+
+          card.style.display = (matchesSearch && matchesFilter) ? 'block' : 'none';
+        });
+      }
+
+      searchInput.addEventListener('input', applyFilters);
+      filterSelect.addEventListener('change', applyFilters);
+    }
+
+    // Initialize
+    async function init() {
+      await loadChangelog();
+      setupFilters();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>
