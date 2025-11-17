@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'docs/github-pages/**'
+      - 'docs/**'
       - 'CHANGELOG.md'
       - 'SCREENSHOTS.md'
       - '.github/workflows/deploy-docs.yml'
@@ -37,9 +37,9 @@ jobs:
 
       - name: Copy changelog and screenshots to docs
         run: |
-          echo "Copying CHANGELOG.md and SCREENSHOTS.md to docs/github-pages directory..."
-          cp CHANGELOG.md docs/github-pages/changelog.md
-          cp SCREENSHOTS.md docs/github-pages/screenshots.md
+          echo "Copying CHANGELOG.md and SCREENSHOTS.md to docs directory..."
+          cp CHANGELOG.md docs/changelog.md
+          cp SCREENSHOTS.md docs/screenshots.md
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -47,7 +47,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './docs/github-pages'
+          path: './docs'
 
       - name: Deploy to GitHub Pages
         id: deployment
