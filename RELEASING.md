@@ -4,17 +4,20 @@ Quick reference for publishing Claude Owl releases.
 
 ## First Time Release (v0.1.0)
 
+Use the automated first-release script (ensures version sync):
+
 ```bash
-# 1. Ensure you're on main branch
-git checkout main
-git pull origin main
-
-# 2. Create the version tag
-git tag -a v0.1.0 -m "Release v0.1.0 - Initial public release"
-
-# 3. Push the tag (triggers GitHub Actions build)
-git push origin v0.1.0
+./scripts/first-release.sh
 ```
+
+This script:
+- ✅ Runs all CI checks
+- ✅ Uses `standard-version` to bump `package.json`
+- ✅ Generates `CHANGELOG.md` from commits
+- ✅ Creates git tag **matching** package.json version
+- ✅ Pushes to GitHub (triggers build)
+
+**Why use the script?** It guarantees the git tag and package.json version are always in sync!
 
 ## What Happens Next
 
