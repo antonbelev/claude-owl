@@ -4,20 +4,47 @@ Quick reference for publishing Claude Owl releases.
 
 ## First Time Release (v0.1.0)
 
-Use the automated first-release script (ensures version sync):
+### Prerequisites: Create Main Branch
+
+First, create your `main` branch from the latest work:
 
 ```bash
+# Merge your current PR or create main from your feature branch
+git checkout -b main
+git push -u origin main
+
+# Set main as default branch in GitHub Settings → Branches
+```
+
+### Release with Automation
+
+**Option A: Simple (No GitFlow Yet)**
+
+Use the automated first-release script:
+
+```bash
+git checkout main
+git pull origin main
 ./scripts/first-release.sh
 ```
 
-This script:
-- ✅ Runs all CI checks
-- ✅ Uses `standard-version` to bump `package.json`
-- ✅ Generates `CHANGELOG.md` from commits
-- ✅ Creates git tag **matching** package.json version
-- ✅ Pushes to GitHub (triggers build)
+**Option B: Set Up GitFlow First (Recommended)**
 
-**Why use the script?** It guarantees the git tag and package.json version are always in sync!
+```bash
+# 1. Create develop branch from main
+git checkout main
+git checkout -b develop
+git push -u origin develop
+
+# 2. Set develop as default branch in GitHub Settings
+
+# 3. Use regular release workflow
+git checkout develop
+./scripts/prepare-release.sh minor  # Creates release branch
+./scripts/finalize-release.sh       # Merges to main, creates tag
+```
+
+**Why use scripts?** They guarantee git tag and package.json version are always in sync!
 
 ## What Happens Next
 
