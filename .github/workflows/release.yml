@@ -247,7 +247,7 @@ jobs:
           files: |
             artifacts/macos-artifacts/**/*.dmg
             artifacts/macos-artifacts/**/*.yml
-            artifacts/windows-artifacts/**/*.exe
+            artifacts/windows-artifacts/**/*Setup*.exe
             artifacts/windows-artifacts/**/*.yml
             artifacts/linux-artifacts/**/*.AppImage
             artifacts/linux-artifacts/**/*.deb
