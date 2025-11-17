@@ -202,7 +202,9 @@ export class SettingsService {
       case 'project':
         return this.projectPath ? path.join(this.projectPath, '.claude', 'settings.json') : '';
       case 'local':
-        return this.projectPath ? path.join(this.projectPath, '.claude', 'settings.local.json') : '';
+        return this.projectPath
+          ? path.join(this.projectPath, '.claude', 'settings.local.json')
+          : '';
       case 'managed':
         return this.managedSettingsPath;
       default:

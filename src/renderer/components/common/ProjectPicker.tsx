@@ -129,9 +129,7 @@ export const ProjectPicker: React.FC<ProjectPickerProps> = ({
   return (
     <div className={`border rounded-lg p-4 bg-gray-50 ${className}`}>
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-medium">
-          {compact ? 'Project' : 'Select Project'}
-        </h4>
+        <h4 className="text-sm font-medium">{compact ? 'Project' : 'Select Project'}</h4>
         <Button
           variant="ghost"
           size="sm"
@@ -180,33 +178,31 @@ export const ProjectPicker: React.FC<ProjectPickerProps> = ({
           />
         )}
 
-        {filteredProjects.length > 0 ? (
-          filteredProjects.map(project => (
-            <ProjectPickerItem
-              key={project.path}
-              project={project}
-              isSelected={selectedProject?.path === project.path}
-              onClick={() => onSelect(project)}
-              disabled={disabled}
-              compact={compact}
-            />
-          ))
-        ) : (
-          searchQuery && (
-            <div className="text-center py-4 text-sm text-gray-600">
-              <SearchIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <p>No projects found matching &quot;{searchQuery}&quot;</p>
-              <Button
-                onClick={() => setSearchQuery('')}
-                variant="outline"
-                size="sm"
-                className="mt-2"
-              >
-                Clear Search
-              </Button>
-            </div>
-          )
-        )}
+        {filteredProjects.length > 0
+          ? filteredProjects.map(project => (
+              <ProjectPickerItem
+                key={project.path}
+                project={project}
+                isSelected={selectedProject?.path === project.path}
+                onClick={() => onSelect(project)}
+                disabled={disabled}
+                compact={compact}
+              />
+            ))
+          : searchQuery && (
+              <div className="text-center py-4 text-sm text-gray-600">
+                <SearchIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <p>No projects found matching &quot;{searchQuery}&quot;</p>
+                <Button
+                  onClick={() => setSearchQuery('')}
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                >
+                  Clear Search
+                </Button>
+              </div>
+            )}
       </div>
     </div>
   );
@@ -261,7 +257,9 @@ const ProjectPickerItem: React.FC<ProjectPickerItemProps> = ({
               <span className={`text-sm font-medium truncate ${compact ? 'text-xs' : ''}`}>
                 {label || project?.name}
               </span>
-              {isSelected && <CheckIcon className="h-3.5 w-3.5 text-blue-600 flex-shrink-0" strokeWidth={3} />}
+              {isSelected && (
+                <CheckIcon className="h-3.5 w-3.5 text-blue-600 flex-shrink-0" strokeWidth={3} />
+              )}
             </div>
             {!compact && project && (
               <div className="text-xs text-gray-600 truncate" title={project.path}>

@@ -137,7 +137,9 @@ export function CommandEditor({ command, onSave, onCancel, isLoading }: CommandE
         await onSave({
           name,
           location: location as 'user' | 'project',
-          ...(location === 'project' && selectedProject?.path ? { projectPath: selectedProject.path } : {}),
+          ...(location === 'project' && selectedProject?.path
+            ? { projectPath: selectedProject.path }
+            : {}),
           namespace: namespace || undefined,
           frontmatter: finalFrontmatter,
           content: finalContent,

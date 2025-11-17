@@ -38,7 +38,11 @@ export function registerSkillsHandlers() {
     IPC_CHANNELS.GET_SKILL,
     async (_event, request: GetSkillRequest): Promise<GetSkillResponse> => {
       try {
-        const skill = await skillsService.getSkill(request.name, request.location, request.projectPath);
+        const skill = await skillsService.getSkill(
+          request.name,
+          request.location,
+          request.projectPath
+        );
         return {
           success: true,
           data: skill,
