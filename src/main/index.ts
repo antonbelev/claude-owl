@@ -87,6 +87,10 @@ function createWindow() {
     mainWindow.loadFile(indexPath).catch(err => {
       console.error('Failed to load file:', err);
     });
+
+    // Open DevTools in production for debugging (can be removed later)
+    // Users can also use Cmd+Shift+I to toggle DevTools
+    mainWindow.webContents.openDevTools();
   }
 
   mainWindow.on('closed', () => {
