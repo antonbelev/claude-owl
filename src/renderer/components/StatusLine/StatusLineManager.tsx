@@ -107,8 +107,9 @@ export const StatusLineManager: React.FC = () => {
                 Status Lines Won&apos;t Work - Hooks Are Disabled
               </h3>
               <p className="text-red-800 mb-3">
-                Your settings have <strong>&quot;disableAllHooks&quot;</strong> enabled. This prevents status
-                lines from displaying because they rely on hooks to show session information.
+                Your settings have <strong>&quot;disableAllHooks&quot;</strong> enabled. This
+                prevents status lines from displaying because they rely on hooks to show session
+                information.
               </p>
               <p className="text-red-800">
                 To enable status lines: Go to{' '}

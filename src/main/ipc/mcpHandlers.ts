@@ -70,7 +70,11 @@ export function registerMCPHandlers(): void {
       });
 
       try {
-        const result = await claudeService.removeMCPServer(request.name, request.scope, request.projectPath);
+        const result = await claudeService.removeMCPServer(
+          request.name,
+          request.scope,
+          request.projectPath
+        );
 
         console.log('[MCPHandlers] Remove MCP server result:', {
           success: result.success,

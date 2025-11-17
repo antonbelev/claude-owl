@@ -452,7 +452,9 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
       content: content.trim(),
       filePath: agent?.filePath || '',
       location,
-      ...(location === 'project' && selectedProject?.path ? { projectPath: selectedProject.path } : {}),
+      ...(location === 'project' && selectedProject?.path
+        ? { projectPath: selectedProject.path }
+        : {}),
     };
 
     const success = await onSave(agentData);
