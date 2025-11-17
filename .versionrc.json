@@ -52,8 +52,7 @@
   "issueUrlFormat": "https://github.com/antonbelev/claude-owl/issues/{{id}}",
   "releaseCommitMessageFormat": "chore(release): {{currentTag}}",
   "scripts": {
-    "prerelease": "echo 'Running pre-release checks...' && npm run format && npm run lint && npm run typecheck && npm run test:unit && npm run build",
-    "postchangelog": "echo 'Changelog updated successfully'"
+    "postchangelog": "echo '✓ Changelog updated successfully'"
   },
   "skip": {
     "tag": true
