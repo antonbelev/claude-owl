@@ -167,7 +167,7 @@ npm test -- -t "should detect Claude"      # Run tests matching pattern
 
 ### Claude Code Integration
 
-**IMPORTANT:** See `docs/adr-001-settings-management-redesign.md` for complete architecture decision.
+**IMPORTANT:** See `project-docs/adr/adr-001-settings-management-redesign.md` for complete architecture decision.
 
 Claude Owl interacts with these Claude Code files:
 
@@ -436,7 +436,7 @@ npm run test:coverage     # Coverage report
 
 ## Working with Scoped Features
 
-**⚠️ IMPORTANT:** When adding features that support both user-level and project-level configurations (e.g., MCP servers, slash commands, subagents, skills, hooks), you MUST use the unified project selection pattern defined in **[ADR-005: Project Selection UX](./docs/adr/adr-005-project-selection-ux.md)**.
+**⚠️ IMPORTANT:** When adding features that support both user-level and project-level configurations (e.g., MCP servers, slash commands, subagents, skills, hooks), you MUST use the unified project selection pattern defined in **[ADR-005: Project Selection UX](./project-docs/adr/adr-005-project-selection-ux.md)**.
 
 ### Quick Reference
 
@@ -530,8 +530,8 @@ When adding a new scoped feature:
    - Test correct file path resolution
 
 ### See Also
-- [ADR-005: Unified Project Selection UX](./docs/adr/adr-005-project-selection-ux.md) - Complete architecture
-- [Project Selection Implementation Guide](./docs/PROJECT_SELECTION_IMPLEMENTATION.md) - Detailed checklist
+- [ADR-005: Unified Project Selection UX](./project-docs/adr/adr-005-project-selection-ux.md) - Complete architecture
+- [Project Selection Implementation Guide](./project-docs/PROJECT_SELECTION_IMPLEMENTATION.md) - Detailed checklist
 
 ## Critical Design Constraint
 
@@ -594,8 +594,8 @@ const request = {
 ```
 
 **See also:**
-- [ADR-005: Unified Project Selection UX](./docs/adr/adr-005-project-selection-ux.md) - Complete architecture
-- [Project Selection Implementation Guide](./docs/PROJECT_SELECTION_IMPLEMENTATION.md) - Detailed checklist
+- [ADR-005: Unified Project Selection UX](./project-docs/adr/adr-005-project-selection-ux.md) - Complete architecture
+- [Project Selection Implementation Guide](./project-docs/PROJECT_SELECTION_IMPLEMENTATION.md) - Detailed checklist
 
 ## Current State
 

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Screenshots - Claude Owl</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Explore Claude Owl's features through screenshots. Visual walkthrough of settings management, MCP servers, subagents, skills, slash commands, and more.">
+  <meta name="keywords" content="Claude Owl Screenshots, Claude Code UI, Visual Configuration Manager">
+  <meta name="author" content="Claude Owl Contributors">
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://antonbelev.github.io/claude-owl/screenshots.html">
+  <meta property="og:title" content="Screenshots - Claude Owl">
+  <meta property="og:description" content="Visual walkthrough of Claude Owl features">
+  <meta property="og:image" content="https://antonbelev.github.io/claude-owl/assets/og-image.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="assets/styles.css">
+
+  <style>
+    .screenshot-img {
+      border-radius: 0.5rem;
+      border: 2px solid rgb(51, 65, 85);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .screenshot-img:hover {
+      border-color: rgb(59, 130, 246);
+      transform: scale(1.02);
+      box-shadow: 0 10px 40px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.9);
+    }
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      max-width: 90%;
+      max-height: 90%;
+    }
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 40px;
+      color: #fff;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close-modal:hover {
+      color: #bbb;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white min-h-screen">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 w-full bg-slate-900/80 backdrop-blur-md border-b border-slate-700 z-50">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <span class="text-3xl">🦉</span>
+        <a href="index.html" class="text-xl font-bold hover:text-blue-400 transition">Claude Owl</a>
+        <span id="version-badge" class="text-xs bg-blue-600 px-2 py-1 rounded-full">v0.1.0</span>
+      </div>
+      <div class="hidden md:flex space-x-6">
+        <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+        <a href="screenshots.html" class="text-blue-400">Screenshots</a>
+        <a href="changelog.html" class="hover:text-blue-400 transition">Changelog</a>
+        <a href="installation.html" class="hover:text-blue-400 transition">Installation</a>
+        <a href="https://github.com/antonbelev/claude-owl" target="_blank" class="hover:text-blue-400 transition">GitHub</a>
+      </div>
+      <button id="mobile-menu-btn" class="md:hidden text-white">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="pt-32 pb-12 px-6">
+    <div class="container mx-auto text-center">
+      <div class="text-6xl mb-6">📸</div>
+      <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+        Feature Screenshots
+      </h1>
+      <p class="text-lg text-slate-300 mb-4 max-w-2xl mx-auto">
+        Explore Claude Owl's intuitive interface through visual walkthroughs
+      </p>
+      <p class="text-sm text-slate-400 max-w-xl mx-auto">
+        All features shown are available on macOS (Intel & Apple Silicon). Windows and Linux support coming soon.
+      </p>
+    </div>
+  </section>
+
+  <!-- Table of Contents -->
+  <section class="pb-8 px-6">
+    <div class="container mx-auto max-w-5xl">
+      <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+        <h2 class="text-xl font-semibold mb-4">Jump to Section</h2>
+        <div class="grid md:grid-cols-3 gap-3 text-sm">
+          <a href="#dashboard" class="text-blue-400 hover:underline">🏠 Dashboard</a>
+          <a href="#settings" class="text-blue-400 hover:underline">⚙️ Settings</a>
+          <a href="#subagents" class="text-blue-400 hover:underline">🤖 Subagents</a>
+          <a href="#skills" class="text-blue-400 hover:underline">🎯 Skills</a>
+          <a href="#commands" class="text-blue-400 hover:underline">⚡ Slash Commands</a>
+          <a href="#hooks" class="text-blue-400 hover:underline">🪝 Hooks</a>
+          <a href="#mcp" class="text-blue-400 hover:underline">🔌 MCP Servers</a>
+          <a href="#statusline" class="text-blue-400 hover:underline">📊 Status Line</a>
+          <a href="#logs" class="text-blue-400 hover:underline">📝 Debug Logs</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboard -->
+  <section id="dashboard" class="py-12 px-6 bg-slate-800/30">
+    <div class="container mx-auto max-w-5xl">
+      <h2 class="text-3xl font-bold mb-2 flex items-center">
+        <span class="text-4xl mr-3">🏠</span> Dashboard
+      </h2>
+      <p class="text-slate-400 mb-6">Claude Code installation status and API monitoring at a glance</p>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-blue-300">Claude Code Installation Status & API Monitoring</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/claude-owl-dashboard.png"
+               alt="Claude Owl Dashboard"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            Real-time detection of installed version, path, API service status monitor with incident tracking, and quick access to installation guides.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Settings -->
+  <section id="settings" class="py-12 px-6">
+    <div class="container mx-auto max-w-5xl">
+      <h2 class="text-3xl font-bold mb-2 flex items-center">
+        <span class="text-4xl mr-3">⚙️</span> Settings Management
+      </h2>
+      <p class="text-slate-400 mb-6">Manage user and project-level settings with visual editors</p>
+
+      <div class="space-y-8">
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-blue-300">User-Level Settings</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/settings-user-level.png"
+               alt="Settings - User Level"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            Configure global Claude Code preferences: default model selection, environment variables, and core settings.
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-blue-300">Project-Level Settings</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/settings-project-level-search.png"
+               alt="Settings - Project Level"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            Project-specific configuration overrides with search, filter, and local overrides support.
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-blue-300">Advanced Permissions Editor</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/settings-permissions.png"
+               alt="Settings - Permissions"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            Visual permission rule builder with grid view, color-coding by permission level, and search capabilities.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-blue-300">Create Permission Rule</h3>
+            <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/settings-permissions-create-rule.png"
+                 alt="Settings - Create Permission Rule"
+                 class="screenshot-img w-full"
+                 onclick="openModal(this.src, this.alt)">
+            <p class="text-sm text-slate-400 mt-2">
+              Step-by-step form with pattern matching, live validation, and example preview.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-blue-300">Pre-built Templates</h3>
+            <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/settings-permissions-rules-templates.png"
+                 alt="Settings - Templates"
+                 class="screenshot-img w-full"
+                 onclick="openModal(this.src, this.alt)">
+            <p class="text-sm text-slate-400 mt-2">
+              6 security templates for common use cases: env protection, npm scripts, git read-only, and more.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-blue-300">Raw JSON Editor</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/settings-raw-json-editor.png"
+               alt="Settings - Raw JSON"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            Advanced configuration for power users with read-only view and manual editing capability.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Subagents -->
+  <section id="subagents" class="py-12 px-6 bg-slate-800/30">
+    <div class="container mx-auto max-w-5xl">
+      <h2 class="text-3xl font-bold mb-2 flex items-center">
+        <span class="text-4xl mr-3">🤖</span> Subagents Manager
+      </h2>
+      <p class="text-slate-400 mb-6">Create and manage custom Claude Code agents</p>
+
+      <div class="space-y-8">
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-blue-300">Subagents Grid View</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/subagents.png"
+               alt="Subagents Grid"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            Browse all custom agents with tool count indicators, location badges, and last modified timestamps.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-blue-300">Agent Details</h3>
+            <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/subagents-view.png"
+                 alt="Subagent Details"
+                 class="screenshot-img w-full"
+                 onclick="openModal(this.src, this.alt)">
+            <p class="text-sm text-slate-400 mt-2">
+              Full agent information with markdown rendering, tool list, and metadata.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-blue-300">Create Subagent</h3>
+            <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/create-subagent.png"
+                 alt="Create Subagent"
+                 class="screenshot-img w-full"
+                 onclick="openModal(this.src, this.alt)">
+            <p class="text-sm text-slate-400 mt-2">
+              Visual form with name validation, model selection, tool restrictions, and unsaved changes protection.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section id="skills" class="py-12 px-6">
+    <div class="container mx-auto max-w-5xl">
+      <h2 class="text-3xl font-bold mb-2 flex items-center">
+        <span class="text-4xl mr-3">🎯</span> Skills Manager
+      </h2>
+      <p class="text-slate-400 mb-6">Manage Claude Code skills with frontmatter support</p>
+
+      <div class="space-y-8">
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-blue-300">Skills Grid View</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/skills.png"
+               alt="Skills Grid"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            Browse available skills with supporting files count, allowed tools indicators, and location badges.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-blue-300">Skill Details</h3>
+            <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/skills-view.png"
+                 alt="Skill Details"
+                 class="screenshot-img w-full"
+                 onclick="openModal(this.src, this.alt)">
+            <p class="text-sm text-slate-400 mt-2">
+              Complete skill information with markdown rendering, tools list, and supporting files.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-blue-300">Create Skill</h3>
+            <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/skills-create-new.png"
+                 alt="Create Skill"
+                 class="screenshot-img w-full"
+                 onclick="openModal(this.src, this.alt)">
+            <p class="text-sm text-slate-400 mt-2">
+              Upload markdown or create from scratch with frontmatter validation and character limits.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slash Commands -->
+  <section id="commands" class="py-12 px-6 bg-slate-800/30">
+    <div class="container mx-auto max-w-5xl">
+      <h2 class="text-3xl font-bold mb-2 flex items-center">
+        <span class="text-4xl mr-3">⚡</span> Slash Commands Manager
+      </h2>
+      <p class="text-slate-400 mb-6">Create custom slash commands and import from GitHub</p>
+
+      <div class="space-y-8">
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-blue-300">Commands Grid View</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/slash-commands.png"
+               alt="Slash Commands"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            Browse all slash commands with namespace grouping, model and tool count badges, and source tracking.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-blue-300">Command Details</h3>
+            <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/slash-commands-view-command.png"
+                 alt="Command Details"
+                 class="screenshot-img w-full"
+                 onclick="openModal(this.src, this.alt)">
+            <p class="text-sm text-slate-400 mt-2">
+              Full command information with usage examples and imported source tracking.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-blue-300">Create Command</h3>
+            <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/slash-command-create-new-project-scope.png"
+                 alt="Create Command"
+                 class="screenshot-img w-full"
+                 onclick="openModal(this.src, this.alt)">
+            <p class="text-sm text-slate-400 mt-2">
+              Multi-step wizard with frontmatter editor, content editor, and security warnings.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-blue-300">GitHub Integration - Browse Repository</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/slash-commands-import-github.png"
+               alt="GitHub Import"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            Browse GitHub repositories with folder navigation, breadcrumbs, and markdown file filtering.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-blue-300">Select Commands to Import</h3>
+            <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/slash-commands-import-github-select-commands.png"
+                 alt="Select Commands"
+                 class="screenshot-img w-full"
+                 onclick="openModal(this.src, this.alt)">
+            <p class="text-sm text-slate-400 mt-2">
+              Multi-select capability with batch import and content preview.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-blue-300">Import Success</h3>
+            <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/slash-commands-import-github-success.png"
+                 alt="Import Success"
+                 class="screenshot-img w-full"
+                 onclick="openModal(this.src, this.alt)">
+            <p class="text-sm text-slate-400 mt-2">
+              Confirmation with imported command details and quick links.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hooks -->
+  <section id="hooks" class="py-12 px-6">
+    <div class="container mx-auto max-w-5xl">
+      <h2 class="text-3xl font-bold mb-2 flex items-center">
+        <span class="text-4xl mr-3">🪝</span> Hooks Viewer
+      </h2>
+      <p class="text-slate-400 mb-6">View hook configurations (Phase 1 - Read-Only)</p>
+
+      <div>
+        <h3 class="text-xl font-semibold mb-3 text-blue-300">Hooks Manager</h3>
+        <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/hooks-read-only-phase-1.png"
+             alt="Hooks Manager"
+             class="screenshot-img w-full"
+             onclick="openModal(this.src, this.alt)">
+        <p class="text-sm text-slate-400 mt-2">
+          Support for 8 hook events with validation status, security warnings, and context variables documentation. Template-based editing planned for Phase 2.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MCP Servers -->
+  <section id="mcp" class="py-12 px-6 bg-slate-800/30">
+    <div class="container mx-auto max-w-5xl">
+      <h2 class="text-3xl font-bold mb-2 flex items-center">
+        <span class="text-4xl mr-3">🔌</span> MCP Servers Manager
+      </h2>
+      <p class="text-slate-400 mb-6">Configure Model Context Protocol servers</p>
+
+      <div class="space-y-8">
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-blue-300">MCP Servers Grid View</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/mcp-servers.png"
+               alt="MCP Servers"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            Browse installed servers with scope badges, type indicators, and quick actions.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-blue-300">Add MCP Server</h3>
+            <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/mcp-add-server.png"
+                 alt="Add MCP Server"
+                 class="screenshot-img w-full"
+                 onclick="openModal(this.src, this.alt)">
+            <p class="text-sm text-slate-400 mt-2">
+              Configure new server with transport type selection, command/URL configuration, and environment variables.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-blue-300">Server Details</h3>
+            <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/mcp-view-server.png"
+                 alt="Server Details"
+                 class="screenshot-img w-full"
+                 onclick="openModal(this.src, this.alt)">
+            <p class="text-sm text-slate-400 mt-2">
+              Full server configuration display with environment variables, command arguments, and edit capability.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Status Line -->
+  <section id="statusline" class="py-12 px-6">
+    <div class="container mx-auto max-w-5xl">
+      <h2 class="text-3xl font-bold mb-2 flex items-center">
+        <span class="text-4xl mr-3">📊</span> Status Line Manager
+      </h2>
+      <p class="text-slate-400 mb-6">Choose from 10+ pre-built status line templates</p>
+
+      <div class="space-y-8">
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-blue-300">Templates Gallery</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/statusline-apply-template.png"
+               alt="Status Line Templates"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            Browse templates organized by skill level: Beginner, Intermediate, Advanced, and Specialized categories.
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-blue-300">Template Application Review</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/statusline-apply-template-review.png"
+               alt="Apply Template"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            Live preview with mock session data, script content display, and dependency warnings.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Debug Logs -->
+  <section id="logs" class="py-12 px-6 bg-slate-800/30">
+    <div class="container mx-auto max-w-5xl">
+      <h2 class="text-3xl font-bold mb-2 flex items-center">
+        <span class="text-4xl mr-3">📝</span> Debug Logs Viewer
+      </h2>
+      <p class="text-slate-400 mb-6">Access and search Claude Code debug logs</p>
+
+      <div>
+        <h3 class="text-xl font-semibold mb-3 text-blue-300">Debug Logs</h3>
+        <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/debug-logs.png"
+             alt="Debug Logs"
+             class="screenshot-img w-full"
+             onclick="openModal(this.src, this.alt)">
+        <p class="text-sm text-slate-400 mt-2">
+          Log file list with timestamps, full content viewer, syntax highlighting, line numbers, and search capabilities.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Additional Features -->
+  <section class="py-12 px-6">
+    <div class="container mx-auto max-w-5xl">
+      <h2 class="text-3xl font-bold mb-6">🧩 Additional Features</h2>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+          <h3 class="text-xl font-semibold mb-3">📁 Project Discovery</h3>
+          <ul class="text-sm text-slate-400 space-y-2">
+            <li>• Automatic detection of Claude Code projects</li>
+            <li>• Project selection for project-level settings</li>
+            <li>• Recent projects quick access</li>
+            <li>• Project context maintained across app</li>
+          </ul>
+        </div>
+
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+          <h3 class="text-xl font-semibold mb-3">🎨 Design Features</h3>
+          <ul class="text-sm text-slate-400 space-y-2">
+            <li>• Responsive layouts for all screen sizes</li>
+            <li>• Modal dialogs for detailed views</li>
+            <li>• Keyboard navigation (ESC, Tab, Enter)</li>
+            <li>• Hover states and smooth transitions</li>
+          </ul>
+        </div>
+
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+          <h3 class="text-xl font-semibold mb-3">🔍 Common UI Patterns</h3>
+          <ul class="text-sm text-slate-400 space-y-2">
+            <li>• Empty states with helpful guidance</li>
+            <li>• Loading states with skeleton loaders</li>
+            <li>• Error handling with retry options</li>
+            <li>• Real-time validation feedback</li>
+          </ul>
+        </div>
+
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+          <h3 class="text-xl font-semibold mb-3">♿ Accessibility</h3>
+          <ul class="text-sm text-slate-400 space-y-2">
+            <li>• ESC key support for modal dismissal</li>
+            <li>• Tab navigation throughout</li>
+            <li>• Color-coded information (green/yellow/red)</li>
+            <li>• Descriptive labels and help text</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- System Requirements -->
+  <section class="py-12 px-6 bg-gradient-to-r from-blue-600 to-purple-600">
+    <div class="container mx-auto text-center max-w-3xl">
+      <h2 class="text-3xl font-bold mb-4">📱 System Requirements</h2>
+      <div class="bg-white/10 rounded-xl p-6 backdrop-blur-sm">
+        <p class="text-lg mb-4">All screenshots showcase features tested on:</p>
+        <ul class="text-left inline-block text-lg space-y-2">
+          <li>✅ <strong>macOS</strong> (Intel & Apple Silicon)</li>
+          <li>✅ <strong>Node.js</strong> >= 18.0.0</li>
+          <li>✅ <strong>Claude Code CLI</strong> installed</li>
+        </ul>
+        <p class="text-sm mt-6 opacity-90">
+          Windows and Linux support coming in future releases.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 px-6">
+    <div class="container mx-auto text-center">
+      <h2 class="text-4xl font-bold mb-4">Ready to try Claude Owl?</h2>
+      <p class="text-xl mb-8 text-slate-300">Download now and experience visual configuration management</p>
+      <div class="flex justify-center space-x-4">
+        <a href="index.html#download-section" class="bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition">
+          Download for macOS
+        </a>
+        <a href="installation.html" class="bg-slate-700 text-white font-semibold py-3 px-8 rounded-lg hover:bg-slate-600 transition">
+          Installation Guide
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-8 px-6 border-t border-slate-700">
+    <div class="container mx-auto text-center text-slate-400 text-sm">
+      <p class="mb-2">
+        Made with ❤️ by the Claude Owl community
+      </p>
+      <p>
+        <a href="https://github.com/antonbelev/claude-owl" class="hover:text-blue-400">GitHub</a> •
+        <a href="https://github.com/antonbelev/claude-owl/issues" class="hover:text-blue-400">Issues</a> •
+        <a href="changelog.html" class="hover:text-blue-400">Changelog</a> •
+        <a href="https://github.com/antonbelev/claude-owl/blob/main/LICENSE" class="hover:text-blue-400">MIT License</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Image Modal -->
+  <div id="imageModal" class="modal" onclick="closeModal()">
+    <span class="close-modal" onclick="closeModal()">&times;</span>
+    <img class="modal-content" id="modalImage">
+  </div>
+
+  <!-- JavaScript -->
+  <script src="assets/app.js"></script>
+  <script>
+    function openModal(src, alt) {
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImage');
+      modal.classList.add('active');
+      modalImg.src = src;
+      modalImg.alt = alt;
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('imageModal');
+      modal.classList.remove('active');
+    }
+
+    // Close modal on ESC key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>

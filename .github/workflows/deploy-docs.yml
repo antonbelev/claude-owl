@@ -6,6 +6,7 @@ on:
     paths:
       - 'docs/**'
       - 'CHANGELOG.md'
+      - 'SCREENSHOTS.md'
       - '.github/workflows/deploy-docs.yml'
 
   # Allow manual trigger
@@ -34,10 +35,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Copy changelog to docs
+      - name: Copy changelog and screenshots to docs
         run: |
-          echo "Copying CHANGELOG.md to docs directory..."
+          echo "Copying CHANGELOG.md and SCREENSHOTS.md to docs directory..."
           cp CHANGELOG.md docs/changelog.md
+          cp SCREENSHOTS.md docs/screenshots.md
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -61,5 +63,6 @@ jobs:
           echo ""
           echo "📄 Pages deployed:"
           echo "  • Homepage: ${{ steps.deployment.outputs.page_url }}"
+          echo "  • Screenshots: ${{ steps.deployment.outputs.page_url }}screenshots.html"
           echo "  • Changelog: ${{ steps.deployment.outputs.page_url }}changelog.html"
           echo "  • Installation: ${{ steps.deployment.outputs.page_url }}installation.html"
