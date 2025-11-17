@@ -8,7 +8,8 @@
     "moduleResolution": "bundler",
 
     // Output configuration
-    "outDir": "dist/preload",
+    "rootDir": "src",
+    "outDir": "dist",
 
     // No JSX in preload scripts
     "jsx": "preserve",

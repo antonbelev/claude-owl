@@ -10,7 +10,7 @@
 
     // Output configuration
     "rootDir": "src",
-    "outDir": "dist/main",
+    "outDir": "dist",
 
     // Path aliases for main process
     "baseUrl": ".",
