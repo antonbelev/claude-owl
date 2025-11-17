@@ -73,15 +73,11 @@ export const ScopeSelector: React.FC<ScopeSelectorProps> = ({
                     peer-data-[state=checked]:border-blue-500
                   `}
                 >
-                  {scope === 'user' && (
-                    <div className="w-2 h-2 rounded-full bg-blue-500" />
-                  )}
+                  {scope === 'user' && <div className="w-2 h-2 rounded-full bg-blue-500" />}
                 </div>
                 <span className="font-medium text-sm">{userLabel}</span>
               </div>
-              {!compact && (
-                <p className="text-xs text-gray-600 pl-6">{userDescription}</p>
-              )}
+              {!compact && <p className="text-xs text-gray-600 pl-6">{userDescription}</p>}
             </Label>
           </div>
 
@@ -108,15 +104,11 @@ export const ScopeSelector: React.FC<ScopeSelectorProps> = ({
                     peer-data-[state=checked]:border-blue-500
                   `}
                 >
-                  {scope === 'project' && (
-                    <div className="w-2 h-2 rounded-full bg-blue-500" />
-                  )}
+                  {scope === 'project' && <div className="w-2 h-2 rounded-full bg-blue-500" />}
                 </div>
                 <span className="font-medium text-sm">{projectLabel}</span>
               </div>
-              {!compact && (
-                <p className="text-xs text-gray-600 pl-6">{projectDescription}</p>
-              )}
+              {!compact && <p className="text-xs text-gray-600 pl-6">{projectDescription}</p>}
             </Label>
           </div>
         </RadioGroup>

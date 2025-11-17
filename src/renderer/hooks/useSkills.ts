@@ -19,7 +19,11 @@ export interface UseSkillsResult {
     allowedTools?: string[],
     projectPath?: string
   ) => Promise<boolean>;
-  deleteSkill: (name: string, location: 'user' | 'project', projectPath?: string) => Promise<boolean>;
+  deleteSkill: (
+    name: string,
+    location: 'user' | 'project',
+    projectPath?: string
+  ) => Promise<boolean>;
 }
 
 /**

@@ -110,7 +110,7 @@ function createWindow() {
       console.error('[Main] Error details:', {
         code: err.code,
         path: err.path,
-        message: err.message
+        message: err.message,
       });
     });
   }

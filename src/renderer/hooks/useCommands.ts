@@ -129,7 +129,11 @@ export function useCommands(filter?: CommandFilter, sort?: CommandSortOptions) {
       frontmatter: CommandFrontmatter;
       content: string;
     }): Promise<{ success: boolean; filePath?: string; error?: string }> => {
-      console.log('[useCommands] Creating command:', { name: options.name, location: options.location, projectPath: options.projectPath });
+      console.log('[useCommands] Creating command:', {
+        name: options.name,
+        location: options.location,
+        projectPath: options.projectPath,
+      });
 
       if (!window.electronAPI) {
         return { success: false, error: 'Not running in Electron' };

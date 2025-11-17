@@ -294,7 +294,11 @@ export class SkillsService {
   /**
    * Delete a skill
    */
-  async deleteSkill(name: string, location: 'user' | 'project', projectPath?: string): Promise<void> {
+  async deleteSkill(
+    name: string,
+    location: 'user' | 'project',
+    projectPath?: string
+  ): Promise<void> {
     const skillsPath = this.getSkillsPath(location, projectPath);
     const skillDirPath = path.join(skillsPath, name);
 

@@ -114,7 +114,9 @@ export const AddServerForm: React.FC<AddServerFormProps> = ({ onSubmit, onCancel
         name: name.trim(),
         transport,
         scope,
-        ...(scope === 'project' && selectedProject?.path ? { projectPath: selectedProject.path } : {}),
+        ...(scope === 'project' && selectedProject?.path
+          ? { projectPath: selectedProject.path }
+          : {}),
       };
 
       // Add transport-specific fields

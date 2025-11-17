@@ -489,9 +489,8 @@ export class CommandsService {
     }
 
     // Determine commands path based on location and projectPath
-    const commandsPath = location === 'user'
-      ? this.userCommandsPath
-      : path.join(projectPath!, '.claude', 'commands');
+    const commandsPath =
+      location === 'user' ? this.userCommandsPath : path.join(projectPath!, '.claude', 'commands');
 
     const targetDir = namespace ? path.join(commandsPath, namespace) : commandsPath;
     const commandFilePath = path.join(targetDir, `${name}.md`);
