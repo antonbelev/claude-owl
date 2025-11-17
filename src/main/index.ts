@@ -20,7 +20,8 @@ let mainWindow: BrowserWindow | null = null;
 
 function createWindow() {
   const preloadPath = path.join(__dirname, '../preload/index.js');
-  console.log('Preload path:', preloadPath);
+  console.log('[Main] Preload path:', preloadPath);
+  console.log('[Main] Preload exists:', fs.existsSync(preloadPath));
 
   // In packaged app, icon is set by electron-builder
   // In development, skip icon since it may not exist
@@ -37,6 +38,7 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
+      webSecurity: false, // Allow loading local resources in production
     },
     title: 'Claude Owl',
     titleBarStyle: 'default',
@@ -53,10 +55,23 @@ function createWindow() {
 
   mainWindow = new BrowserWindow(browserWindowConfig);
 
-  // Show window when ready
+  // Show window when ready (or after timeout to ensure visibility)
+  let windowShown = false;
   mainWindow.once('ready-to-show', () => {
-    mainWindow?.show();
+    if (!windowShown) {
+      mainWindow?.show();
+      windowShown = true;
+    }
   });
+
+  // Fallback: show window after 3 seconds even if not ready (for debugging)
+  setTimeout(() => {
+    if (!windowShown && mainWindow && !mainWindow.isDestroyed()) {
+      console.log('[Main] Showing window after timeout (ready-to-show did not fire)');
+      mainWindow.show();
+      windowShown = true;
+    }
+  }, 3000);
 
   // Log console messages from renderer
   mainWindow.webContents.on('console-message', (_event, _level, message) => {
@@ -82,10 +97,21 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
   } else {
     // In production, load from dist folder within asar
-    const indexPath = path.join(__dirname, '../../dist/renderer/index.html');
-    console.log('Loading from file:', indexPath);
+    // __dirname is .../app.asar/dist/main, so we need to go up one level to app.asar, then to dist/renderer
+    const appAsar = path.join(__dirname, '../../');
+    const indexPath = path.join(appAsar, 'dist/renderer/index.html');
+    console.log('[Main] Loading from file:', indexPath);
+    console.log('[Main] __dirname:', __dirname);
+    console.log('[Main] appAsar:', appAsar);
+    console.log('[Main] File exists:', fs.existsSync(indexPath));
+
     mainWindow.loadFile(indexPath).catch(err => {
-      console.error('Failed to load file:', err);
+      console.error('[Main] Failed to load file:', err);
+      console.error('[Main] Error details:', {
+        code: err.code,
+        path: err.path,
+        message: err.message
+      });
     });
   }
 

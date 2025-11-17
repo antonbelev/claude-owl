@@ -50,7 +50,7 @@ export default defineConfig({
     },
     root: 'src/renderer',
     build: {
-      outDir: '../../dist/renderer',
+      outDir: path.resolve(__dirname, 'dist/renderer'),
       rollupOptions: {
         input: path.resolve(__dirname, 'src/renderer/index.html'),
       },

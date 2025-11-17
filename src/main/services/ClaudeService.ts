@@ -43,11 +43,28 @@ interface ClaudeConfigMCPServer {
 
 export class ClaudeService {
   /**
+   * Get the execution environment with proper PATH for macOS
+   * This is needed because packaged Electron apps don't inherit the user's PATH
+   */
+  private getExecEnv() {
+    const env = { ...process.env };
+
+    // On macOS, add common binary paths that might not be in Electron's PATH
+    if (process.platform === 'darwin') {
+      const paths = [env.PATH || '', '/usr/local/bin', '/opt/homebrew/bin', '/usr/bin', '/bin'];
+      env.PATH = paths.filter(p => p).join(':');
+    }
+
+    return env;
+  }
+
+  /**
    * Check if Claude Code CLI is installed and get its version
    */
   async checkInstallation(): Promise<ClaudeInstallationInfo> {
     try {
-      const { stdout, stderr } = await execAsync('which claude');
+      const env = this.getExecEnv();
+      const { stdout, stderr } = await execAsync('which claude', { env });
 
       if (stderr || !stdout.trim()) {
         return {
@@ -61,7 +78,7 @@ export class ClaudeService {
 
       // Get version
       try {
-        const { stdout: versionOutput } = await execAsync('claude --version');
+        const { stdout: versionOutput } = await execAsync('claude --version', { env });
         const version = versionOutput.trim();
 
         return {
@@ -91,7 +108,7 @@ export class ClaudeService {
    */
   async getVersion(): Promise<string | null> {
     try {
-      const { stdout } = await execAsync('claude --version');
+      const { stdout } = await execAsync('claude --version', { env: this.getExecEnv() });
       return stdout.trim();
     } catch {
       return null;
@@ -245,7 +262,7 @@ export class ClaudeService {
 
       console.log('[ClaudeService] Executing command:', command, { cwd });
 
-      const { stdout, stderr } = await execAsync(command, { cwd });
+      const { stdout, stderr } = await execAsync(command, { cwd, env: this.getExecEnv() });
 
       // Parse output to determine success
       const output = stdout + stderr;
@@ -297,7 +314,7 @@ export class ClaudeService {
 
       console.log('[ClaudeService] Executing command:', command, { cwd });
 
-      const { stdout, stderr } = await execAsync(command, { cwd });
+      const { stdout, stderr } = await execAsync(command, { cwd, env: this.getExecEnv() });
 
       const output = stdout + stderr;
       const success =
@@ -364,7 +381,7 @@ export class ClaudeService {
       const command = `claude mcp get ${this.escapeArg(name)} --format json`;
       console.log('[ClaudeService] Executing command:', command);
 
-      const { stdout, stderr } = await execAsync(command);
+      const { stdout, stderr } = await execAsync(command, { env: this.getExecEnv() });
 
       if (stderr && stderr.toLowerCase().includes('error')) {
         console.error('[ClaudeService] Error getting MCP server:', stderr);

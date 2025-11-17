@@ -18,10 +18,8 @@ npm run dev            # Start Vite dev server only (for renderer testing)
 
 ### Building
 ```bash
-npm run build          # Build all (renderer, main, preload)
-npm run build:renderer # Build React frontend only
-npm run build:main     # Build Electron main process only
-npm run build:preload  # Build preload scripts only
+npm run build          # Build all (renderer, main, preload) using electron-vite
+npm run build:renderer # Build React frontend only (Vite standalone)
 ```
 
 ### Testing
@@ -397,9 +395,6 @@ npm run test:unit
 
 # 5. Build all targets
 npm run build
-npm run build:renderer
-npm run build:main
-npm run build:preload
 ```
 
 **Or run everything at once:**
@@ -422,7 +417,7 @@ The automated CI pipeline (`.github/workflows/ci.yml`) runs these jobs and **ALL
 - ✅ **Lint** - Code quality checks
 - ✅ **Type Check** - TypeScript compilation
 - ✅ **Unit Tests** - All tests must pass
-- ✅ **Build** - All build targets (main, renderer, preload)
+- ✅ **Build** - Production build using electron-vite
 - ⚠️ **Security Scan** - Trivy vulnerability scanner (informational)
 - ⚠️ **Integration Tests** - Optional, runs if above pass
 

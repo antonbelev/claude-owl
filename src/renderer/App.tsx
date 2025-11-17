@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ProjectProvider } from './contexts/ProjectContext';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
@@ -33,7 +33,7 @@ export const App: React.FC = () => {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <ProjectProvider>
-          <BrowserRouter>
+          <HashRouter>
             <Routes>
               <Route path="/" element={<AppLayout />}>
                 <Route index element={<Dashboard />} />
@@ -51,7 +51,7 @@ export const App: React.FC = () => {
                 <Route path="about" element={<AboutPage />} />
               </Route>
             </Routes>
-          </BrowserRouter>
+          </HashRouter>
         </ProjectProvider>
       </QueryClientProvider>
     </ErrorBoundary>

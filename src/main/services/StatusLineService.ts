@@ -42,6 +42,22 @@ export class StatusLineService {
   }
 
   /**
+   * Get the execution environment with proper PATH for macOS
+   * This is needed because packaged Electron apps don't inherit the user's PATH
+   */
+  private getExecEnv() {
+    const env = { ...process.env };
+
+    // On macOS, add common binary paths that might not be in Electron's PATH
+    if (process.platform === 'darwin') {
+      const paths = [env.PATH || '', '/usr/local/bin', '/opt/homebrew/bin', '/usr/bin', '/bin'];
+      env.PATH = paths.filter(p => p).join(':');
+    }
+
+    return env;
+  }
+
+  /**
    * Get active status line configuration from settings.json
    */
   async getActiveConfig(): Promise<StatusLineConfig | null> {
@@ -204,11 +220,7 @@ export class StatusLineService {
         const { stdout, stderr } = await execAsync(command, {
           timeout: 2000,
           shell: '/bin/bash',
-          env: {
-            HOME: process.env.HOME,
-            USER: process.env.USER,
-            PATH: process.env.PATH,
-          },
+          env: this.getExecEnv(),
         });
 
         if (stderr) {
