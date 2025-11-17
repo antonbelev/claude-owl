@@ -101,10 +101,6 @@ jobs:
     permissions:
       contents: read
 
-    strategy:
-      matrix:
-        target: [main, renderer, preload]
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -117,8 +113,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build ${{ matrix.target }}
-        run: npm run build:${{ matrix.target }}
+      - name: Build application
+        run: npm run build
 
   # Job 5: Security checks (optional but recommended)
   security:
