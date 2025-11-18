@@ -70,6 +70,7 @@ jobs:
       - name: Package macOS app
         run: npm run package:mac
         env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
           # Future: Add code signing
           # APPLE_ID: ${{ secrets.APPLE_ID }}
           # APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
