@@ -41,6 +41,7 @@
       <div class="flex items-center space-x-3">
         <span class="text-3xl">🦉</span>
         <span class="text-xl font-bold">Claude Owl</span>
+        <span class="text-xs bg-orange-600 px-2 py-1 rounded-full font-semibold">BETA</span>
         <span id="version-badge" class="text-xs bg-blue-600 px-2 py-1 rounded-full">Loading...</span>
       </div>
       <div class="hidden md:flex space-x-6">
@@ -114,7 +115,29 @@
             </p>
           </div>
 
-          <p class="text-sm text-slate-400">
+          <!-- Warning Banner for macOS -->
+          <div class="bg-yellow-900/30 border-2 border-yellow-600 rounded-xl p-4 mt-4">
+            <div class="flex items-start space-x-3">
+              <div class="text-2xl">⚠️</div>
+              <div>
+                <h4 class="text-yellow-300 font-semibold mb-2">Important: macOS Installation Requires Extra Step</h4>
+                <p class="text-sm text-yellow-100 mb-2">
+                  After downloading and installing, macOS will block the app with a "damaged" error because Claude Owl is not yet code-signed (Apple Developer Program costs $99/year).
+                </p>
+                <p class="text-sm text-yellow-100 mb-3">
+                  <strong>Quick Fix:</strong> Run this Terminal command after installation:
+                </p>
+                <code class="block bg-slate-900 text-green-400 text-xs px-3 py-2 rounded mb-3 font-mono">
+                  xattr -r -d com.apple.quarantine "/Applications/Claude Owl.app"
+                </code>
+                <a href="installation.html" class="inline-flex items-center text-sm text-yellow-300 hover:text-yellow-200 font-semibold underline">
+                  View Full Installation Guide →
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-sm text-slate-400 mt-4">
             macOS 10.15 (Catalina) or later required
           </p>
         </div>

@@ -22,6 +22,7 @@
           <span class="text-3xl">🦉</span>
           <span class="text-xl font-bold">Claude Owl</span>
         </a>
+        <span class="text-xs bg-orange-600 px-2 py-1 rounded-full font-semibold">BETA</span>
       </div>
       <div class="hidden md:flex space-x-6">
         <a href="index.html" class="hover:text-blue-400 transition">Home</a>
@@ -261,10 +262,28 @@
           </div>
         </div>
 
+        <div class="mt-4 p-3 bg-red-900/30 border border-red-700 rounded-lg">
+          <p class="text-sm text-red-300 mb-2">
+            <strong>🚨 "App is damaged" error?</strong>
+          </p>
+          <p class="text-sm text-red-100 mb-2">
+            If you see <em>"Claude Owl is damaged and can't be opened"</em> or <em>"You should move it to the Trash"</em>, this is a macOS security restriction on unsigned apps downloaded from the internet.
+          </p>
+          <p class="text-sm text-red-100 mb-2">
+            <strong>✅ Verified Fix:</strong> Run this Terminal command after dragging Claude Owl to Applications:
+          </p>
+          <code class="block bg-slate-900 text-green-400 text-sm px-3 py-2 rounded mb-2 font-mono">
+            xattr -r -d com.apple.quarantine "/Applications/Claude Owl.app"
+          </code>
+          <p class="text-xs text-red-200">
+            This removes the download quarantine flag. After running this command, Claude Owl will launch normally.
+          </p>
+        </div>
+
         <div class="mt-4 p-3 bg-blue-900/30 border border-blue-700 rounded-lg">
           <p class="text-sm text-blue-300">
             <strong>📝 Why does this happen?</strong>
-            Claude Owl is currently distributed without Apple code signing (which costs $99/year). This warning will be removed in a future version when we implement code signing.
+            Claude Owl is currently distributed without Apple code signing (which costs $99/year). macOS automatically quarantines downloaded unsigned apps and prevents them from launching. Code signing will be added in a future version.
           </p>
         </div>
       </div>
