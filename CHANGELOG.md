@@ -8,6 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 
+### [0.1.6](https://github.com/antonbelev/claude-owl/compare/v0.1.3...v0.1.6) (2025-11-18)
+
+
+### 🐛 Bug Fixes
+
+* add version badge to all pages and load version script ([0a92ac7](https://github.com/antonbelev/claude-owl/commit/0a92ac781bddfd7116f27791dcf31da098b0fc8d))
+* **ci:** disable auto code signing discovery for unsigned macOS builds ([5faa180](https://github.com/antonbelev/claude-owl/commit/5faa1806be6d359e172e6ef182c877946ee0892a))
+* **mac:** use identity null to completely disable code signing ([cad049a](https://github.com/antonbelev/claude-owl/commit/cad049a5027d210f9ac5e06b0c85a9faad0e03c3))
+
+
+### 📚 Documentation
+
+* add Anthropic disclaimer to README and homepage ([1060a0d](https://github.com/antonbelev/claude-owl/commit/1060a0ddb2cbfe39736b04417005bbda59cefc4e))
+* add macOS installation workaround and BETA indicators ([d85c8c5](https://github.com/antonbelev/claude-owl/commit/d85c8c5fa02e631bea6a59166134b3203d79ecf5))
+* update Anthropic legal entity name (PBC → Inc) ([6abd3b0](https://github.com/antonbelev/claude-owl/commit/6abd3b03739f29fc929153ac811b6ff6170378a8))
+
 ### [0.1.5](https://github.com/antonbelev/claude-owl/compare/v0.1.3...v0.1.5) (2025-11-18)
 
 
