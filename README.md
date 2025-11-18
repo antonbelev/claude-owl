@@ -122,6 +122,6 @@ Claude Owl is open-source software licensed under the [MIT License](LICENSE).
 
 ## Disclaimer
 
-Claude Owl is an independent community project and is **not affiliated with, endorsed by, or sponsored by Anthropic**. Claude is a trademark of Anthropic, PBC. This project uses Claude through the publicly available Claude Code CLI and is not an official Anthropic product.
+Claude Owl is an independent community project and is **not affiliated with, endorsed by, or sponsored by Anthropic**. Claude is a trademark of Anthropic, Inc. This project uses Claude through the publicly available Claude Code CLI and is not an official Anthropic product.
 
 ---
