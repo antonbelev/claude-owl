@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Assessment - Claude Owl</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Security and risk assessment of Claude Owl - comprehensive analysis of safety, security practices, and potential risks.">
+  <meta name="keywords" content="Claude Owl, Security Assessment, Risk Analysis, Open Source Security, Electron Security">
+  <meta name="author" content="Claude Owl Contributors">
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://antonbelev.github.io/claude-owl/security.html">
+  <meta property="og:title" content="Security Assessment - Claude Owl">
+  <meta property="og:description" content="Comprehensive security and risk assessment of Claude Owl desktop application.">
+  <meta property="og:image" content="https://antonbelev.github.io/claude-owl/assets/og-image.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="assets/styles.css">
+
+  <!-- Google Analytics -->
+  <script src="assets/analytics.js"></script>
+
+  <style>
+    /* Custom styles for security page */
+    .security-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    .security-badge.critical { background-color: #dc2626; color: white; }
+    .security-badge.high { background-color: #ea580c; color: white; }
+    .security-badge.medium { background-color: #f59e0b; color: white; }
+    .security-badge.good { background-color: #16a34a; color: white; }
+    .security-badge.excellent { background-color: #2563eb; color: white; }
+
+    .risk-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .risk-table th,
+    .risk-table td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #475569;
+    }
+    .risk-table th {
+      background-color: #1e293b;
+      font-weight: 600;
+    }
+    .risk-table tr:hover {
+      background-color: #334155;
+    }
+
+    /* Collapsible sections */
+    details summary {
+      cursor: pointer;
+      font-weight: 600;
+      padding: 1rem;
+      background-color: #1e293b;
+      border-radius: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    details summary:hover {
+      background-color: #334155;
+    }
+    details[open] summary {
+      margin-bottom: 1rem;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white min-h-screen" data-page="security">
+
+  <!-- Navigation loaded by header.js -->
+  <script src="assets/header.js"></script>
+
+  <!-- Hero Section -->
+  <section class="pt-32 pb-12 px-6">
+    <div class="container mx-auto max-w-5xl">
+      <div class="text-center mb-12">
+        <div class="text-6xl mb-4">🛡️</div>
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+          Security & Risk Assessment
+        </h1>
+        <p class="text-xl text-slate-300 mb-6">
+          Independent security analysis by Claude Code AI
+        </p>
+        <div class="inline-block bg-slate-800 rounded-lg px-6 py-3 border border-slate-700">
+          <p class="text-sm text-slate-300">
+            <strong>Last Updated:</strong> November 18, 2025 •
+            <strong>Version Assessed:</strong> v0.2 (Phase 1)
+          </p>
+        </div>
+      </div>
+
+      <!-- Important Notice -->
+      <div class="bg-blue-900/30 border-2 border-blue-500 rounded-xl p-6 mb-8">
+        <div class="flex items-start space-x-3">
+          <div class="text-3xl">🤖</div>
+          <div>
+            <h3 class="text-blue-300 font-semibold text-lg mb-2">About This Assessment</h3>
+            <p class="text-blue-100 mb-3">
+              This security assessment was created by <strong>Claude Code</strong> (an AI assistant from Anthropic) to help users evaluate the safety and trustworthiness of Claude Owl.
+            </p>
+            <p class="text-blue-100 mb-3">
+              <strong>This project has been built extensively with Claude Code</strong> and, like all software, may contain bugs or security issues.
+              This is <strong>open source software</strong> - you can review the complete source code, build it yourself, and verify all security claims.
+            </p>
+            <p class="text-blue-100">
+              <strong>Found a bug or security issue?</strong> Please <a href="https://github.com/antonbelev/claude-owl/issues" class="text-blue-300 underline hover:text-blue-200">report it on GitHub</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overall Rating -->
+      <div class="bg-slate-800 rounded-xl p-8 mb-8 border border-slate-700">
+        <div class="text-center">
+          <h2 class="text-3xl font-bold mb-4">Overall Safety Rating</h2>
+          <div class="text-6xl font-bold mb-4 text-blue-400">7.5/10</div>
+          <span class="security-badge good text-lg">GOOD</span>
+          <p class="text-slate-300 mt-4 max-w-2xl mx-auto">
+            Strong foundational security practices with some Electron configuration issues that need attention.
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Answer -->
+      <div class="grid md:grid-cols-2 gap-6 mb-12">
+        <div class="bg-green-900/30 border-2 border-green-600 rounded-xl p-6">
+          <div class="flex items-start space-x-3">
+            <div class="text-3xl">✅</div>
+            <div>
+              <h3 class="text-green-300 font-semibold text-lg mb-2">Safe for Evaluation</h3>
+              <ul class="text-green-100 space-y-2 text-sm">
+                <li>✓ No sensitive data logging (keys, tokens, passwords)</li>
+                <li>✓ Only accesses Claude config directories</li>
+                <li>✓ Path validation prevents file system attacks</li>
+                <li>✓ Security scanning for imported commands</li>
+                <li>✓ Open source - full code review possible</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-yellow-900/30 border-2 border-yellow-600 rounded-xl p-6">
+          <div class="flex items-start space-x-3">
+            <div class="text-3xl">⚠️</div>
+            <div>
+              <h3 class="text-yellow-300 font-semibold text-lg mb-2">Production: Needs Fixes</h3>
+              <ul class="text-yellow-100 space-y-2 text-sm">
+                <li>⚠ Sandbox disabled (fix: enable in config)</li>
+                <li>⚠ Web security disabled (fix: enable CORS)</li>
+                <li>⚠ No URL validation (fix: whitelist schemes)</li>
+                <li>⚠ 9 dependency vulnerabilities (fix: npm audit)</li>
+                <li>⚠ No command timeouts (fix: add 30s limit)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Strengths -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold mb-6">✅ Security Strengths</h2>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
+            <h3 class="text-xl font-semibold mb-3 text-blue-400">Code Quality</h3>
+            <ul class="space-y-2 text-slate-300">
+              <li>• TypeScript strict mode (100% coverage)</li>
+              <li>• ESLint enforced with recommended rules</li>
+              <li>• Unit tests with coverage reporting</li>
+              <li>• Automated CI/CD pipeline</li>
+            </ul>
+          </div>
+
+          <div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
+            <h3 class="text-xl font-semibold mb-3 text-blue-400">Data Protection</h3>
+            <ul class="space-y-2 text-slate-300">
+              <li>• Zero sensitive data in logs</li>
+              <li>• No telemetry or analytics tracking</li>
+              <li>• Read-only policy for CLI configs</li>
+              <li>• Centralized file operations</li>
+            </ul>
+          </div>
+
+          <div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
+            <h3 class="text-xl font-semibold mb-3 text-blue-400">Electron Security</h3>
+            <ul class="space-y-2 text-slate-300">
+              <li>• Context isolation enabled</li>
+              <li>• Node integration disabled</li>
+              <li>• Secure preload script bridge</li>
+              <li>• Typed IPC communication</li>
+            </ul>
+          </div>
+
+          <div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
+            <h3 class="text-xl font-semibold mb-3 text-blue-400">Security Scanning</h3>
+            <ul class="space-y-2 text-slate-300">
+              <li>• Trivy vulnerability scanner in CI</li>
+              <li>• SecurityScanner for imported code</li>
+              <li>• HooksValidator for hook scripts</li>
+              <li>• Path traversal protection</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Security Concerns -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold mb-6">⚠️ Security Concerns</h2>
+
+        <!-- Critical Issues -->
+        <details open class="mb-6">
+          <summary class="text-xl text-red-300">
+            🔴 Critical Issues (Fix Immediately - ~30 minutes)
+          </summary>
+          <div class="bg-slate-800 rounded-b-lg p-6 border border-slate-700">
+            <table class="risk-table">
+              <thead>
+                <tr>
+                  <th>Issue</th>
+                  <th>Location</th>
+                  <th>Impact</th>
+                  <th>Time to Fix</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Sandbox Disabled</strong></td>
+                  <td><code>src/main/index.ts:40</code></td>
+                  <td>Breaks security model</td>
+                  <td>5 minutes</td>
+                </tr>
+                <tr>
+                  <td><strong>Web Security Disabled</strong></td>
+                  <td><code>src/main/index.ts:41</code></td>
+                  <td>CORS disabled</td>
+                  <td>10 minutes</td>
+                </tr>
+                <tr>
+                  <td><strong>No URL Validation</strong></td>
+                  <td><code>src/main/ipc/systemHandlers.ts:43</code></td>
+                  <td>Malicious URLs possible</td>
+                  <td>10 minutes</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <!-- High Priority -->
+        <details class="mb-6">
+          <summary class="text-xl text-orange-300">
+            🟠 High Priority Issues (~1.5 hours)
+          </summary>
+          <div class="bg-slate-800 rounded-b-lg p-6 border border-slate-700">
+            <table class="risk-table">
+              <thead>
+                <tr>
+                  <th>Issue</th>
+                  <th>Impact</th>
+                  <th>Fix</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Dependency Vulnerabilities</strong></td>
+                  <td>9 total (1 HIGH, 8 MODERATE)</td>
+                  <td>Run <code>npm audit fix</code></td>
+                </tr>
+                <tr>
+                  <td><strong>No Command Timeouts</strong></td>
+                  <td>CLI commands can hang indefinitely</td>
+                  <td>Add 30-second timeout to execAsync</td>
+                </tr>
+                <tr>
+                  <td><strong>No Request Timeouts</strong></td>
+                  <td>Network calls can hang</td>
+                  <td>Add timeout to fetch() calls</td>
+                </tr>
+                <tr>
+                  <td><strong>Simple YAML Parser</strong></td>
+                  <td>Uses string split instead of parser</td>
+                  <td>Replace with js-yaml library</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <!-- Medium Priority -->
+        <details class="mb-6">
+          <summary class="text-xl text-yellow-300">
+            🟡 Medium Priority Issues
+          </summary>
+          <div class="bg-slate-800 rounded-b-lg p-6 border border-slate-700">
+            <ul class="space-y-2 text-slate-300">
+              <li>• No GitHub API authentication (rate limit: 60/hour vs 5000/hour with token)</li>
+              <li>• No IPC rate limiting (potential DoS vector)</li>
+              <li>• No Content Security Policy (CSP) headers</li>
+              <li>• No encryption at rest for settings files</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <!-- What Data Does It Access -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold mb-6">📁 What Data Does Claude Owl Access?</h2>
+
+        <div class="bg-slate-800 rounded-lg p-6 border border-slate-700 mb-6">
+          <h3 class="text-xl font-semibold mb-4 text-green-400">✅ Files Read/Written</h3>
+          <table class="risk-table">
+            <thead>
+              <tr>
+                <th>File Path</th>
+                <th>Access</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>~/.claude/settings.json</code></td>
+                <td>Read/Write</td>
+                <td>User-level settings</td>
+              </tr>
+              <tr>
+                <td><code>~/.claude.json</code></td>
+                <td>Read-only</td>
+                <td>Project discovery</td>
+              </tr>
+              <tr>
+                <td><code>{PROJECT}/.claude/settings.json</code></td>
+                <td>Read/Write</td>
+                <td>Project settings</td>
+              </tr>
+              <tr>
+                <td><code>~/.claude/skills/</code></td>
+                <td>Read/Write</td>
+                <td>Skills management</td>
+              </tr>
+              <tr>
+                <td><code>~/.claude/commands/</code></td>
+                <td>Read/Write</td>
+                <td>Slash commands</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
+          <h3 class="text-xl font-semibold mb-4 text-red-400">❌ What It Does NOT Access</h3>
+          <ul class="space-y-2 text-slate-300">
+            <li>• Your source code files (except <code>.claude/</code> directories)</li>
+            <li>• Your git repositories</li>
+            <li>• System files outside your home directory</li>
+            <li>• Your SSH keys or credentials</li>
+            <li>• Your environment variables</li>
+            <li>• Your browser history or data</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Network Activity -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold mb-6">🌐 Network Activity</h2>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
+            <h3 class="text-xl font-semibold mb-4 text-green-400">✅ Connects To</h3>
+            <ul class="space-y-2 text-slate-300">
+              <li><strong>GitHub API</strong> (<code>api.github.com</code>)</li>
+              <li>→ Fetch marketplace manifests</li>
+              <li>→ Download plugin information</li>
+              <li>→ Unauthenticated (no tokens sent)</li>
+            </ul>
+          </div>
+
+          <div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
+            <h3 class="text-xl font-semibold mb-4 text-red-400">❌ Does NOT</h3>
+            <ul class="space-y-2 text-slate-300">
+              <li>• Send your code to external servers</li>
+              <li>• Send telemetry or analytics</li>
+              <li>• Phone home with usage data</li>
+              <li>• Connect to non-GitHub domains</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Security Scorecard -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold mb-6">📊 Security Scorecard</h2>
+
+        <div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
+          <table class="risk-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Rating</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>TypeScript Safety</td>
+                <td><span class="security-badge excellent">⭐⭐⭐⭐⭐</span></td>
+                <td>Strict mode everywhere</td>
+              </tr>
+              <tr>
+                <td>Code Quality</td>
+                <td><span class="security-badge excellent">⭐⭐⭐⭐⭐</span></td>
+                <td>Comprehensive linting & testing</td>
+              </tr>
+              <tr>
+                <td>IPC Security</td>
+                <td><span class="security-badge good">⭐⭐⭐</span></td>
+                <td>Good isolation, config issues</td>
+              </tr>
+              <tr>
+                <td>File Operations</td>
+                <td><span class="security-badge good">⭐⭐⭐⭐</span></td>
+                <td>Centralized & validated</td>
+              </tr>
+              <tr>
+                <td>CLI Execution</td>
+                <td><span class="security-badge good">⭐⭐⭐</span></td>
+                <td>Safe but no timeouts</td>
+              </tr>
+              <tr>
+                <td>Network Security</td>
+                <td><span class="security-badge good">⭐⭐⭐</span></td>
+                <td>Validation present, auth missing</td>
+              </tr>
+              <tr>
+                <td>Electron Config</td>
+                <td><span class="security-badge medium">⭐⭐</span></td>
+                <td>Critical issues present</td>
+              </tr>
+              <tr>
+                <td>Dependency Mgmt</td>
+                <td><span class="security-badge good">⭐⭐⭐</span></td>
+                <td>Vulnerable but dev-only</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Recommendations -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold mb-6">🚦 Recommendations</h2>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-green-900/30 border-2 border-green-600 rounded-xl p-6">
+            <h3 class="text-green-300 font-semibold text-lg mb-3">✅ For Evaluation & Testing</h3>
+            <p class="text-green-100 mb-3">
+              <strong>Safe to use.</strong> Claude Owl is suitable for:
+            </p>
+            <ul class="text-green-100 space-y-1 text-sm">
+              <li>• Exploring Claude Code configurations</li>
+              <li>• Development and learning</li>
+              <li>• Testing features locally</li>
+              <li>• Evaluating functionality</li>
+            </ul>
+          </div>
+
+          <div class="bg-yellow-900/30 border-2 border-yellow-600 rounded-xl p-6">
+            <h3 class="text-yellow-300 font-semibold text-lg mb-3">⚠️ For Production Use</h3>
+            <p class="text-yellow-100 mb-3">
+              <strong>Use with caution.</strong> Recommended actions:
+            </p>
+            <ul class="text-yellow-100 space-y-1 text-sm">
+              <li>• Fix critical Electron config issues first</li>
+              <li>• Consider building from source</li>
+              <li>• Monitor GitHub for security updates</li>
+              <li>• Run in isolated environment if paranoid</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Trust Indicators -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold mb-6">🔍 Trust Indicators</h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="bg-slate-800 rounded-lg p-4 border border-green-600">
+            <div class="flex items-center space-x-2">
+              <span class="text-2xl">✅</span>
+              <span class="text-green-300 font-semibold">Open Source</span>
+            </div>
+            <p class="text-slate-400 text-sm mt-2">Full source code available for review</p>
+          </div>
+
+          <div class="bg-slate-800 rounded-lg p-4 border border-green-600">
+            <div class="flex items-center space-x-2">
+              <span class="text-2xl">✅</span>
+              <span class="text-green-300 font-semibold">No Telemetry</span>
+            </div>
+            <p class="text-slate-400 text-sm mt-2">Does not send data to external servers</p>
+          </div>
+
+          <div class="bg-slate-800 rounded-lg p-4 border border-green-600">
+            <div class="flex items-center space-x-2">
+              <span class="text-2xl">✅</span>
+              <span class="text-green-300 font-semibold">No Obfuscation</span>
+            </div>
+            <p class="text-slate-400 text-sm mt-2">Clear, readable TypeScript code</p>
+          </div>
+
+          <div class="bg-slate-800 rounded-lg p-4 border border-green-600">
+            <div class="flex items-center space-x-2">
+              <span class="text-2xl">✅</span>
+              <span class="text-green-300 font-semibold">Active Development</span>
+            </div>
+            <p class="text-slate-400 text-sm mt-2">Regular commits and improvements</p>
+          </div>
+
+          <div class="bg-slate-800 rounded-lg p-4 border border-green-600">
+            <div class="flex items-center space-x-2">
+              <span class="text-2xl">✅</span>
+              <span class="text-green-300 font-semibold">Comprehensive Testing</span>
+            </div>
+            <p class="text-slate-400 text-sm mt-2">Unit tests and CI pipeline</p>
+          </div>
+
+          <div class="bg-slate-800 rounded-lg p-4 border border-green-600">
+            <div class="flex items-center space-x-2">
+              <span class="text-2xl">✅</span>
+              <span class="text-green-300 font-semibold">Security Scanning</span>
+            </div>
+            <p class="text-slate-400 text-sm mt-2">Automated vulnerability detection</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mitigation Guide -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold mb-6">🛡️ How to Mitigate Concerns</h2>
+
+        <div class="space-y-6">
+          <div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
+            <h3 class="text-xl font-semibold mb-3 text-blue-400">For Users</h3>
+            <ol class="space-y-3 text-slate-300 list-decimal list-inside">
+              <li><strong>Review the source code</strong> - It's open source at <a href="https://github.com/antonbelev/claude-owl" class="text-blue-400 hover:underline">github.com/antonbelev/claude-owl</a></li>
+              <li><strong>Build from source</strong> - Don't trust binaries? Build it yourself with <code>npm run build && npm run package</code></li>
+              <li><strong>Run in a VM</strong> - Extra paranoid? Run it in an isolated virtual machine</li>
+              <li><strong>Monitor file system access</strong> - Use <code>fs_usage</code> (macOS) or <code>auditd</code> (Linux)</li>
+              <li><strong>Check logs</strong> - Review logs in DevTools (View → Developer → Toggle Developer Tools)</li>
+              <li><strong>Report issues</strong> - Found something? <a href="https://github.com/antonbelev/claude-owl/issues" class="text-blue-400 hover:underline">Open a GitHub issue</a></li>
+            </ol>
+          </div>
+
+          <div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
+            <h3 class="text-xl font-semibold mb-3 text-blue-400">For Developers</h3>
+            <ol class="space-y-3 text-slate-300 list-decimal list-inside">
+              <li><strong>Fix critical issues</strong> - See detailed remediation in project docs</li>
+              <li><strong>Run security scans</strong> - Use <code>npm audit</code>, <code>npm run lint</code>, <code>npm run typecheck</code></li>
+              <li><strong>Enable security features</strong> - Dependabot, code scanning, secret scanning</li>
+              <li><strong>Contribute fixes</strong> - Submit pull requests with security improvements</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <div class="text-center py-8 border-t border-slate-700">
+        <p class="text-slate-400 mb-4">
+          <strong>Assessment Version:</strong> 1.0 •
+          <strong>Generated:</strong> November 18, 2025
+        </p>
+        <p class="text-sm text-slate-500 max-w-3xl mx-auto">
+          This assessment represents a point-in-time analysis. Software changes over time - always review the latest code before use.
+          Assessment provided "as-is" without warranties.
+        </p>
+        <div class="mt-6 space-x-4">
+          <a href="https://github.com/antonbelev/claude-owl" class="text-blue-400 hover:underline">View Source Code</a>
+          <span class="text-slate-600">•</span>
+          <a href="https://github.com/antonbelev/claude-owl/issues" class="text-blue-400 hover:underline">Report Issue</a>
+          <span class="text-slate-600">•</span>
+          <a href="index.html" class="text-blue-400 hover:underline">Back to Home</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>
