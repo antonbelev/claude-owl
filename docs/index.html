@@ -33,31 +33,9 @@
   <!-- Custom Styles -->
   <link rel="stylesheet" href="assets/styles.css">
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white min-h-screen">
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white min-h-screen" data-page="home">
 
-  <!-- Navigation -->
-  <nav class="fixed top-0 w-full bg-slate-900/80 backdrop-blur-md border-b border-slate-700 z-50">
-    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-      <div class="flex items-center space-x-3">
-        <span class="text-3xl">🦉</span>
-        <span class="text-xl font-bold">Claude Owl</span>
-        <span class="text-xs bg-orange-600 px-2 py-1 rounded-full font-semibold">BETA</span>
-        <span id="version-badge" class="text-xs bg-blue-600 px-2 py-1 rounded-full">Loading...</span>
-      </div>
-      <div class="hidden md:flex space-x-6">
-        <a href="#features" class="hover:text-blue-400 transition">Features</a>
-        <a href="screenshots.html" class="hover:text-blue-400 transition">Screenshots</a>
-        <a href="changelog.html" class="hover:text-blue-400 transition">Changelog</a>
-        <a href="installation.html" class="hover:text-blue-400 transition">Installation</a>
-        <a href="https://github.com/antonbelev/claude-owl" target="_blank" class="hover:text-blue-400 transition">GitHub</a>
-      </div>
-      <button id="mobile-menu-btn" class="md:hidden text-white">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
-      </button>
-    </div>
-  </nav>
+  <!-- Navigation will be loaded dynamically by header.js -->
 
   <!-- Hero Section -->
   <section class="pt-32 pb-20 px-6">
@@ -285,6 +263,7 @@
   </footer>
 
   <!-- JavaScript -->
+  <script src="assets/header.js"></script>
   <script src="assets/app.js"></script>
 </body>
 </html>
