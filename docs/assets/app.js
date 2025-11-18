@@ -69,6 +69,22 @@ async function fetchLatestRelease() {
 }
 
 /**
+ * Fetch all releases for total download count
+ */
+async function fetchAllReleases() {
+  try {
+    const response = await fetch(`${GITHUB_API}/releases`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch releases data');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching all releases:', error);
+    return null;
+  }
+}
+
+/**
  * Fetch repository stats
  */
 async function fetchRepoStats() {
@@ -105,6 +121,11 @@ function updateDownloadSection(os) {
   const macosDownloads = document.getElementById('macos-downloads');
   const comingSoon = document.getElementById('coming-soon');
   const detectedOSSpan = document.getElementById('detected-os');
+
+  // Only update if elements exist (home page only)
+  if (!macosDownloads || !comingSoon) {
+    return;
+  }
 
   if (SUPPORTED_PLATFORMS.includes(os)) {
     macosDownloads.classList.remove('hidden');
@@ -149,7 +170,7 @@ async function updateVersionInfo() {
   const version = release.tag_name || 'v0.1.0';
   const versionWithoutV = version.replace('v', '');
 
-  // Update version badges
+  // Update version badges (present on all pages)
   const versionBadge = document.getElementById('version-badge');
   const versionDisplay = document.getElementById('version-display');
   const latestVersion = document.getElementById('latest-version');
@@ -163,13 +184,13 @@ async function updateVersionInfo() {
   const arm64Asset = assets.find(a => a.name.includes('arm64.dmg'));
   const x64Asset = assets.find(a => a.name.includes('x64.dmg'));
 
-  // Update file size
+  // Update file size (home page only)
   const fileSizeEl = document.getElementById('file-size');
   if (fileSizeEl && arm64Asset) {
     fileSizeEl.textContent = formatFileSize(arm64Asset.size);
   }
 
-  // Update download links
+  // Update download links (home page only)
   const downloadArm64 = document.getElementById('download-arm64');
   const downloadX64 = document.getElementById('download-x64');
 
@@ -189,12 +210,36 @@ async function updateVersionInfo() {
     downloadX64.href = `https://github.com/${GITHUB_REPO}/releases/download/${version}/Claude-Owl-${versionWithoutV}-x64.dmg`;
   }
 
-  // Calculate total downloads
-  const totalDownloads = assets.reduce((sum, asset) => sum + (asset.download_count || 0), 0);
+  // Calculate total downloads across all releases
+  await updateTotalDownloads();
+}
+
+/**
+ * Calculate and update total downloads across all releases
+ */
+async function updateTotalDownloads() {
+  const releases = await fetchAllReleases();
+
+  if (!releases || !Array.isArray(releases)) {
+    console.warn('Could not fetch all releases for download count');
+    return;
+  }
+
+  // Sum up all download counts from all releases
+  let totalDownloads = 0;
+  releases.forEach(release => {
+    const assets = release.assets || [];
+    assets.forEach(asset => {
+      totalDownloads += asset.download_count || 0;
+    });
+  });
+
   const downloadsEl = document.getElementById('downloads');
   if (downloadsEl) {
     downloadsEl.textContent = formatNumber(totalDownloads);
   }
+
+  console.log(`Total downloads across ${releases.length} releases: ${totalDownloads}`);
 }
 
 /**
