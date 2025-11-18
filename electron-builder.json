@@ -23,9 +23,7 @@
       }
     ],
     "icon": "assets/icon.icns",
-    "hardenedRuntime": false,
-    "gatekeeperAssess": false,
-    "sign": false
+    "identity": null
   },
   "dmg": {
     "contents": [

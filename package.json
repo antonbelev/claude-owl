@@ -1,6 +1,6 @@
 {
   "name": "claude-owl",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Open-source UI for managing Claude Code configurations, settings, and features",
   "main": "dist/main/index.js",
   "author": "Claude Owl Contributors",
