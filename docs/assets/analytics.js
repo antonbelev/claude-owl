@@ -14,8 +14,8 @@
 (function() {
   'use strict';
 
-  // TODO: Replace this with your actual Google Analytics Measurement ID
-  const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX';
+  // Google Analytics Measurement ID
+  const GA_MEASUREMENT_ID = 'G-5ETGE0Q37E';
 
   // Only load Google Analytics if a valid measurement ID is configured
   if (GA_MEASUREMENT_ID && GA_MEASUREMENT_ID !== 'G-XXXXXXXXXX') {
