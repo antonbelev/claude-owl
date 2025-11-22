@@ -26,6 +26,7 @@
           <a href="screenshots.html" class="nav-screenshots hover:text-blue-400 transition">Screenshots</a>
           <a href="changelog.html" class="nav-changelog hover:text-blue-400 transition">Changelog</a>
           <a href="installation.html" class="nav-installation hover:text-blue-400 transition">Installation</a>
+          <a href="security.html" class="nav-security hover:text-blue-400 transition">Security</a>
           <a href="https://github.com/antonbelev/claude-owl" target="_blank" class="hover:text-blue-400 transition">GitHub</a>
         </div>
         <button id="mobile-menu-btn" class="md:hidden text-white">
