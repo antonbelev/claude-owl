@@ -37,8 +37,8 @@ function createWindow() {
       preload: preloadPath,
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false,
-      webSecurity: false, // Allow loading local resources in production
+      sandbox: true, // Enable sandbox for renderer process isolation
+      webSecurity: true, // Enable CORS and origin checks
     },
     title: 'Claude Owl',
     titleBarStyle: 'default',
