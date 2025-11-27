@@ -43,7 +43,7 @@ export function ModelBreakdownChart({ models }: ModelBreakdownChartProps) {
         <YAxis
           className="text-xs"
           tick={{ fill: 'currentColor' }}
-          label={{ value: 'Tokens (M)', angle: -90, position: 'left', offset: 10 }}
+          label={{ value: 'Tokens (M)', angle: -90, position: 'left', offset: 20 }}
           tickFormatter={value => {
             if (value === 0) return '0';
             return `${(value / 1000000).toFixed(1)}M`;
