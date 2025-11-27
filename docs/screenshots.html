@@ -110,6 +110,7 @@
           <a href="#commands" class="text-blue-400 hover:underline">⚡ Slash Commands</a>
           <a href="#hooks" class="text-blue-400 hover:underline">🪝 Hooks</a>
           <a href="#mcp" class="text-blue-400 hover:underline">🔌 MCP Servers</a>
+          <a href="#metrics" class="text-blue-400 hover:underline">📈 Usage Metrics</a>
           <a href="#statusline" class="text-blue-400 hover:underline">📊 Status Line</a>
           <a href="#logs" class="text-blue-400 hover:underline">📝 Debug Logs</a>
         </div>
@@ -459,6 +460,39 @@
               Full server configuration display with environment variables, command arguments, and edit capability.
             </p>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Usage Metrics -->
+  <section id="metrics" class="py-12 px-6 bg-slate-800/30">
+    <div class="container mx-auto max-w-5xl">
+      <h2 class="text-3xl font-bold mb-2 flex items-center">
+        <span class="text-4xl mr-3">📈</span> Usage Metrics Dashboard
+      </h2>
+      <p class="text-slate-400 mb-6">Analyze Claude Code usage and spending with interactive charts</p>
+
+      <div class="space-y-8">
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-blue-300">Usage Metrics Overview</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/usage-metrics.png"
+               alt="Usage Metrics Dashboard"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            Comprehensive metrics dashboard featuring four interactive charts:
+          </p>
+          <ul class="text-sm text-slate-400 mt-2 ml-4 space-y-1">
+            <li>• <strong>Daily Spend Trend</strong> - Dual Y-axis chart showing cost ($) and token usage over time</li>
+            <li>• <strong>Token Composition</strong> - Pie chart breakdown of Input, Output, Cache Create, and Cache Read tokens</li>
+            <li>• <strong>Model Usage</strong> - Stacked bar chart showing token distribution across different Claude models</li>
+            <li>• <strong>Project Statistics</strong> - Table with per-project usage summary and metrics</li>
+          </ul>
+          <p class="text-sm text-slate-400 mt-3">
+            Timeline filtering allows focusing on specific periods (Last 7/30/90 days, Last Year, or All Time).
+            Summary cards display Total Cost, Total Sessions, Total Tokens, and Average Cost per Session.
+          </p>
         </div>
       </div>
     </div>
