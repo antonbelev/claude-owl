@@ -1527,93 +1527,220 @@ function calculateMessageCost(message: Message): number {
 
 ## Services Architecture
 
-### Main Process Services
+### Phase 0: MVP Services (Minimal)
 
 ```typescript
 // src/main/services/MetricsService.ts
 export class MetricsService {
-  private db: Database;                // SQLite connection
-  private ingestionService: IngestionService;
   private pricingService: PricingService;
 
-  async initialize(): Promise<void> {
-    // Open SQLite database, run migrations
+  /**
+   * Compute metrics from JSONL files on-demand (no database)
+   * Called when user clicks "Metrics" tab
+   */
+  async computeMetricsFromJSONL(): Promise<MetricsData> {
+    // 1. Scan ~/.claude/projects/ for *.jsonl files
+    const jsonlFiles = await this.findAllJSONLFiles();
+    console.log(`[Metrics] Found ${jsonlFiles.length} JSONL files`);
+
+    // 2. Parse each file (streaming to avoid memory issues)
+    const sessions = await this.parseAllSessions(jsonlFiles);
+    console.log(`[Metrics] Parsed ${sessions.length} sessions`);
+
+    // 3. Compute aggregates (daily, by model, by project)
+    const daily = this.aggregateByDay(sessions);
+    const byModel = this.aggregateByModel(sessions);
+    const byProject = this.aggregateByProject(sessions);
+
+    // 4. Calculate costs for each session and aggregate
+    const withCosts = sessions.map(s => ({
+      ...s,
+      cost: this.sessionCost(s)
+    }));
+
+    return {
+      sessions: withCosts,
+      daily,
+      byModel,
+      byProject,
+      summary: this.computeSummary(withCosts, daily, byModel)
+    };
   }
 
-  async scanAllSessions(): Promise<ScanResult> {
-    // Full JSONL scan + ingestion
+  private async parseAllSessions(files: string[]): Promise<Session[]> {
+    const sessions = new Map<string, Session>();
+
+    for (const file of files) {
+      const lines = fs.readFileSync(file, 'utf-8').split('\n');
+
+      for (const line of lines) {
+        if (!line.trim()) continue;
+
+        try {
+          const entry = JSON.parse(line);
+          if (entry.type === 'assistant' && entry.message?.usage) {
+            const sessionId = entry.sessionId;
+            const projectPath = entry.cwd;
+
+            if (!sessions.has(sessionId)) {
+              sessions.set(sessionId, {
+                sessionId,
+                projectPath,
+                gitBranch: entry.gitBranch,
+                claudeVersion: entry.version,
+                startTime: new Date(entry.timestamp),
+                messages: []
+              });
+            }
+
+            sessions.get(sessionId)!.messages.push({
+              model: entry.message.model,
+              inputTokens: entry.message.usage.input_tokens || 0,
+              outputTokens: entry.message.usage.output_tokens || 0,
+              cacheCreationTokens: entry.message.usage.cache_creation_input_tokens || 0,
+              cacheReadTokens: entry.message.usage.cache_read_input_tokens || 0,
+              timestamp: new Date(entry.timestamp)
+            });
+          }
+        } catch (e) {
+          // Skip malformed lines
+          continue;
+        }
+      }
+    }
+
+    return Array.from(sessions.values());
   }
 
-  async getDashboardStats(dateRange: DateRange): Promise<DashboardStats> {
-    // Query daily_stats for overview
+  private aggregateByDay(sessions: Session[]): DailyAggregate[] {
+    const dailyMap = new Map<string, DailyStats>();
+
+    for (const session of sessions) {
+      for (const message of session.messages) {
+        const date = message.timestamp.toISOString().split('T')[0];
+
+        if (!dailyMap.has(date)) {
+          dailyMap.set(date, {
+            date,
+            inputTokens: 0,
+            outputTokens: 0,
+            cacheCreationTokens: 0,
+            cacheReadTokens: 0,
+            cost: 0
+          });
+        }
+
+        const daily = dailyMap.get(date)!;
+        daily.inputTokens += message.inputTokens;
+        daily.outputTokens += message.outputTokens;
+        daily.cacheCreationTokens += message.cacheCreationTokens;
+        daily.cacheReadTokens += message.cacheReadTokens;
+        daily.cost += this.pricingService.calculateMessageCost(message);
+      }
+    }
+
+    return Array.from(dailyMap.values())
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }
 
-  async getSessionList(filters: SessionFilters): Promise<Session[]> {
-    // Query sessions table with filters
+  private aggregateByModel(sessions: Session[]): ModelAggregate[] {
+    const modelMap = new Map<string, ModelStats>();
+
+    for (const session of sessions) {
+      for (const message of session.messages) {
+        if (!modelMap.has(message.model)) {
+          modelMap.set(message.model, {
+            model: message.model,
+            messageCount: 0,
+            inputTokens: 0,
+            outputTokens: 0,
+            cost: 0
+          });
+        }
+
+        const model = modelMap.get(message.model)!;
+        model.messageCount++;
+        model.inputTokens += message.inputTokens;
+        model.outputTokens += message.outputTokens;
+        model.cost += this.pricingService.calculateMessageCost(message);
+      }
+    }
+
+    return Array.from(modelMap.values())
+      .sort((a, b) => b.cost - a.cost);
   }
 
-  async getSessionDetail(sessionId: string): Promise<SessionDetail> {
-    // Get session + all messages
+  private sessionCost(session: Session): number {
+    return session.messages.reduce(
+      (sum, msg) => sum + this.pricingService.calculateMessageCost(msg),
+      0
+    );
   }
 
-  async getProjectComparison(): Promise<ProjectStats[]> {
-    // Query project_stats
-  }
-
-  async getModelAnalytics(): Promise<ModelStats[]> {
-    // Query model_stats
-  }
-
-  async exportData(format: 'csv' | 'json', options: ExportOptions): Promise<string> {
-    // Generate export file
-  }
-}
-
-// src/main/services/IngestionService.ts
-export class IngestionService {
-  async ingestJSONLFile(filePath: string): Promise<IngestResult> {
-    // Parse JSONL, extract sessions + messages, insert to DB
-  }
-
-  async watchForChanges(): Promise<void> {
-    // Setup file watchers on ~/.claude/projects/
-  }
-
-  private parseJSONLLine(line: string): Message | null {
-    // Parse single JSONL line, extract usage data
+  private computeSummary(sessions: SessionWithCost[], daily: DailyAggregate[], byModel: ModelAggregate[]) {
+    return {
+      totalSessions: sessions.length,
+      totalMessages: sessions.reduce((sum, s) => sum + s.messages.length, 0),
+      totalInputTokens: sessions.reduce((sum, s) => sum +
+        s.messages.reduce((m, msg) => m + msg.inputTokens, 0), 0),
+      totalOutputTokens: sessions.reduce((sum, s) => sum +
+        s.messages.reduce((m, msg) => m + msg.outputTokens, 0), 0),
+      totalCost: sessions.reduce((sum, s) => sum + s.cost, 0),
+      daysActive: daily.length,
+      topModel: byModel[0]?.model || 'unknown'
+    };
   }
 }
 
 // src/main/services/PricingService.ts
 export class PricingService {
-  async getModelPricing(modelName: string): Promise<ModelPricing> {
-    // Lookup pricing from DB or fallback to hardcoded
-  }
+  // Phase 0: Hardcoded pricing
+  // Phase 1+: Move to SQLite database
+  private PRICING = {
+    'claude-sonnet-4-5-20250929': {
+      inputCost: 3.00,     // per 1M tokens
+      outputCost: 15.00,
+      cacheCreationCost: 3.75,   // 25% of input
+      cacheReadCost: 0.30        // 10% of cache creation
+    },
+    'claude-opus-4-20250514': {
+      inputCost: 15.00,
+      outputCost: 75.00,
+      cacheCreationCost: 18.75,
+      cacheReadCost: 1.50
+    },
+    'claude-haiku-3-5-20241022': {
+      inputCost: 0.80,
+      outputCost: 4.00,
+      cacheCreationCost: 1.00,
+      cacheReadCost: 0.08
+    }
+  };
 
-  async updatePricing(modelName: string, pricing: ModelPricing): Promise<void> {
-    // User-editable pricing updates
-  }
+  calculateMessageCost(message: Message): number {
+    const pricing = this.PRICING[message.model as keyof typeof this.PRICING];
+    if (!pricing) {
+      console.warn(`[Pricing] Unknown model: ${message.model}`);
+      return 0;
+    }
 
-  calculateCost(message: Message): number {
-    // Cost calculation logic
-  }
-}
+    const inputCost = (message.inputTokens / 1_000_000) * pricing.inputCost;
+    const outputCost = (message.outputTokens / 1_000_000) * pricing.outputCost;
+    const cacheCreateCost = (message.cacheCreationTokens / 1_000_000) * pricing.cacheCreationCost;
+    const cacheReadCost = (message.cacheReadTokens / 1_000_000) * pricing.cacheReadCost;
 
-// src/main/services/BudgetService.ts
-export class BudgetService {
-  async setBudget(budget: Budget): Promise<void> {
-    // Create or update budget
-  }
-
-  async checkBudgets(): Promise<BudgetAlert[]> {
-    // Compare current spending vs. budgets, trigger alerts
-  }
-
-  async getBudgetStatus(scope: string, projectPath?: string): Promise<BudgetStatus> {
-    // Get current spending vs. budget for dashboard
+    return inputCost + outputCost + cacheCreateCost + cacheReadCost;
   }
 }
 ```
+
+### Phase 1+: Full Services
+
+After Phase 0 validation, add:
+- `DatabaseService` - SQLite persistence
+- `IngestionService` - Parse + cache JSONL
+- `BudgetService` - Budget alerts
+- `DatabaseMigrationService` - Schema versioning
 
 ### IPC Handlers
 
@@ -1654,31 +1781,50 @@ export function registerMetricsHandlers() {
 
 ## Frontend Components
 
-### Page Components
+### Phase 0: MVP Components
 
 ```
+src/renderer/pages/
+└── MetricsPage.tsx               # Single page with all 3 charts + summary
+
+src/renderer/components/metrics/
+├── MetricsLoadingScreen.tsx      # "Computing metrics..." splash
+├── MetricsSummaryCard.tsx        # Total cost, tokens, days active
+├── DailySpendChart.tsx           # Line chart (7/30/90 day trend)
+├── TokenCompositionChart.tsx     # Stacked area (input/output/cache)
+├── ModelBreakdownChart.tsx       # Pie chart (per-model cost %)
+└── MetricsRefreshButton.tsx      # Refresh data button
+```
+
+**MetricsPage UX Flow:**
+```
+1. User clicks "Metrics" tab
+2. Show loading screen + spinner
+3. Background: computeMetricsFromJSONL() runs
+   - Scans ~/.claude/projects/
+   - Parses JSONL files
+   - Computes aggregates
+4. On complete: Show 3 charts + summary card
+5. User can click "Refresh" to re-compute
+```
+
+### Phase 1+: Advanced Components
+
+After Phase 0 validation, add:
+```
 src/renderer/pages/metrics/
-├── MetricsOverviewPage.tsx       # Dashboard (entry point)
-├── UsageTrendsPage.tsx           # Time-series charts
 ├── SessionExplorerPage.tsx       # Session list + detail
 ├── ProjectComparisonPage.tsx     # Multi-project analytics
 ├── ModelAnalyticsPage.tsx        # Per-model stats
-├── BudgetSettingsPage.tsx        # Budget configuration
-└── CacheOptimizationPage.tsx     # Cache insights
-```
+└── BudgetSettingsPage.tsx        # Budget configuration
 
-### Reusable Components
-
-```
 src/renderer/components/metrics/
-├── MetricCard.tsx                # Stat card (tokens, cost, etc.)
-├── TokenUsageChart.tsx           # Line chart for tokens
-├── CostBreakdownChart.tsx        # Pie chart for costs
 ├── SessionTable.tsx              # Sortable session table
 ├── SessionDetailDrawer.tsx       # Side panel for session details
 ├── BudgetProgressBar.tsx         # Visual budget tracker
-├── ExportDialog.tsx              # Export configuration modal
-└── LiveActivityFeed.tsx          # Real-time activity stream
+├── DateRangePicker.tsx           # Advanced filtering
+├── ExportDialog.tsx              # Export to CSV/JSON
+└── LiveActivityFeed.tsx          # Real-time updates
 ```
 
 ### React Hooks
@@ -1714,55 +1860,86 @@ export function useBudgetStatus(scope: string, projectPath?: string) {
 
 ## Implementation Phases
 
-### Phase 0: Foundation (Week 1)
+### Phase 0: MVP - Beautiful Charts (Week 1)
+**Goal**: Build attractive charts without heavy infrastructure. Replace current Sessions page with rich visualizations.
+
+**Scope**:
 - ✅ Design ADR (this document)
-- ✅ Get stakeholder approval
-- Set up SQLite database service
-- Create database schema + migrations
-- Write IngestionService (JSONL parser)
+- Parse JSONL files on-demand (same approach as ccusage)
+- Create `MetricsPage` with loading screen + charts
+- Compute metrics when user opens page (no persistence)
+- Display 3 beautiful charts:
+  1. **Daily Spend Trend** (line chart: 7/30/90 days)
+  2. **Token Composition** (stacked area: input vs output vs cache)
+  3. **Model Breakdown** (pie chart: per-model costs)
+- Session summary card (total cost, token count, days active)
+- "Refresh" button to re-compute
 
-### Phase 1: Basic Dashboard (Week 2)
-- Implement initial data scan (sync all JSONL files)
-- Create `MetricsOverviewPage` with summary cards
-- Display total tokens, cost, session count
-- Add "Refresh Data" button
-- Basic error handling (no JSONL files found, etc.)
+**Tech Stack**:
+- Recharts for all visualizations
+- Node.js `child_process` to run ccusage CLI (if installed)
+- JSONL parser (simple file reading + parsing)
+- React component with loading state
+- No SQLite, no userData persistence yet
 
-### Phase 2: Session Explorer (Week 3)
-- Build `SessionExplorerPage` with table
-- Session list with sorting, filtering
+**User Experience**:
+```
+User clicks "Metrics" tab
+  ↓
+Show loading screen: "Computing your metrics..."
+  ↓
+Scan ~/.claude/projects/ for JSONL files
+  ↓
+Parse all sessions (3-10 seconds for typical user)
+  ↓
+Render beautiful charts
+```
+
+**Data Preservation**: Not needed yet (computed fresh each time)
+
+### Phase 1: Persistence & Caching (Week 2)
+- Add SQLite database (`userData/metrics.db`)
+- Cache parsed JSONL data (don't re-parse every time)
+- Store computed aggregates (daily_stats, model_stats, project_stats)
+- File watcher to detect new JSONL additions
+- Incremental updates (only re-parse changed files)
+
+### Phase 2: Session Explorer & Details (Week 3)
+- Build `SessionExplorerPage` with sortable table
+- Session list with filtering
 - Session detail drawer with message breakdown
 - Export session to JSON
 
-### Phase 3: Charts & Trends (Week 4)
-- Integrate Recharts library
-- Build `UsageTrendsPage` with line charts
-- Add cost breakdown pie chart
-- Date range picker
+### Phase 3: Advanced Charts & Filtering (Week 4)
+- Date range picker (override default 7/30/90 days)
+- Project-specific filtering
+- Model-specific filtering
+- Cost breakdown by project
+- Cache efficiency analysis
 
-### Phase 4: Project & Model Analytics (Week 5)
-- `ProjectComparisonPage` with bar charts
-- `ModelAnalyticsPage` with stats tables
-- Multi-line project timeline chart
+### Phase 4: Budgets & Alerts (Week 5)
+- Budget configuration (monthly limits)
+- Visual progress bars
+- Alert logic + notifications
+- Budget history
 
-### Phase 5: Budgets & Alerts (Week 6)
-- `BudgetSettingsPage` UI
-- Budget service + alert logic
-- In-app notification badges
-- Budget progress bars on dashboard
+### Phase 5: Database Versioning (Week 6)
+- Full migration system (DatabaseMigrationService)
+- Schema versioning with auto-backups
+- Update scenarios testing
+- Data recovery procedures
 
 ### Phase 6: Advanced Features (Weeks 7-8)
-- Cache optimization insights
-- Live monitoring (file watcher + real-time updates)
+- Live monitoring dashboard
+- Predictive forecasting
 - Export to CSV/PDF
-- Predictive forecasting (ML model)
+- Custom dashboards
 
-### Phase 7: Polish & Testing (Week 9)
-- Unit tests for services
-- Integration tests for IPC
-- E2E tests for UI flows
-- Performance optimization (large datasets)
+### Phase 7: Polish & Production (Week 9)
+- Performance optimization
+- Comprehensive testing
 - Documentation
+- Release prep
 
 ---
 
