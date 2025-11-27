@@ -13,7 +13,7 @@ import { PluginsPage } from './pages/PluginsPage';
 import { CommandsPage } from './pages/CommandsPage';
 import { HooksPage } from './pages/HooksPage';
 import { MCPPage } from './pages/MCPPage';
-import { SessionsPage } from './pages/SessionsPage';
+import { MetricsPage } from './pages/MetricsPage';
 import { TestsPage } from './pages/TestsPage';
 import { LogsPage } from './pages/LogsPage';
 import { AboutPage } from './pages/AboutPage';
@@ -45,7 +45,7 @@ export const App: React.FC = () => {
                 <Route path="commands" element={<CommandsPage />} />
                 <Route path="hooks" element={<HooksPage />} />
                 <Route path="mcp" element={<MCPPage />} />
-                <Route path="sessions" element={<SessionsPage />} />
+                <Route path="metrics" element={<MetricsPage />} />
                 <Route path="tests" element={<TestsPage />} />
                 <Route path="logs" element={<LogsPage />} />
                 <Route path="about" element={<AboutPage />} />

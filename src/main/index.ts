@@ -7,6 +7,7 @@ import { registerAgentsHandlers } from './ipc/agentsHandlers';
 import { registerCommandsHandlers } from './ipc/commandsHandlers';
 import { registerSettingsHandlers } from './ipc/settingsHandlers';
 import { registerCCUsageHandlers } from './ipc/ccusageHandlers';
+import { registerMetricsHandlers } from './ipc/metricsHandlers';
 import { registerPluginsHandlers } from './ipc/pluginsHandlers';
 import { registerHooksHandlers } from './ipc/hooksHandlers';
 import { registerMCPHandlers } from './ipc/mcpHandlers';
@@ -37,8 +38,8 @@ function createWindow() {
       preload: preloadPath,
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false,
-      webSecurity: false, // Allow loading local resources in production
+      sandbox: true, // Enable sandbox for renderer process isolation
+      webSecurity: true, // Enable CORS and origin checks
     },
     title: 'Claude Owl',
     titleBarStyle: 'default',
@@ -151,6 +152,7 @@ app.whenReady().then(() => {
   registerCommandsHandlers();
   registerSettingsHandlers();
   registerCCUsageHandlers();
+  registerMetricsHandlers();
   registerPluginsHandlers();
   registerHooksHandlers();
   registerMCPHandlers();

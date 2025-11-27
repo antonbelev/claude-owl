@@ -54,11 +54,16 @@ export interface ElectronAPI {
   getGitHubRepoInfo: (args: unknown) => Promise<unknown>;
   getPluginHealth: (args: unknown) => Promise<unknown>;
 
-  // CCUsage
+  // CCUsage (deprecated - replaced by Metrics)
   checkCCUsageInstalled: () => Promise<unknown>;
   getCCUsageVersion: () => Promise<unknown>;
   getUsageReport: () => Promise<unknown>;
   getCCUsageRawOutput: () => Promise<unknown>;
+
+  // Metrics
+  computeMetrics: (
+    request?: import('../shared/types').ComputeMetricsRequest
+  ) => Promise<import('../shared/types').ComputeMetricsResponse>;
 
   // Hooks
   getAllHooks: (args: unknown) => Promise<unknown>;

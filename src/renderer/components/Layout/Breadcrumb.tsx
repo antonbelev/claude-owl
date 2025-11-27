@@ -23,7 +23,7 @@ export const Breadcrumb: React.FC = () => {
       commands: 'Slash Commands',
       hooks: 'Hooks',
       mcp: 'MCP Servers',
-      sessions: 'Sessions',
+      metrics: 'Metrics',
       tests: 'Test Runner',
     };
 

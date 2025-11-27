@@ -8,6 +8,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 
+### [0.1.7](https://github.com/antonbelev/claude-owl/compare/v0.1.3...v0.1.7) (2025-11-27)
+
+
+### ♻️ Code Refactoring
+
+* **gh-pages:** Extract header navigation into shared component ([7778a47](https://github.com/antonbelev/claude-owl/commit/7778a474fb928f76fda4efa3b8c1af44bd5ce209))
+
+
+### ✨ Features
+
+* **docs:** Add comprehensive security and risk assessment ([f39bc90](https://github.com/antonbelev/claude-owl/commit/f39bc9086a52748230645270341de03d01004001))
+* **gh-pages:** Add Google Analytics 4 tracking to all pages ([4ca0b0f](https://github.com/antonbelev/claude-owl/commit/4ca0b0fa160f857d2198500a28e645af5d5ec099))
+* **gh-pages:** Configure Google Analytics with Measurement ID ([2e962b2](https://github.com/antonbelev/claude-owl/commit/2e962b277110668e752bc33ae80e5aff9728bab1))
+* **metrics:** implement comprehensive metrics dashboard with token analysis ([ebaa51b](https://github.com/antonbelev/claude-owl/commit/ebaa51be355b7974ae767b15914acc8e02aa161e))
+
+
+### 🐛 Bug Fixes
+
+* add version badge to all pages and load version script ([0a92ac7](https://github.com/antonbelev/claude-owl/commit/0a92ac781bddfd7116f27791dcf31da098b0fc8d))
+* **ci:** disable auto code signing discovery for unsigned macOS builds ([5faa180](https://github.com/antonbelev/claude-owl/commit/5faa1806be6d359e172e6ef182c877946ee0892a))
+* **deps:** revert glob to v10.5.0 for Node.js 18 compatibility ([922429c](https://github.com/antonbelev/claude-owl/commit/922429cfdf82a429d6f25d4b10f1813ad972cd9e))
+* **gh-pages:** Embed header HTML inline to support local file:// testing ([d90683a](https://github.com/antonbelev/claude-owl/commit/d90683a173aecc265bc0c3850d0a21d5c27e3651))
+* **gh-pages:** Fix version badge and console errors on non-home pages ([a7fc618](https://github.com/antonbelev/claude-owl/commit/a7fc6188c54483a7f585a0459d81aed8712304e9))
+* **mac:** use identity null to completely disable code signing ([cad049a](https://github.com/antonbelev/claude-owl/commit/cad049a5027d210f9ac5e06b0c85a9faad0e03c3))
+* **metrics:** improve ModelBreakdownChart Y-axis formatting ([25b3275](https://github.com/antonbelev/claude-owl/commit/25b3275eb28d07f1449642f316eb9cba187a67da))
+* **metrics:** increase Y-axis label padding ([1ff5c7a](https://github.com/antonbelev/claude-owl/commit/1ff5c7a5311146eb0d9b73a5c189b954f30f7b2a))
+* **security:** implement critical security fixes for Electron configuration and URL validation ([e00a8c0](https://github.com/antonbelev/claude-owl/commit/e00a8c0e7838bb3a587140b66d7f7e48392d372d))
+* **security:** update glob to patched version 10.5.0/11.1.0 to address CVE-2025-64756 ([37e4d8e](https://github.com/antonbelev/claude-owl/commit/37e4d8e2bb8c5e6d3f89ec4e9be04f555983aa4e))
+
+
+### 📚 Documentation
+
+* add ADR-008 for native usage metrics and analytics system ([ee66448](https://github.com/antonbelev/claude-owl/commit/ee6644848f70fc25fa31307af8f8832257eeb3a0))
+* add Anthropic disclaimer to README and homepage ([1060a0d](https://github.com/antonbelev/claude-owl/commit/1060a0ddb2cbfe39736b04417005bbda59cefc4e))
+* add macOS installation workaround and BETA indicators ([d85c8c5](https://github.com/antonbelev/claude-owl/commit/d85c8c5fa02e631bea6a59166134b3203d79ecf5))
+* add Usage Metrics dashboard section to screenshots page ([72e49c3](https://github.com/antonbelev/claude-owl/commit/72e49c3b6d25088f312a70ed316c1bfe177c9ae2))
+* **adr-008:** refocus Phase 0 as MVP with live charts ([895b826](https://github.com/antonbelev/claude-owl/commit/895b8268f68032c5dab1eab088168b3c55a44a67))
+* **adr:** add ADR-007 comprehensive Windows support gaps analysis and remediation strategy ([f9896d0](https://github.com/antonbelev/claude-owl/commit/f9896d0c89bc3beb0e0d2f959ef276a1191d01d5))
+* **security:** update security assessment to reflect resolved critical issues ([42d4762](https://github.com/antonbelev/claude-owl/commit/42d476211e7e0bdc39912e48dcca92bb9c6c124a))
+* simplify security.html for end users ([f182e6b](https://github.com/antonbelev/claude-owl/commit/f182e6b5a0e70c396437699e030c42ab9741b948))
+* update Anthropic legal entity name (PBC → Inc) ([6abd3b0](https://github.com/antonbelev/claude-owl/commit/6abd3b03739f29fc929153ac811b6ff6170378a8))
+
 ### [0.1.6](https://github.com/antonbelev/claude-owl/compare/v0.1.3...v0.1.6) (2025-11-18)
 
 
