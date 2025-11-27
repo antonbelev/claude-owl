@@ -9,4 +9,6 @@ export * from './hook.types';
 export * from './plugin.types';
 export * from './permissions.types';
 export * from './project.types';
+export * from './metrics.types';
+export * from './ipc.metrics.types';
 export * from './ipc.types';

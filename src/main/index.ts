@@ -7,6 +7,7 @@ import { registerAgentsHandlers } from './ipc/agentsHandlers';
 import { registerCommandsHandlers } from './ipc/commandsHandlers';
 import { registerSettingsHandlers } from './ipc/settingsHandlers';
 import { registerCCUsageHandlers } from './ipc/ccusageHandlers';
+import { registerMetricsHandlers } from './ipc/metricsHandlers';
 import { registerPluginsHandlers } from './ipc/pluginsHandlers';
 import { registerHooksHandlers } from './ipc/hooksHandlers';
 import { registerMCPHandlers } from './ipc/mcpHandlers';
@@ -151,6 +152,7 @@ app.whenReady().then(() => {
   registerCommandsHandlers();
   registerSettingsHandlers();
   registerCCUsageHandlers();
+  registerMetricsHandlers();
   registerPluginsHandlers();
   registerHooksHandlers();
   registerMCPHandlers();

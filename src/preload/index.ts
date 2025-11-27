@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { IPC_CHANNELS } from '@/shared/types';
+import type { ComputeMetricsRequest } from '@/shared/types';
 
 // Define settings channel strings directly to avoid tree-shaking
 const SETTINGS_CHANNELS = {
@@ -27,6 +28,11 @@ const CCUSAGE_CHANNELS = {
   GET_CCUSAGE_VERSION: 'ccusage:get-version',
   GET_USAGE_REPORT: 'ccusage:get-report',
   GET_RAW_OUTPUT: 'ccusage:get-raw-output',
+} as const;
+
+// Define metrics channel strings directly to avoid tree-shaking
+const METRICS_CHANNELS = {
+  COMPUTE_METRICS: 'metrics:compute',
 } as const;
 
 // Define plugins channel strings directly to avoid tree-shaking
@@ -197,11 +203,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke(PLUGINS_CHANNELS.GET_GITHUB_REPO_INFO, args),
   getPluginHealth: (args: unknown) => ipcRenderer.invoke(PLUGINS_CHANNELS.GET_PLUGIN_HEALTH, args),
 
-  // CCUsage
+  // CCUsage (deprecated - replaced by Metrics)
   checkCCUsageInstalled: () => ipcRenderer.invoke(CCUSAGE_CHANNELS.CHECK_CCUSAGE_INSTALLED),
   getCCUsageVersion: () => ipcRenderer.invoke(CCUSAGE_CHANNELS.GET_CCUSAGE_VERSION),
   getUsageReport: () => ipcRenderer.invoke(CCUSAGE_CHANNELS.GET_USAGE_REPORT),
   getCCUsageRawOutput: () => ipcRenderer.invoke(CCUSAGE_CHANNELS.GET_RAW_OUTPUT),
+
+  // Metrics
+  computeMetrics: (request?: ComputeMetricsRequest) => ipcRenderer.invoke(METRICS_CHANNELS.COMPUTE_METRICS, request),
 
   // Hooks
   getAllHooks: (args: unknown) => ipcRenderer.invoke(HOOKS_CHANNELS.GET_ALL_HOOKS, args),
@@ -337,6 +346,7 @@ export interface ElectronAPI {
   getCCUsageVersion: () => Promise<unknown>;
   getUsageReport: () => Promise<unknown>;
   getCCUsageRawOutput: () => Promise<unknown>;
+  computeMetrics: (request?: ComputeMetricsRequest) => Promise<import('@/shared/types').ComputeMetricsResponse>;
   getServiceStatus: () => Promise<unknown>;
   getAllHooks: (args: unknown) => Promise<unknown>;
   getHookTemplates: () => Promise<unknown>;
