@@ -27,7 +27,10 @@ export function ModelBreakdownChart({ models }: ModelBreakdownChartProps) {
 
   return (
     <ResponsiveContainer width="100%" height={350}>
-      <BarChart data={chartData}>
+      <BarChart
+        data={chartData}
+        margin={{ top: 20, right: 30, left: 60, bottom: 80 }}
+      >
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis
           dataKey="name"
@@ -40,10 +43,10 @@ export function ModelBreakdownChart({ models }: ModelBreakdownChartProps) {
         <YAxis
           className="text-xs"
           tick={{ fill: 'currentColor' }}
+          label={{ value: 'Tokens (M)', angle: -90, position: 'left', offset: 10 }}
           tickFormatter={value => {
             if (value === 0) return '0';
-            if (value < 1000) return value.toString();
-            return `${(value / 1000).toFixed(1)}k`;
+            return `${(value / 1000000).toFixed(1)}M`;
           }}
         />
         <Tooltip
