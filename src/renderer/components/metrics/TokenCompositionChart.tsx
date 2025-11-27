@@ -19,7 +19,8 @@ interface LabelProps {
  */
 const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: LabelProps) => {
   // Only show label if percentage is greater than 5%
-  if (!percent || !cx || !cy || !midAngle || !innerRadius || !outerRadius || percent < 0.05) return null;
+  if (!percent || !cx || !cy || !midAngle || !innerRadius || !outerRadius || percent < 0.05)
+    return null;
 
   const RADIAN = Math.PI / 180;
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -91,9 +92,7 @@ export function TokenCompositionChart({ summary }: TokenCompositionChartProps) {
               return (
                 <div className="bg-background border rounded-lg p-3 shadow-lg">
                   <p className="font-semibold">{item.name}</p>
-                  <p className="text-sm">
-                    {item.value.toLocaleString()} tokens
-                  </p>
+                  <p className="text-sm">{item.value.toLocaleString()} tokens</p>
                   <p className="text-sm text-muted-foreground">
                     {((item.value / summary.totalTokens) * 100).toFixed(1)}%
                   </p>

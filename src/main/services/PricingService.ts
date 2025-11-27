@@ -60,8 +60,7 @@ export class PricingService {
 
     const inputCost = (message.inputTokens / 1_000_000) * pricing.inputCost;
     const outputCost = (message.outputTokens / 1_000_000) * pricing.outputCost;
-    const cacheCreateCost =
-      (message.cacheCreationTokens / 1_000_000) * pricing.cacheCreationCost;
+    const cacheCreateCost = (message.cacheCreationTokens / 1_000_000) * pricing.cacheCreationCost;
     const cacheReadCost = (message.cacheReadTokens / 1_000_000) * pricing.cacheReadCost;
 
     return inputCost + outputCost + cacheCreateCost + cacheReadCost;

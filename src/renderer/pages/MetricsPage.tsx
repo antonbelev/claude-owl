@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/renderer/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/renderer/components/ui/card';
 import { useMetrics } from '@/renderer/hooks/useMetrics';
 import type { MetricsFilter } from '@/shared/types';
 import { DailySpendChart } from '@/renderer/components/metrics/DailySpendChart';
@@ -59,9 +65,7 @@ export function MetricsPage() {
         <Card>
           <CardHeader>
             <CardTitle>No Usage Data Found</CardTitle>
-            <CardDescription>
-              No Claude Code sessions found in ~/.claude/projects/
-            </CardDescription>
+            <CardDescription>No Claude Code sessions found in ~/.claude/projects/</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
@@ -80,9 +84,7 @@ export function MetricsPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Usage Metrics</h1>
-            <p className="text-muted-foreground">
-              Analyze your Claude Code usage and spending
-            </p>
+            <p className="text-muted-foreground">Analyze your Claude Code usage and spending</p>
           </div>
           <button
             onClick={refresh}
@@ -163,9 +165,7 @@ export function MetricsPage() {
                       <td className="text-right py-2 px-4">
                         {(project.totalTokens || 0).toLocaleString()}
                       </td>
-                      <td className="text-right py-2 px-4">
-                        ${(project.cost || 0).toFixed(4)}
-                      </td>
+                      <td className="text-right py-2 px-4">${(project.cost || 0).toFixed(4)}</td>
                       <td className="text-right py-2 px-4 text-sm text-muted-foreground">
                         {project.topModel}
                       </td>

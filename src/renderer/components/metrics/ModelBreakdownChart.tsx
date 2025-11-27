@@ -1,4 +1,13 @@
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+import {
+  Bar,
+  BarChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Legend,
+} from 'recharts';
 import type { ModelStats } from '@/shared/types';
 
 interface ModelBreakdownChartProps {
@@ -10,27 +19,22 @@ interface ModelBreakdownChartProps {
  */
 export function ModelBreakdownChart({ models }: ModelBreakdownChartProps) {
   // Transform data for recharts - show top 5 models by cost
-  const chartData = models
-    .slice(0, 5)
-    .map(model => ({
-      name: model.model.replace('claude-', '').replace(/^(.*?)-(\d{8})$/, '$1'),
-      cost: Number(model.cost.toFixed(4)),
-      percentage: Number(model.percentage.toFixed(1)),
-      sessions: model.sessionCount,
-      messages: model.messageCount,
-      inputTokens: model.inputTokens,
-      outputTokens: model.outputTokens,
-      cacheCreationTokens: model.cacheCreationTokens,
-      cacheReadTokens: model.cacheReadTokens,
-      totalTokens: model.totalTokens,
-    }));
+  const chartData = models.slice(0, 5).map(model => ({
+    name: model.model.replace('claude-', '').replace(/^(.*?)-(\d{8})$/, '$1'),
+    cost: Number(model.cost.toFixed(4)),
+    percentage: Number(model.percentage.toFixed(1)),
+    sessions: model.sessionCount,
+    messages: model.messageCount,
+    inputTokens: model.inputTokens,
+    outputTokens: model.outputTokens,
+    cacheCreationTokens: model.cacheCreationTokens,
+    cacheReadTokens: model.cacheReadTokens,
+    totalTokens: model.totalTokens,
+  }));
 
   return (
     <ResponsiveContainer width="100%" height={350}>
-      <BarChart
-        data={chartData}
-        margin={{ top: 20, right: 30, left: 60, bottom: 80 }}
-      >
+      <BarChart data={chartData} margin={{ top: 20, right: 30, left: 60, bottom: 80 }}>
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis
           dataKey="name"
@@ -62,8 +66,12 @@ export function ModelBreakdownChart({ models }: ModelBreakdownChartProps) {
                   <div className="space-y-1 text-xs">
                     <p className="text-blue-600">Input: {item.inputTokens.toLocaleString()}</p>
                     <p className="text-emerald-600">Output: {item.outputTokens.toLocaleString()}</p>
-                    <p className="text-amber-600">Cache Create: {item.cacheCreationTokens.toLocaleString()}</p>
-                    <p className="text-purple-600">Cache Read: {item.cacheReadTokens.toLocaleString()}</p>
+                    <p className="text-amber-600">
+                      Cache Create: {item.cacheCreationTokens.toLocaleString()}
+                    </p>
+                    <p className="text-purple-600">
+                      Cache Read: {item.cacheReadTokens.toLocaleString()}
+                    </p>
                     <p className="text-muted-foreground font-semibold border-t pt-1 mt-1">
                       Total: {item.totalTokens.toLocaleString()}
                     </p>
@@ -78,30 +86,10 @@ export function ModelBreakdownChart({ models }: ModelBreakdownChartProps) {
           }}
         />
         <Legend />
-        <Bar
-          dataKey="inputTokens"
-          stackId="tokens"
-          fill="#3b82f6"
-          name="Input Tokens"
-        />
-        <Bar
-          dataKey="outputTokens"
-          stackId="tokens"
-          fill="#10b981"
-          name="Output Tokens"
-        />
-        <Bar
-          dataKey="cacheCreationTokens"
-          stackId="tokens"
-          fill="#f59e0b"
-          name="Cache Create"
-        />
-        <Bar
-          dataKey="cacheReadTokens"
-          stackId="tokens"
-          fill="#8b5cf6"
-          name="Cache Read"
-        />
+        <Bar dataKey="inputTokens" stackId="tokens" fill="#3b82f6" name="Input Tokens" />
+        <Bar dataKey="outputTokens" stackId="tokens" fill="#10b981" name="Output Tokens" />
+        <Bar dataKey="cacheCreationTokens" stackId="tokens" fill="#f59e0b" name="Cache Create" />
+        <Bar dataKey="cacheReadTokens" stackId="tokens" fill="#8b5cf6" name="Cache Read" />
       </BarChart>
     </ResponsiveContainer>
   );

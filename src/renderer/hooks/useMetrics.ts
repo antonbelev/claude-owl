@@ -1,9 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type {
-  MetricsData,
-  MetricsFilter,
-  ComputeMetricsResponse,
-} from '@/shared/types';
+import type { MetricsData, MetricsFilter, ComputeMetricsResponse } from '@/shared/types';
 
 export interface MetricsState {
   data: MetricsData | null;

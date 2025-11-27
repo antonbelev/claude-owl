@@ -61,7 +61,9 @@ export interface ElectronAPI {
   getCCUsageRawOutput: () => Promise<unknown>;
 
   // Metrics
-  computeMetrics: (request?: import('../shared/types').ComputeMetricsRequest) => Promise<import('../shared/types').ComputeMetricsResponse>;
+  computeMetrics: (
+    request?: import('../shared/types').ComputeMetricsRequest
+  ) => Promise<import('../shared/types').ComputeMetricsResponse>;
 
   // Hooks
   getAllHooks: (args: unknown) => Promise<unknown>;

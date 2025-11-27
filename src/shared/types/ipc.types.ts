@@ -171,10 +171,7 @@ export type {
 } from './ipc.system.types';
 
 // Re-export metrics types
-export type {
-  ComputeMetricsRequest,
-  ComputeMetricsResponse,
-} from './ipc.metrics.types';
+export type { ComputeMetricsRequest, ComputeMetricsResponse } from './ipc.metrics.types';
 
 // Re-export status types
 export type {

@@ -1,4 +1,13 @@
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+import {
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Legend,
+} from 'recharts';
 import type { DailyStats } from '@/shared/types';
 
 interface DailySpendChartProps {
@@ -24,11 +33,7 @@ export function DailySpendChart({ data }: DailySpendChartProps) {
     <ResponsiveContainer width="100%" height={350}>
       <LineChart data={chartData}>
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-        <XAxis
-          dataKey="date"
-          className="text-xs"
-          tick={{ fill: 'currentColor' }}
-        />
+        <XAxis dataKey="date" className="text-xs" tick={{ fill: 'currentColor' }} />
         <YAxis
           yAxisId="left"
           className="text-xs"
@@ -55,8 +60,12 @@ export function DailySpendChart({ data }: DailySpendChartProps) {
                   <div className="mt-2 space-y-1 text-xs">
                     <p className="text-blue-600">Input: {data.inputTokens.toLocaleString()}</p>
                     <p className="text-emerald-600">Output: {data.outputTokens.toLocaleString()}</p>
-                    <p className="text-amber-600">Cache Create: {data.cacheCreationTokens.toLocaleString()}</p>
-                    <p className="text-purple-600">Cache Read: {data.cacheReadTokens.toLocaleString()}</p>
+                    <p className="text-amber-600">
+                      Cache Create: {data.cacheCreationTokens.toLocaleString()}
+                    </p>
+                    <p className="text-purple-600">
+                      Cache Read: {data.cacheReadTokens.toLocaleString()}
+                    </p>
                     <p className="text-muted-foreground font-semibold border-t pt-1 mt-1">
                       Total: {data.totalTokens.toLocaleString()}
                     </p>

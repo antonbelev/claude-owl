@@ -210,7 +210,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getCCUsageRawOutput: () => ipcRenderer.invoke(CCUSAGE_CHANNELS.GET_RAW_OUTPUT),
 
   // Metrics
-  computeMetrics: (request?: ComputeMetricsRequest) => ipcRenderer.invoke(METRICS_CHANNELS.COMPUTE_METRICS, request),
+  computeMetrics: (request?: ComputeMetricsRequest) =>
+    ipcRenderer.invoke(METRICS_CHANNELS.COMPUTE_METRICS, request),
 
   // Hooks
   getAllHooks: (args: unknown) => ipcRenderer.invoke(HOOKS_CHANNELS.GET_ALL_HOOKS, args),
@@ -346,7 +347,9 @@ export interface ElectronAPI {
   getCCUsageVersion: () => Promise<unknown>;
   getUsageReport: () => Promise<unknown>;
   getCCUsageRawOutput: () => Promise<unknown>;
-  computeMetrics: (request?: ComputeMetricsRequest) => Promise<import('@/shared/types').ComputeMetricsResponse>;
+  computeMetrics: (
+    request?: ComputeMetricsRequest
+  ) => Promise<import('@/shared/types').ComputeMetricsResponse>;
   getServiceStatus: () => Promise<unknown>;
   getAllHooks: (args: unknown) => Promise<unknown>;
   getHookTemplates: () => Promise<unknown>;
