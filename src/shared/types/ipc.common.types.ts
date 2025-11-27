@@ -62,10 +62,13 @@ export const IPC_CHANNELS = {
   GET_CLAUDE_VERSION: 'system:claude-version',
   CHECK_CLAUDE_INSTALLED: 'system:check-claude',
 
-  // CCUsage
+  // CCUsage (deprecated - replaced by Metrics)
   CHECK_CCUSAGE_INSTALLED: 'ccusage:check-installed',
   GET_CCUSAGE_VERSION: 'ccusage:get-version',
   GET_USAGE_REPORT: 'ccusage:get-report',
+
+  // Metrics
+  COMPUTE_METRICS: 'metrics:compute',
 
   // Plugins
   GET_MARKETPLACES: 'plugins:get-marketplaces',
