@@ -43,16 +43,27 @@ interface ClaudeConfigMCPServer {
 
 export class ClaudeService {
   /**
-   * Get the execution environment with proper PATH for macOS
+   * Get the execution environment with proper PATH for different platforms
    * This is needed because packaged Electron apps don't inherit the user's PATH
    */
   private getExecEnv() {
     const env = { ...process.env };
 
-    // On macOS, add common binary paths that might not be in Electron's PATH
     if (process.platform === 'darwin') {
+      // macOS: Add common binary paths that might not be in Electron's PATH
       const paths = [env.PATH || '', '/usr/local/bin', '/opt/homebrew/bin', '/usr/bin', '/bin'];
       env.PATH = paths.filter(p => p).join(':');
+    } else if (process.platform === 'win32') {
+      // Windows: Add common binary paths
+      const userProfile = env.USERPROFILE || 'C:\\Users\\Default';
+      const paths = [
+        env.PATH || '',
+        'C:\\Program Files\\nodejs\\',
+        path.join(userProfile, 'AppData', 'Roaming', 'npm'),
+        'C:\\Windows\\System32',
+        'C:\\Windows',
+      ];
+      env.PATH = paths.filter(p => p).join(';'); // Windows uses semicolon separator
     }
 
     return env;
@@ -64,7 +75,12 @@ export class ClaudeService {
   async checkInstallation(): Promise<ClaudeInstallationInfo> {
     try {
       const env = this.getExecEnv();
-      const { stdout, stderr } = await execAsync('which claude', { env });
+      // Use 'where' on Windows, 'which' on Unix-like systems
+      const command = process.platform === 'win32' ? 'where claude' : 'which claude';
+
+      console.log('[ClaudeService] Checking Claude installation with command:', command);
+
+      const { stdout, stderr } = await execAsync(command, { env });
 
       if (stderr || !stdout.trim()) {
         return {
@@ -74,7 +90,10 @@ export class ClaudeService {
         };
       }
 
-      const claudePath = stdout.trim();
+      // Windows 'where' may return multiple paths, take the first one
+      const claudePath = stdout.trim().split('\n')[0];
+
+      console.log('[ClaudeService] Claude CLI found at:', claudePath);
 
       // Get version
       try {
@@ -83,18 +102,19 @@ export class ClaudeService {
 
         return {
           installed: true,
-          version,
-          path: claudePath,
+          version: version || null,
+          path: claudePath || null,
         };
       } catch {
         // Claude is installed but version command failed
         return {
           installed: true,
           version: null,
-          path: claudePath,
+          path: claudePath || null,
         };
       }
     } catch (error) {
+      console.log('[ClaudeService] Claude CLI not found');
       return {
         installed: false,
         version: null,
@@ -436,7 +456,17 @@ export class ClaudeService {
 
     // Add command and args for stdio transport
     if (options.transport === 'stdio' && options.command) {
-      parts.push('--', this.escapeArg(options.command));
+      parts.push('--');
+
+      // Windows-specific: Wrap npx with cmd /c
+      // See: https://code.claude.com/docs/en/mcp
+      if (process.platform === 'win32' && options.command.toLowerCase().includes('npx')) {
+        console.log('[ClaudeService] Adding Windows cmd /c wrapper for npx command');
+        parts.push('cmd', '/c', this.escapeArg(options.command));
+      } else {
+        parts.push(this.escapeArg(options.command));
+      }
+
       if (options.args && options.args.length > 0) {
         parts.push(...options.args.map(arg => this.escapeArg(arg)));
       }

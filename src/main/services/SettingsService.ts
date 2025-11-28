@@ -45,19 +45,21 @@ export class SettingsService {
 
   /**
    * Get platform-specific managed settings path
+   * See: https://code.claude.com/docs/en/settings
    */
   private getManagedSettingsPath(): string {
     const platformType = platform();
 
     if (platformType === 'darwin') {
-      // macOS
-      return '/Library/Application Support/ClaudeCode/managed-settings.json';
+      // macOS: /Library/Application Support/ClaudeCode/managed-settings.json
+      return path.join('/Library', 'Application Support', 'ClaudeCode', 'managed-settings.json');
     } else if (platformType === 'win32') {
-      // Windows
-      return 'C:\\ProgramData\\ClaudeCode\\managed-settings.json';
+      // Windows: C:\ProgramData\ClaudeCode\managed-settings.json
+      const programData = process.env.ProgramData || 'C:\\ProgramData';
+      return path.join(programData, 'ClaudeCode', 'managed-settings.json');
     } else {
-      // Linux/WSL
-      return '/etc/claude-code/managed-settings.json';
+      // Linux/WSL: /etc/claude-code/managed-settings.json
+      return path.join('/etc', 'claude-code', 'managed-settings.json');
     }
   }
 
