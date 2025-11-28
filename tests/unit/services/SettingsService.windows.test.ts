@@ -127,7 +127,7 @@ describe('SettingsService - Windows Platform Support', () => {
       expect(managedPath).not.toContain('\\\\managed');
 
       // Should be properly formed
-      expect(managedPath).toMatch(/ProgramData[\\\/]ClaudeCode[\\\/]managed-settings\.json$/);
+      expect(managedPath).toMatch(/ProgramData[\\/]ClaudeCode[\\/]managed-settings\.json$/);
     });
 
     it('should use path.join for consistency on macOS', () => {
@@ -138,7 +138,7 @@ describe('SettingsService - Windows Platform Support', () => {
 
       // Should not have issues with "Application Support" spaces
       expect(managedPath).toContain('Application Support');
-      expect(managedPath).toMatch(/Library[\/]Application Support[\/]ClaudeCode[\/]managed-settings\.json$/);
+      expect(managedPath).toMatch(/Library[/]Application Support[/]ClaudeCode[/]managed-settings\.json$/);
     });
 
     it('should use path.join for consistency on Linux', () => {
@@ -149,7 +149,7 @@ describe('SettingsService - Windows Platform Support', () => {
 
       // Should be properly formed without double slashes
       expect(managedPath).not.toContain('//');
-      expect(managedPath).toMatch(/\/etc[\/]claude-code[\/]managed-settings\.json$/);
+      expect(managedPath).toMatch(/\/etc[/]claude-code[/]managed-settings\.json$/);
     });
   });
 

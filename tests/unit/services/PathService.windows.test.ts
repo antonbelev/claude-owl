@@ -51,7 +51,7 @@ describe('PathService - Windows Platform Support', () => {
       expect(logsPath).toContain('AppData');
       expect(logsPath).toContain('claude-owl');
       expect(logsPath).toContain('logs');
-      expect(logsPath).toMatch(/Roaming[\\\/]claude-owl[\\\/]logs$/);
+      expect(logsPath).toMatch(/Roaming[\\/]claude-owl[\\/]logs$/);
 
       // Restore
       process.env.APPDATA = originalAppData;
@@ -66,7 +66,7 @@ describe('PathService - Windows Platform Support', () => {
       expect(logsPath).toContain('Library');
       expect(logsPath).toContain('Caches');
       expect(logsPath).toContain('claude-owl');
-      expect(logsPath).toMatch(/Caches[\/]claude-owl[\/]logs$/);
+      expect(logsPath).toMatch(/Caches[/]claude-owl[/]logs$/);
     });
 
     it('should return Linux path format on Linux', () => {
@@ -77,7 +77,7 @@ describe('PathService - Windows Platform Support', () => {
       // Should use Linux .cache path
       expect(logsPath).toContain('.cache');
       expect(logsPath).toContain('claude-owl');
-      expect(logsPath).toMatch(/\.cache[\/]claude-owl[\/]logs$/);
+      expect(logsPath).toMatch(/\.cache[/]claude-owl[/]logs$/);
     });
 
     it('should handle missing APPDATA on Windows with fallback', () => {
