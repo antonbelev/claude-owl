@@ -30,9 +30,11 @@ describe('PathService', () => {
       expect(result).toBe(path.join(projectPath, '.claude'));
     });
 
-    it('should return project claude directory for cwd if no path provided', () => {
-      const result = pathService.getProjectClaudeDir();
-      expect(result).toBe(path.join(process.cwd(), '.claude'));
+    it('should throw error when no path provided', () => {
+      expect(() => {
+        // @ts-expect-error - Testing runtime validation
+        pathService.getProjectClaudeDir();
+      }).toThrow('projectPath is required');
     });
   });
 
