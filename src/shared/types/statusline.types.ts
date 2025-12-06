@@ -32,6 +32,9 @@ export interface StatusLineTemplate {
 
   /** Whether this template requires external dependencies (git, jq, etc.) */
   dependencies?: string[];
+
+  /** Platform(s) this template supports ('windows', 'unix' for both mac/linux) */
+  platforms?: ('windows' | 'unix')[];
 }
 
 /**

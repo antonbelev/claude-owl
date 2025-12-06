@@ -14,8 +14,15 @@ import { SettingsService } from './SettingsService';
 import {
   BUILT_IN_TEMPLATES,
   getTemplateById,
+  getTemplatesForPlatform,
   generateMockSessionData,
 } from './statusLineTemplates';
+import {
+  getPlatform,
+  isWindows,
+  getExecEnvForPlatform,
+  buildScriptExecutionCommand,
+} from '@/shared/utils/platform.utils';
 
 const execAsync = promisify(exec);
 
@@ -42,19 +49,88 @@ export class StatusLineService {
   }
 
   /**
-   * Get the execution environment with proper PATH for macOS
+   * Get the execution environment with proper PATH for the current platform
    * This is needed because packaged Electron apps don't inherit the user's PATH
    */
   private getExecEnv() {
-    const env = { ...process.env };
+    return getExecEnvForPlatform();
+  }
 
-    // On macOS, add common binary paths that might not be in Electron's PATH
-    if (process.platform === 'darwin') {
-      const paths = [env.PATH || '', '/usr/local/bin', '/opt/homebrew/bin', '/usr/bin', '/bin'];
-      env.PATH = paths.filter(p => p).join(':');
+  /**
+   * Detect script language from content
+   * Supports: Node.js, Python, Bash, and Windows Batch
+   */
+  private detectScriptLanguage(script: string): 'bash' | 'node' | 'python' | 'batch' {
+    // Check for Node.js shebang or JavaScript comments
+    if (script.includes('#!/usr/bin/env node') || script.startsWith('// ')) {
+      return 'node';
     }
+    // Check for Python shebang
+    if (script.includes('#!/usr/bin/env python') || script.includes('#!/usr/bin/python')) {
+      return 'python';
+    }
+    // Check for Windows batch syntax
+    if (script.includes('@echo off') || script.includes('@echo on') || script.startsWith('REM ')) {
+      return 'batch';
+    }
+    // Default to bash
+    return 'bash';
+  }
 
-    return env;
+  /**
+   * Get file extension for script based on language
+   * IMPORTANT: Language determines extension, NOT platform
+   * - Node.js → .js (all platforms)
+   * - Python → .py (all platforms)
+   * - Bash → .sh (Unix only)
+   * - Batch → .bat (Windows only)
+   */
+  private getScriptExtensionForLanguage(
+    language: 'bash' | 'node' | 'python' | 'batch'
+  ): string {
+    switch (language) {
+      case 'node':
+        return 'js';
+      case 'python':
+        return 'py';
+      case 'batch':
+        return 'bat';
+      case 'bash':
+      default:
+        return 'sh';
+    }
+  }
+
+  /**
+   * Build the full command to execute a script
+   * On Windows, we need to prefix with the interpreter (e.g., "node script.js")
+   * On Unix, scripts with shebang can be executed directly
+   *
+   * @param scriptPath - Full path to the script file
+   * @param language - Script language (bash, node, python, batch)
+   * @returns Full command string to execute the script
+   */
+  private buildExecutionCommand(
+    scriptPath: string,
+    language: 'bash' | 'node' | 'python' | 'batch'
+  ): string {
+    if (isWindows()) {
+      // Windows: Need explicit interpreter for non-.bat files
+      switch (language) {
+        case 'node':
+          return `node "${scriptPath}"`;
+        case 'python':
+          return `python "${scriptPath}"`;
+        case 'batch':
+          return scriptPath; // Batch files can execute directly
+        case 'bash':
+        default:
+          return scriptPath; // Should not happen on Windows (filtered out)
+      }
+    } else {
+      // Unix: Scripts with shebang can execute directly
+      return scriptPath;
+    }
   }
 
   /**
@@ -86,18 +162,28 @@ export class StatusLineService {
   }
 
   /**
-   * List all available templates
+   * List available templates for the current platform
+   * Automatically filters out templates that are incompatible with the user's OS
    */
   async listTemplates(): Promise<StatusLineTemplate[]> {
-    console.log('[StatusLineService] Listing templates');
-    return BUILT_IN_TEMPLATES;
+    const platform = getPlatform();
+    const compatibleTemplates = getTemplatesForPlatform(platform);
+
+    console.log('[StatusLineService] Listing templates for platform:', {
+      platform,
+      totalTemplates: BUILT_IN_TEMPLATES.length,
+      compatibleTemplates: compatibleTemplates.length,
+      filtered: BUILT_IN_TEMPLATES.length - compatibleTemplates.length,
+    });
+
+    return compatibleTemplates;
   }
 
   /**
    * Set status line from a template
    */
   async setTemplate(templateId: string): Promise<{ scriptPath: string; scriptContent: string }> {
-    console.log('[StatusLineService] Setting template:', templateId);
+    console.log('[StatusLineService] Setting template:', { templateId, platform: getPlatform() });
 
     // Get template
     const template = getTemplateById(templateId);
@@ -105,22 +191,44 @@ export class StatusLineService {
       throw new Error(`Template not found: ${templateId}`);
     }
 
+    // Check platform compatibility
+    const platform = getPlatform();
+    const platformKey = platform === 'windows' ? 'windows' : 'unix';
+
+    if (template.platforms && !template.platforms.includes(platformKey)) {
+      throw new Error(
+        `Template "${template.name}" is not available for ${platform}. ` +
+        `Supported platforms: ${template.platforms.join(', ')}`
+      );
+    }
+
     // Ensure .claude directory exists
     await fs.mkdir(this.userClaudeDir, { recursive: true });
 
-    // Write script file
-    const scriptPath = path.join(this.userClaudeDir, `statusline-${templateId}.sh`);
+    // Detect script language and get appropriate extension
+    const language = this.detectScriptLanguage(template.script);
+    const ext = this.getScriptExtensionForLanguage(language);
+    const scriptPath = path.join(this.userClaudeDir, `statusline-${templateId}.${ext}`);
+
+    // Write script file with platform-specific permissions
     await fs.writeFile(scriptPath, template.script, { mode: 0o755 });
 
-    // Ensure executable permissions (extra safety)
-    await fs.chmod(scriptPath, 0o755);
+    // Ensure executable permissions on Unix-like systems
+    if (!isWindows()) {
+      await fs.chmod(scriptPath, 0o755);
+    }
 
-    console.log('[StatusLineService] Wrote executable script to:', scriptPath);
+    console.log('[StatusLineService] Wrote script to:', { scriptPath, platform, language });
+
+    // Build full execution command (with interpreter prefix on Windows)
+    const command = this.buildExecutionCommand(scriptPath, language);
+
+    console.log('[StatusLineService] Full command for settings.json:', { command });
 
     // Update settings.json
     await this.updateSettings({
       type: 'command',
-      command: scriptPath,
+      command,
       padding: 0,
     });
 
@@ -132,9 +240,9 @@ export class StatusLineService {
    */
   async setCustomScript(
     scriptContent: string,
-    language?: 'bash' | 'python' | 'node'
+    language?: 'bash' | 'python' | 'node' | 'batch'
   ): Promise<{ scriptPath: string }> {
-    console.log('[StatusLineService] Setting custom script:', { language });
+    console.log('[StatusLineService] Setting custom script:', { language, platform: getPlatform() });
 
     // Scan for security issues
     const scanResult = await this.scanScript(scriptContent);
@@ -151,22 +259,30 @@ export class StatusLineService {
     // Ensure .claude directory exists
     await fs.mkdir(this.userClaudeDir, { recursive: true });
 
-    // Determine file extension
-    const ext = language === 'python' ? 'py' : language === 'node' ? 'js' : 'sh';
+    // Detect or use provided language
+    const detectedLanguage = language || this.detectScriptLanguage(scriptContent);
+    const ext = this.getScriptExtensionForLanguage(detectedLanguage);
 
     // Write script file
     const scriptPath = path.join(this.userClaudeDir, `statusline-custom.${ext}`);
     await fs.writeFile(scriptPath, scriptContent, { mode: 0o755 });
 
-    // Ensure executable permissions (extra safety)
-    await fs.chmod(scriptPath, 0o755);
+    // Ensure executable permissions on Unix-like systems
+    if (!isWindows()) {
+      await fs.chmod(scriptPath, 0o755);
+    }
 
-    console.log('[StatusLineService] Wrote executable custom script to:', scriptPath);
+    console.log('[StatusLineService] Wrote custom script to:', { scriptPath, platform: getPlatform(), language: detectedLanguage });
+
+    // Build full execution command (with interpreter prefix on Windows)
+    const command = this.buildExecutionCommand(scriptPath, detectedLanguage);
+
+    console.log('[StatusLineService] Full command for settings.json:', { command });
 
     // Update settings.json
     await this.updateSettings({
       type: 'command',
-      command: scriptPath,
+      command,
       padding: 0,
     });
 
@@ -180,9 +296,11 @@ export class StatusLineService {
     templateId?: string,
     scriptContent?: string
   ): Promise<StatusLinePreviewResult> {
+    const platform = getPlatform();
     console.log('[StatusLineService] Previewing status line:', {
       templateId,
       hasCustomScript: !!scriptContent,
+      platform,
     });
 
     const startTime = Date.now();
@@ -196,6 +314,18 @@ export class StatusLineService {
         if (!template) {
           throw new Error(`Template not found: ${templateId}`);
         }
+
+        // Validate platform compatibility
+        const platformKey = platform === 'windows' ? 'windows' : 'unix';
+        if (!template.platforms?.includes(platformKey)) {
+          const supportedPlatforms = template.platforms?.join(' or ') || 'unknown';
+          throw new Error(
+            `Template "${template.name}" is not compatible with ${platform}. ` +
+            `Supported platforms: ${supportedPlatforms}. ` +
+            `Please select a cross-platform template (Node.js-based).`
+          );
+        }
+
         script = template.script;
       } else if (scriptContent) {
         // Preview custom script
@@ -206,20 +336,34 @@ export class StatusLineService {
 
       // Generate mock session data
       const mockData = generateMockSessionData();
+      const mockDataJson = JSON.stringify(mockData, null, 2);
 
-      // Create temporary script file
-      const tmpScriptPath = path.join(this.userClaudeDir, `statusline-preview-${Date.now()}.sh`);
+      // Create temporary script file with platform-appropriate extension
+      // Detect language to use correct extension
+      const language = this.detectScriptLanguage(script);
+      const ext = this.getScriptExtensionForLanguage(language);
+      const tmpScriptPath = path.join(this.userClaudeDir, `statusline-preview-${Date.now()}.${ext}`);
       await fs.mkdir(this.userClaudeDir, { recursive: true });
       await fs.writeFile(tmpScriptPath, script, { mode: 0o755 });
 
+      // Build command using temp file approach (avoids shell escaping issues)
+      const { command, tempFile } = buildScriptExecutionCommand(
+        tmpScriptPath,
+        this.userClaudeDir,
+        platform
+      );
+
+      // Write JSON to the temporary input file that the command expects
+      await fs.writeFile(tempFile, mockDataJson, 'utf8');
+
+      console.log('[StatusLineService] Created temp input file:', tempFile);
+      console.log('[StatusLineService] Executing preview command:', command);
+
       try {
-        // Execute script with mock data via stdin
-        const mockDataJson = JSON.stringify(mockData, null, 2);
-        const command = `echo '${mockDataJson.replace(/'/g, "'\\''")}' | ${tmpScriptPath}`;
 
         const { stdout, stderr } = await execAsync(command, {
           timeout: 2000,
-          shell: '/bin/bash',
+          shell: isWindows() ? 'cmd.exe' : '/bin/bash',
           env: this.getExecEnv(),
         });
 
@@ -244,8 +388,11 @@ export class StatusLineService {
           executionTime,
         };
       } finally {
-        // Clean up temporary script
+        // Clean up temporary files
         await fs.unlink(tmpScriptPath).catch(() => {
+          /* ignore */
+        });
+        await fs.unlink(tempFile).catch(() => {
           /* ignore */
         });
       }
