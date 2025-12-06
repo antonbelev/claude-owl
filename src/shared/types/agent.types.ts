@@ -2,10 +2,12 @@
  * Agent and skill-related type definitions
  */
 
+import type { AgentModelAlias, CommandModelAlias } from '../constants/models';
+
 export interface AgentFrontmatter {
   name: string;
   description: string;
-  model?: 'sonnet' | 'opus' | 'haiku' | 'inherit';
+  model?: AgentModelAlias;
   tools?: string[];
 }
 
@@ -38,7 +40,7 @@ export interface CommandFrontmatter {
   description?: string;
   'argument-hint'?: string;
   'allowed-tools'?: string[];
-  model?: 'sonnet' | 'opus' | 'haiku';
+  model?: CommandModelAlias;
   'disable-model-invocation'?: boolean;
 }
 

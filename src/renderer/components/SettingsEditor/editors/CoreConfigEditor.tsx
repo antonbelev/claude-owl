@@ -1,5 +1,6 @@
 import React from 'react';
 import type { ClaudeSettings } from '@/shared/types';
+import { MODEL_OPTIONS } from '@/shared/types';
 import { Input } from '@/renderer/components/ui/input';
 import { Textarea } from '@/renderer/components/ui/textarea';
 import { Label } from '@/renderer/components/ui/label';
@@ -20,12 +21,6 @@ interface CoreConfigEditorProps {
   readOnly?: boolean;
 }
 
-const AVAILABLE_MODELS = [
-  { value: 'claude-sonnet-4-5-20250929', label: 'Claude Sonnet 4.5 (Default)' },
-  { value: 'claude-opus-4-1-20250805', label: 'Claude Opus 4.1' },
-  { value: 'claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5' },
-];
-
 export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
   settings,
   updateSettings,
@@ -38,9 +33,9 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
         <div className="space-y-2">
           <Label htmlFor="model">Default Model</Label>
           <Select
-            value={settings.model || '__default__'}
+            value={settings.model || 'default'}
             onValueChange={value => {
-              if (value === '__default__') {
+              if (value === 'default') {
                 const { model: _removed, ...rest } = settings;
                 updateSettings(rest);
               } else {
@@ -50,18 +45,22 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
             disabled={readOnly}
           >
             <SelectTrigger id="model">
-              <SelectValue placeholder="Select a model (default: Sonnet 4.5)" />
+              <SelectValue placeholder="Select a model" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__default__">Use default</SelectItem>
-              {AVAILABLE_MODELS.map(model => (
-                <SelectItem key={model.value} value={model.value}>
-                  {model.label}
+              {MODEL_OPTIONS.map(model => (
+                <SelectItem key={model.alias} value={model.alias}>
+                  <div className="flex flex-col">
+                    <span>{model.label}</span>
+                    <span className="text-xs text-muted-foreground">{model.description}</span>
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <p className="text-sm text-neutral-600">Override the default Claude model</p>
+          <p className="text-sm text-neutral-600">
+            Select the Claude model to use. Model aliases are the official Claude Code identifiers.
+          </p>
         </div>
       </div>
 

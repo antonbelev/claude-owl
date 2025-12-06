@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { Bot, Plus, Search, X, Edit2, Trash2, AlertCircle } from 'lucide-react';
 import { useAgents } from '../../hooks/useAgents';
-import type { Agent, AgentFrontmatter, ProjectInfo } from '@/shared/types';
+import type { Agent, AgentFrontmatter, ProjectInfo, AgentModelAlias } from '@/shared/types';
+import { AGENT_MODEL_OPTIONS } from '@/shared/types';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { PageHeader } from '../common/PageHeader';
 import { ScopeSelector } from '../common/ScopeSelector';
@@ -381,7 +382,7 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
     (agent?.location as 'user' | 'project') || 'user'
   );
   const [selectedProject, setSelectedProject] = useState<ProjectInfo | null>(null);
-  const [model, setModel] = useState<'sonnet' | 'opus' | 'haiku' | 'inherit' | 'default'>(
+  const [model, setModel] = useState<AgentModelAlias>(
     agent?.frontmatter.model || 'default'
   );
   const [tools, setTools] = useState(agent?.frontmatter.tools?.join(', ') || '');
@@ -437,7 +438,7 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
     };
 
     if (model && model !== 'default') {
-      frontmatter.model = model as 'sonnet' | 'opus' | 'haiku' | 'inherit';
+      frontmatter.model = model;
     }
 
     if (tools.trim()) {
@@ -536,21 +537,25 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
               <Label htmlFor="agent-model">Model</Label>
               <Select
                 value={model}
-                onValueChange={value =>
-                  setModel(value as 'sonnet' | 'opus' | 'haiku' | 'inherit' | 'default')
-                }
+                onValueChange={value => setModel(value as AgentModelAlias)}
               >
                 <SelectTrigger id="agent-model">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="z-[1100]">
-                  <SelectItem value="default">Default</SelectItem>
-                  <SelectItem value="sonnet">Sonnet</SelectItem>
-                  <SelectItem value="opus">Opus</SelectItem>
-                  <SelectItem value="haiku">Haiku</SelectItem>
-                  <SelectItem value="inherit">Inherit</SelectItem>
+                  {AGENT_MODEL_OPTIONS.map(option => (
+                    <SelectItem key={option.alias} value={option.alias}>
+                      <div className="flex flex-col">
+                        <span>{option.label}</span>
+                        <span className="text-xs text-muted-foreground">{option.description}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground">
+                Model to use for this subagent. Select &quot;Inherit&quot; to use parent context model.
+              </p>
             </div>
 
             <div className="space-y-2">
