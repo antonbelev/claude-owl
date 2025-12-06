@@ -47,12 +47,19 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
             <SelectTrigger id="model">
               <SelectValue placeholder="Select a model" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-w-md">
               {MODEL_OPTIONS.map(model => (
-                <SelectItem key={model.alias} value={model.alias}>
-                  <div className="flex flex-col">
-                    <span>{model.label}</span>
-                    <span className="text-xs text-muted-foreground">{model.description}</span>
+                <SelectItem
+                  key={model.alias}
+                  value={model.alias}
+                  className="py-2.5"
+                  textValue={model.label}
+                >
+                  <div className="flex flex-col gap-0.5">
+                    <span className="font-medium">{model.label}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {model.description}
+                    </span>
                   </div>
                 </SelectItem>
               ))}

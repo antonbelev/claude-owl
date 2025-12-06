@@ -542,12 +542,19 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
                 <SelectTrigger id="agent-model">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="z-[1100]">
+                <SelectContent className="z-[1100] max-w-md">
                   {AGENT_MODEL_OPTIONS.map(option => (
-                    <SelectItem key={option.alias} value={option.alias}>
-                      <div className="flex flex-col">
-                        <span>{option.label}</span>
-                        <span className="text-xs text-muted-foreground">{option.description}</span>
+                    <SelectItem
+                      key={option.alias}
+                      value={option.alias}
+                      className="py-2.5"
+                      textValue={option.label}
+                    >
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-medium">{option.label}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {option.description}
+                        </span>
                       </div>
                     </SelectItem>
                   ))}
