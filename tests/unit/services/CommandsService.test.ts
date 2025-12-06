@@ -259,7 +259,7 @@ Test content`;
 
       const filePath = await commandsService.createCommand(options);
 
-      expect(filePath).toContain('commands/new-cmd.md');
+      expect(filePath).toMatch(/commands[\\/]new-cmd\.md$/);
       expect(await fs.pathExists(filePath)).toBe(true);
 
       const content = await fs.readFile(filePath, 'utf-8');
@@ -283,7 +283,7 @@ Test content`;
 
       const filePath = await commandsService.createCommand(options);
 
-      expect(filePath).toContain('commands/git/git-status.md');
+      expect(filePath).toMatch(/commands[\\/]git[\\/]git-status\.md$/);
       expect(await fs.pathExists(filePath)).toBe(true);
     });
 
@@ -467,7 +467,7 @@ Test content`;
 
       const newPath = await commandsService.moveCommand(options);
 
-      expect(newPath).toContain('commands/git/test.md');
+      expect(newPath).toMatch(/commands[\\/]git[\\/]test\.md$/);
       expect(await fs.pathExists(newPath)).toBe(true);
       expect(await fs.pathExists(oldPath)).toBe(false);
     });
@@ -487,7 +487,7 @@ Test content`;
 
       const newPath = await commandsService.moveCommand(options);
 
-      expect(newPath).toContain('commands/test.md');
+      expect(newPath).toMatch(/commands[\\/]test\.md$/);
       expect(newPath).not.toContain('git');
       expect(await fs.pathExists(newPath)).toBe(true);
       expect(await fs.pathExists(oldPath)).toBe(false);
