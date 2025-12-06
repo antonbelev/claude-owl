@@ -57,9 +57,7 @@ export const CoreConfigEditor: React.FC<CoreConfigEditorProps> = ({
                 >
                   <div className="flex flex-col gap-0.5">
                     <span className="font-medium">{model.label}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {model.description}
-                    </span>
+                    <span className="text-xs text-muted-foreground">{model.description}</span>
                   </div>
                 </SelectItem>
               ))}

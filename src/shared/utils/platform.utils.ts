@@ -86,17 +86,12 @@ export function getExecEnvForPlatform(): NodeJS.ProcessEnv {
       '/opt/homebrew/bin',
       '/opt/local/bin',
       '/usr/bin',
-      '/bin'
+      '/bin',
     ];
     env.PATH = paths.filter(p => p).join(':');
   } else if (isLinux()) {
     // Ensure standard paths for Linux
-    const paths = [
-      env.PATH || '',
-      '/usr/local/bin',
-      '/usr/bin',
-      '/bin'
-    ];
+    const paths = [env.PATH || '', '/usr/local/bin', '/usr/bin', '/bin'];
     env.PATH = paths.filter(p => p).join(':');
   }
   // Windows: use existing PATH, cmd.exe handles it natively
@@ -140,32 +135,32 @@ export function buildScriptExecutionCommand(
       // Node.js script: type input.json | node script.js
       return {
         command: `type "${tempFile}" | node "${scriptPath}"`,
-        tempFile
+        tempFile,
       };
     } else if (ext === 'py') {
       // Python script: type input.json | python script.py
       return {
         command: `type "${tempFile}" | python "${scriptPath}"`,
-        tempFile
+        tempFile,
       };
     } else if (ext === 'bat') {
       // Batch script: type input.json | script.bat
       return {
         command: `type "${tempFile}" | "${scriptPath}"`,
-        tempFile
+        tempFile,
       };
     } else {
       // Default to Node.js
       return {
         command: `type "${tempFile}" | node "${scriptPath}"`,
-        tempFile
+        tempFile,
       };
     }
   } else {
     // Unix: bash script.sh < input.json
     return {
       command: `bash "${scriptPath}" < "${tempFile}"`,
-      tempFile
+      tempFile,
     };
   }
 }

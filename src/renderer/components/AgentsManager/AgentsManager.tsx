@@ -382,9 +382,7 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
     (agent?.location as 'user' | 'project') || 'user'
   );
   const [selectedProject, setSelectedProject] = useState<ProjectInfo | null>(null);
-  const [model, setModel] = useState<AgentModelAlias>(
-    agent?.frontmatter.model || 'default'
-  );
+  const [model, setModel] = useState<AgentModelAlias>(agent?.frontmatter.model || 'default');
   const [tools, setTools] = useState(agent?.frontmatter.tools?.join(', ') || '');
   const [saving, setSaving] = useState(false);
   const [validationError, setValidationError] = useState('');
@@ -535,10 +533,7 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
 
             <div className="space-y-2">
               <Label htmlFor="agent-model">Model</Label>
-              <Select
-                value={model}
-                onValueChange={value => setModel(value as AgentModelAlias)}
-              >
+              <Select value={model} onValueChange={value => setModel(value as AgentModelAlias)}>
                 <SelectTrigger id="agent-model">
                   <SelectValue />
                 </SelectTrigger>
@@ -552,16 +547,15 @@ const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave 
                     >
                       <div className="flex flex-col gap-0.5">
                         <span className="font-medium">{option.label}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {option.description}
-                        </span>
+                        <span className="text-xs text-muted-foreground">{option.description}</span>
                       </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Model to use for this subagent. Select &quot;Inherit&quot; to use parent context model.
+                Model to use for this subagent. Select &quot;Inherit&quot; to use parent context
+                model.
               </p>
             </div>
 
