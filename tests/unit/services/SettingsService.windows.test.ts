@@ -38,7 +38,9 @@ describe('SettingsService - Windows Platform Support', () => {
 
       const projectPath = service.getSettingsPath('project');
 
-      expect(projectPath).toContain(unixProjectPath);
+      // Normalize paths for comparison (path.join converts / to \ on Windows)
+      const normalizedPath = projectPath.replace(/\\/g, '/');
+      expect(normalizedPath).toContain(unixProjectPath);
       expect(projectPath).toContain('.claude');
       expect(projectPath).toContain('settings.json');
     });
@@ -72,7 +74,9 @@ describe('SettingsService - Windows Platform Support', () => {
 
       const localPath = service.getSettingsPath('local');
 
-      expect(localPath).toContain(unixProjectPath);
+      // Normalize paths for comparison (path.join converts / to \ on Windows)
+      const normalizedPath = localPath.replace(/\\/g, '/');
+      expect(normalizedPath).toContain(unixProjectPath);
       expect(localPath).toContain('.claude');
       expect(localPath).toContain('settings.local.json');
     });
@@ -148,7 +152,9 @@ describe('SettingsService - Windows Platform Support', () => {
       const projPath = service.getSettingsPath('project');
 
       expect(projPath).toBeDefined();
-      expect(projPath).toContain(projectPath);
+      // Normalize paths for comparison (path.join converts / to \ on Windows)
+      const normalizedPath = projPath.replace(/\\/g, '/');
+      expect(normalizedPath).toContain(projectPath);
     });
   });
 });

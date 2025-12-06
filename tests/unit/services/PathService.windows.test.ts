@@ -43,7 +43,9 @@ describe('PathService - Windows Platform Support', () => {
       const projectPath = '/Users/testuser/Projects/my-project';
       const result = service.getProjectClaudeDir(projectPath);
 
-      expect(result).toContain(projectPath);
+      // Normalize paths for comparison (path.join converts / to \ on Windows)
+      const normalizedResult = result.replace(/\\/g, '/');
+      expect(normalizedResult).toContain(projectPath);
       expect(result).toContain('.claude');
     });
 
