@@ -356,7 +356,8 @@ echo Sonnet 4.5 - Working...
   {
     id: 'minimal-cross-platform',
     name: 'Minimal (Node.js - Cross-Platform)',
-    description: 'Model name and current directory - works on Windows, macOS, and Linux with Node.js',
+    description:
+      'Model name and current directory - works on Windows, macOS, and Linux with Node.js',
     category: 'beginner',
     preview: 'Sonnet 4.5 • ~/my-project',
     dependencies: ['node'],

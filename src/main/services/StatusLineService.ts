@@ -85,9 +85,7 @@ export class StatusLineService {
    * - Bash → .sh (Unix only)
    * - Batch → .bat (Windows only)
    */
-  private getScriptExtensionForLanguage(
-    language: 'bash' | 'node' | 'python' | 'batch'
-  ): string {
+  private getScriptExtensionForLanguage(language: 'bash' | 'node' | 'python' | 'batch'): string {
     switch (language) {
       case 'node':
         return 'js';
@@ -198,7 +196,7 @@ export class StatusLineService {
     if (template.platforms && !template.platforms.includes(platformKey)) {
       throw new Error(
         `Template "${template.name}" is not available for ${platform}. ` +
-        `Supported platforms: ${template.platforms.join(', ')}`
+          `Supported platforms: ${template.platforms.join(', ')}`
       );
     }
 
@@ -242,7 +240,10 @@ export class StatusLineService {
     scriptContent: string,
     language?: 'bash' | 'python' | 'node' | 'batch'
   ): Promise<{ scriptPath: string }> {
-    console.log('[StatusLineService] Setting custom script:', { language, platform: getPlatform() });
+    console.log('[StatusLineService] Setting custom script:', {
+      language,
+      platform: getPlatform(),
+    });
 
     // Scan for security issues
     const scanResult = await this.scanScript(scriptContent);
@@ -272,7 +273,11 @@ export class StatusLineService {
       await fs.chmod(scriptPath, 0o755);
     }
 
-    console.log('[StatusLineService] Wrote custom script to:', { scriptPath, platform: getPlatform(), language: detectedLanguage });
+    console.log('[StatusLineService] Wrote custom script to:', {
+      scriptPath,
+      platform: getPlatform(),
+      language: detectedLanguage,
+    });
 
     // Build full execution command (with interpreter prefix on Windows)
     const command = this.buildExecutionCommand(scriptPath, detectedLanguage);
@@ -321,8 +326,8 @@ export class StatusLineService {
           const supportedPlatforms = template.platforms?.join(' or ') || 'unknown';
           throw new Error(
             `Template "${template.name}" is not compatible with ${platform}. ` +
-            `Supported platforms: ${supportedPlatforms}. ` +
-            `Please select a cross-platform template (Node.js-based).`
+              `Supported platforms: ${supportedPlatforms}. ` +
+              `Please select a cross-platform template (Node.js-based).`
           );
         }
 
@@ -342,7 +347,10 @@ export class StatusLineService {
       // Detect language to use correct extension
       const language = this.detectScriptLanguage(script);
       const ext = this.getScriptExtensionForLanguage(language);
-      const tmpScriptPath = path.join(this.userClaudeDir, `statusline-preview-${Date.now()}.${ext}`);
+      const tmpScriptPath = path.join(
+        this.userClaudeDir,
+        `statusline-preview-${Date.now()}.${ext}`
+      );
       await fs.mkdir(this.userClaudeDir, { recursive: true });
       await fs.writeFile(tmpScriptPath, script, { mode: 0o755 });
 
@@ -360,7 +368,6 @@ export class StatusLineService {
       console.log('[StatusLineService] Executing preview command:', command);
 
       try {
-
         const { stdout, stderr } = await execAsync(command, {
           timeout: 2000,
           shell: isWindows() ? 'cmd.exe' : '/bin/bash',

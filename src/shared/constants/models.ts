@@ -84,7 +84,10 @@ export const MODEL_OPTIONS: ModelDisplayInfo[] = [
 /**
  * Model options for agent configuration (includes 'inherit')
  */
-export const AGENT_MODEL_OPTIONS: (ModelDisplayInfo | { alias: 'inherit'; label: string; description: string })[] = [
+export const AGENT_MODEL_OPTIONS: (
+  | ModelDisplayInfo
+  | { alias: 'inherit'; label: string; description: string }
+)[] = [
   {
     alias: 'default',
     label: 'Default',
@@ -125,7 +128,11 @@ export const AGENT_MODEL_OPTIONS: (ModelDisplayInfo | { alias: 'inherit'; label:
 /**
  * Model options for command configuration (simpler set)
  */
-export const COMMAND_MODEL_OPTIONS: { alias: CommandModelAlias; label: string; description: string }[] = [
+export const COMMAND_MODEL_OPTIONS: {
+  alias: CommandModelAlias;
+  label: string;
+  description: string;
+}[] = [
   {
     alias: 'default',
     label: 'Default (Current Model)',
