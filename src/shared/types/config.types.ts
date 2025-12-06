@@ -3,6 +3,8 @@
  * Based on Claude Code settings.json schema
  */
 
+import type { ModelAlias } from '../constants/models';
+
 /**
  * Main Claude Code settings structure
  */
@@ -121,10 +123,13 @@ export interface MarketplaceConfig {
  * Model configuration (legacy, now uses 'model' string)
  */
 export interface ModelConfig {
-  defaultModel?: 'sonnet' | 'opus' | 'haiku';
+  defaultModel?: ModelAlias;
   temperature?: number;
   maxTokens?: number;
 }
+
+// Re-export model types for convenience
+export type { ModelAlias, AgentModelAlias, CommandModelAlias } from '../constants/models';
 
 /**
  * Configuration level in the hierarchy

@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { CommandToolSelector } from './CommandToolSelector';
+import { COMMAND_MODEL_OPTIONS, type CommandModelAlias } from '@/shared/types';
 import './CommandFrontmatterForm.css';
 
 export interface CommandFrontmatterFormProps {
   name: string;
   description: string;
   argumentHint: string;
-  model: 'sonnet' | 'opus' | 'haiku' | 'default';
+  model: CommandModelAlias;
   allowedTools: string[];
   disableModelInvocation: boolean;
   location: 'user' | 'project';
@@ -14,7 +15,7 @@ export interface CommandFrontmatterFormProps {
   onNameChange: (name: string) => void;
   onDescriptionChange: (description: string) => void;
   onArgumentHintChange: (hint: string) => void;
-  onModelChange: (model: string) => void;
+  onModelChange: (model: CommandModelAlias) => void;
   onToolsChange: (tools: string[]) => void;
   onDisableModelInvocationChange: (disabled: boolean) => void;
   onLocationChange: (location: 'user' | 'project') => void;
@@ -179,13 +180,14 @@ export function CommandFrontmatterForm({
               <select
                 id="model"
                 value={model}
-                onChange={e => onModelChange(e.target.value)}
+                onChange={e => onModelChange(e.target.value as CommandModelAlias)}
                 className="form-select"
               >
-                <option value="default">Default (Current Model)</option>
-                <option value="opus">Opus (Most capable)</option>
-                <option value="sonnet">Sonnet (Balanced)</option>
-                <option value="haiku">Haiku (Fastest)</option>
+                {COMMAND_MODEL_OPTIONS.map(option => (
+                  <option key={option.alias} value={option.alias}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
               <div className="field-hint">
                 Specify which Claude model should run this command. Defaults to user&apos;s current

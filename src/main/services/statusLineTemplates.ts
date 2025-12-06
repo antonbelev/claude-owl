@@ -20,6 +20,7 @@ export const BUILT_IN_TEMPLATES: StatusLineTemplate[] = [
     category: 'beginner',
     preview: 'Sonnet 4.5 • ~/my-project',
     dependencies: ['jq'],
+    platforms: ['unix'], // Bash script - Unix/Mac/Linux only
     script: `#!/bin/bash
 # Minimal Status Line Template
 # Shows: Model name • Current directory
@@ -44,6 +45,7 @@ echo -e "\\033[38;5;214m$model\\033[0m • \\033[38;5;39m$dir\\033[0m"
     category: 'intermediate',
     preview: 'Sonnet 4.5 • ~/my-project (main) • $0.45',
     dependencies: ['jq', 'git'],
+    platforms: ['unix'], // Bash script - Unix/Mac/Linux only
     script: `#!/bin/bash
 # Developer Status Line Template
 # Shows: Model • Directory (git branch) • Cost
@@ -85,6 +87,7 @@ echo -e "$output"
     category: 'advanced',
     preview: 'Sonnet 4.5 • ~/my-project (main ✓) • $0.45 • 1.2k lines • 45m',
     dependencies: ['jq', 'git', 'date'],
+    platforms: ['unix'],
     script: `#!/bin/bash
 # Full Metrics Status Line Template
 # Shows: Model • Directory (branch status) • Cost • Lines • Time
@@ -144,6 +147,7 @@ echo -e "$output"
     category: 'specialized',
     preview: '$0.45 / $10.00 daily • 4.5% • Sonnet 4.5',
     dependencies: ['jq', 'bc'],
+    platforms: ['unix'],
     script: `#!/bin/bash
 # Cost-Focused Status Line Template
 # Shows: Current cost / Daily budget • Percentage • Model
@@ -185,6 +189,7 @@ echo -e "$output"
     category: 'specialized',
     preview: 'main • ↑2 ↓1 • +3 ~5 -1 • ~/my-project',
     dependencies: ['git'],
+    platforms: ['unix'],
     script: `#!/bin/bash
 # Git-Focused Status Line Template
 # Shows: Branch • Push/Pull • Changes • Directory
@@ -253,6 +258,7 @@ echo -e "$output"
     category: 'advanced',
     preview: ' Sonnet 4.5  ~/project  main  $0.45 ',
     dependencies: ['jq', 'git'],
+    platforms: ['unix'],
     script: `#!/bin/bash
 # Powerline-Style Status Line Template
 # Shows: Model  Directory  Branch  Cost
@@ -313,6 +319,269 @@ output+="\${FG_YELLOW}\${SEP}\${RESET}"
 echo -e "$output"
 `,
   },
+
+  // Windows-specific templates (batch scripts)
+  {
+    id: 'minimal-windows',
+    name: 'Minimal (Windows)',
+    description: 'Model name and current directory - Windows batch version',
+    category: 'beginner',
+    preview: 'Sonnet 4.5 • C:\\Users\\name\\my-project',
+    platforms: ['windows'],
+    script: `@echo off
+REM Minimal Status Line Template (Windows Batch)
+REM Shows: Model name - Current directory
+
+setlocal enabledelayedexpansion
+REM Read input line
+set "input="
+for /f "delims=" %%A in ('findstr ".*"') do set "input=%%A"
+
+REM Check if jq is available
+where jq >nul 2>&1
+if !ERRORLEVEL! EQU 0 (
+  for /f "delims=" %%A in ('echo !input! ^| jq -r ".model.display_name" 2^>nul') do set "model=%%A"
+  for /f "delims=" %%A in ('echo !input! ^| jq -r ".workspace.current_dir" 2^>nul') do set "dir=%%A"
+  if not "!model!"=="" (
+    echo !model! - !dir!
+    exit /b 0
+  )
+)
+
+REM Fallback if jq not available
+echo Sonnet 4.5 - Working...
+`,
+  },
+
+  {
+    id: 'minimal-cross-platform',
+    name: 'Minimal (Node.js - Cross-Platform)',
+    description:
+      'Model name and current directory - works on Windows, macOS, and Linux with Node.js',
+    category: 'beginner',
+    preview: 'Sonnet 4.5 • ~/my-project',
+    dependencies: ['node'],
+    platforms: ['windows', 'unix'],
+    script: `#!/usr/bin/env node
+// Cross-platform Minimal Status Line (requires Node.js)
+// Works on Windows, macOS, and Linux
+
+const fs = require('fs');
+
+try {
+  // Read JSON from stdin synchronously
+  const input = fs.readFileSync(0, 'utf-8');
+  const data = JSON.parse(input);
+  const model = data.model.display_name;
+  const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+  const dir = data.workspace.current_dir.replace(homeDir, '~');
+
+  // Use ANSI color codes if terminal supports it
+  const modelColor = '\\033[38;5;214m';
+  const dirColor = '\\033[38;5;39m';
+  const reset = '\\033[0m';
+
+  console.log(\`\${modelColor}\${model}\${reset} • \${dirColor}\${dir}\${reset}\`);
+} catch (e) {
+  console.error('Error parsing input:', e.message);
+  process.exit(1);
+}
+`,
+  },
+
+  {
+    id: 'developer-cross-platform',
+    name: 'Developer (Node.js - Cross-Platform)',
+    description: 'Model, directory, git branch, and cost - works on all platforms',
+    category: 'intermediate',
+    preview: 'Sonnet 4.5 • ~/my-project (main) • $0.45',
+    dependencies: ['node', 'git'],
+    platforms: ['windows', 'unix'],
+    script: `#!/usr/bin/env node
+// Developer Status Line (Cross-Platform Node.js)
+// Shows: Model • Directory (git branch) • Cost
+
+const fs = require('fs');
+const { execSync } = require('child_process');
+
+try {
+  // Read JSON from stdin synchronously
+  const input = fs.readFileSync(0, 'utf-8');
+  const data = JSON.parse(input);
+  const model = data.model.display_name;
+  const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+  const dir = data.workspace.current_dir.replace(homeDir, '~');
+  const projectDir = data.workspace.project_dir;
+  const cost = data.cost.total_cost_usd;
+
+  // Get git branch
+  let branch = '';
+  try {
+    branch = execSync('git branch --show-current', {
+      cwd: projectDir,
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe']
+    }).trim();
+  } catch (e) {
+    // Not a git repo or git not available
+  }
+
+  // Build output
+  let output = \`\${model} • \${dir}\`;
+  if (branch) {
+    output += \` (\${branch})\`;
+  }
+  output += \` • $\${cost}\`;
+
+  console.log(output);
+} catch (e) {
+  console.error('Error:', e.message);
+  process.exit(1);
+}
+`,
+  },
+
+  {
+    id: 'git-windows',
+    name: 'Git Status (Windows PowerShell)',
+    description: 'Detailed git repository info with branch and changes - Windows PowerShell',
+    category: 'specialized',
+    preview: 'main • +3 ~5 -1 • C:\\Users\\name\\project',
+    dependencies: ['git', 'powershell'],
+    platforms: ['windows'],
+    script: `#!/usr/bin/env node
+// Git-Focused Status Line for Windows (Node.js)
+// Shows: Branch • Changes • Directory
+
+const fs = require('fs');
+const { execSync } = require('child_process');
+
+try {
+  // Read JSON from stdin synchronously
+  const input = fs.readFileSync(0, 'utf-8');
+  const data = JSON.parse(input);
+  const dir = data.workspace.current_dir.replace(process.env.USERPROFILE || '', '~');
+  const projectDir = data.workspace.project_dir;
+
+  // Check if in git repo
+  let isGitRepo = false;
+  try {
+    execSync('git rev-parse --git-dir', {
+      cwd: projectDir,
+      stdio: ['pipe', 'pipe', 'pipe']
+    });
+    isGitRepo = true;
+  } catch (e) {
+    console.log(\`Not a git repository • \${dir}\`);
+    process.exit(0);
+  }
+
+  if (!isGitRepo) {
+    console.log(\`Not a git repository • \${dir}\`);
+    process.exit(0);
+  }
+
+  // Get git branch
+  const branch = execSync('git branch --show-current', {
+    cwd: projectDir,
+    encoding: 'utf8'
+  }).trim();
+
+  // Get file changes
+  const status = execSync('git status --porcelain', {
+    cwd: projectDir,
+    encoding: 'utf8'
+  });
+
+  const lines = status.split('\\n').filter(l => l.trim());
+  const added = lines.filter(l => l.startsWith('A')).length;
+  const modified = lines.filter(l => l.startsWith(' M') || l.startsWith('M')).length;
+  const deleted = lines.filter(l => l.startsWith('D')).length;
+
+  // Build output
+  let output = \`\${branch}\`;
+  if (added > 0 || modified > 0 || deleted > 0) {
+    output += ' •';
+    if (added > 0) output += \` +\${added}\`;
+    if (modified > 0) output += \` ~\${modified}\`;
+    if (deleted > 0) output += \` -\${deleted}\`;
+  }
+  output += \` • \${dir}\`;
+
+  console.log(output);
+} catch (e) {
+  console.error('Error:', e.message);
+  process.exit(1);
+}
+`,
+  },
+
+  {
+    id: 'full-cross-platform',
+    name: 'Full Metrics (Node.js - Cross-Platform)',
+    description: 'Complete info: model, directory, git, cost, lines - all platforms',
+    category: 'advanced',
+    preview: 'Sonnet 4.5 • ~/project (main ✓) • $0.45 • 1.2k lines',
+    dependencies: ['node', 'git'],
+    platforms: ['windows', 'unix'],
+    script: `#!/usr/bin/env node
+// Full Metrics Status Line (Cross-Platform)
+// Shows: Model • Directory (branch status) • Cost • Lines
+
+const fs = require('fs');
+const { execSync } = require('child_process');
+
+try {
+  // Read JSON from stdin synchronously
+  const input = fs.readFileSync(0, 'utf-8');
+  const data = JSON.parse(input);
+  const model = data.model.display_name;
+  const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+  const dir = data.workspace.current_dir.replace(homeDir, '~');
+  const projectDir = data.workspace.project_dir;
+  const cost = data.cost.total_cost_usd;
+  const lines = data.cost.total_lines_added;
+
+  // Get git info
+  let branch = '';
+  let gitStatus = '';
+  try {
+    branch = execSync('git branch --show-current', {
+      cwd: projectDir,
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe']
+    }).trim();
+
+    // Check if working tree is clean
+    const status = execSync('git status --porcelain', {
+      cwd: projectDir,
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe']
+    });
+    gitStatus = status.trim() === '' ? '✓' : '✗';
+  } catch (e) {
+    // Not a git repo
+  }
+
+  // Format lines
+  const linesFormatted = lines >= 1000
+    ? (lines / 1000).toFixed(1) + 'k'
+    : lines.toString();
+
+  // Build output
+  let output = \`\${model} • \${dir}\`;
+  if (branch) {
+    output += \` (\${branch} \${gitStatus})\`;
+  }
+  output += \` • $\${cost} • \${linesFormatted} lines\`;
+
+  console.log(output);
+} catch (e) {
+  console.error('Error:', e.message);
+  process.exit(1);
+}
+`,
+  },
 ];
 
 /**
@@ -329,6 +598,23 @@ export function getTemplatesByCategory(
   category: StatusLineTemplate['category']
 ): StatusLineTemplate[] {
   return BUILT_IN_TEMPLATES.filter(t => t.category === category);
+}
+
+/**
+ * Get templates compatible with the current platform
+ * Filters out templates that cannot run on the given platform
+ *
+ * @param platform - 'windows' | 'macos' | 'linux'
+ * @returns Array of templates compatible with the platform
+ */
+export function getTemplatesForPlatform(
+  platform: 'windows' | 'macos' | 'linux'
+): StatusLineTemplate[] {
+  const platformKey = platform === 'windows' ? 'windows' : 'unix';
+
+  return BUILT_IN_TEMPLATES.filter(template => {
+    return template.platforms?.includes(platformKey);
+  });
 }
 
 /**
