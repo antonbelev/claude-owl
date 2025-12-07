@@ -7,7 +7,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Beta](https://img.shields.io/badge/status-Beta-blue.svg)](#status)
 
-**Status:** 🚀 Beta - Actively developed and tested on macOS (Windows support coming soon)
+**Status:** 🚀 Beta - Actively developed, currently supports **macOS and Windows**.
 
 ---
 
@@ -28,7 +28,7 @@ For a complete list of features, see [SCREENSHOTS.md](SCREENSHOTS.md) and [CHANG
 - **Node.js** >= 18.0.0
 - **npm** >= 9.0.0
 - **Claude Code CLI** ([installation guide](https://code.claude.com/docs/en/quickstart))
-- **macOS** (currently tested and supported; Windows/Linux support in development)
+- **macOS or Windows**
 
 ### Install from Source
 
@@ -46,14 +46,23 @@ npm install
 npm run dev:electron
 ```
 
-### Build for Production
+### Download Pre-built Binaries
+
+Pre-built installers are available for macOS and Windows:
+
+**[📥 Download Latest Release](https://github.com/antonbelev/claude-owl/releases/latest)**
+
+- **macOS**: `.dmg` files for Intel and Apple Silicon
+- **Windows**: `.exe` installer for x64 and ARM64
+
+For detailed installation instructions, see our [Installation Guide](https://antonbelev.github.io/claude-owl/installation.html).
+
+### Build from Source
 
 ```bash
 npm run build
 npm run package
 ```
-
-Pre-built binaries for macOS are coming soon.
 
 ## Documentation
 
@@ -102,9 +111,8 @@ Yes! Claude Owl is completely local-first. All configurations and data stay on y
 
 ### What platforms are currently supported?
 
-- **macOS** (Intel & Apple Silicon) - ✅ 
-- **Windows** - In development
-- **Linux** - In development
+- **macOS** (Intel & Apple Silicon) - ✅ Fully supported
+- **Windows** (x64 & ARM64) - ✅ Fully supported
 
 ### How can I contribute?
 

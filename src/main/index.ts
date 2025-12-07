@@ -24,11 +24,25 @@ function createWindow() {
   console.log('[Main] Preload path:', preloadPath);
   console.log('[Main] Preload exists:', fs.existsSync(preloadPath));
 
-  // In packaged app, icon is set by electron-builder
-  // In development, skip icon since it may not exist
   const isDev = !app.isPackaged;
 
-  // Prepare window icon (used in dev mode, packaged app uses electron-builder config)
+  // Determine icon path based on environment
+  let iconPath: string | undefined;
+  if (isDev) {
+    // Development: use project root icon
+    const devIconPath = path.join(__dirname, '../../claude-owl-logo.png');
+    if (fs.existsSync(devIconPath)) {
+      iconPath = devIconPath;
+    }
+  } else {
+    // Production: use icon from extraResources
+    // On Windows: icon.ico, on Unix: icon.png
+    const iconFile = process.platform === 'win32' ? 'icon.ico' : 'icon.png';
+    iconPath = path.join(process.resourcesPath, iconFile);
+    console.log('[Main] Icon path (production):', iconPath);
+    console.log('[Main] Icon exists:', fs.existsSync(iconPath));
+  }
+
   const browserWindowConfig: import('electron').BrowserWindowConstructorOptions = {
     width: 1200,
     height: 800,
@@ -44,15 +58,8 @@ function createWindow() {
     title: 'Claude Owl',
     titleBarStyle: 'default',
     show: false,
+    ...(iconPath && { icon: iconPath }), // Set icon for BrowserWindow if available
   };
-
-  // Add icon for dev mode if available
-  if (isDev) {
-    const iconPath = path.join(__dirname, '../../claude-owl-logo.png');
-    if (fs.existsSync(iconPath)) {
-      browserWindowConfig.icon = iconPath;
-    }
-  }
 
   mainWindow = new BrowserWindow(browserWindowConfig);
 

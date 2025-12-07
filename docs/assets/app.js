@@ -4,8 +4,8 @@
 const GITHUB_REPO = 'antonbelev/claude-owl';
 const GITHUB_API = `https://api.github.com/repos/${GITHUB_REPO}`;
 
-// Supported platforms (Phase 1: macOS only)
-const SUPPORTED_PLATFORMS = ['macOS'];
+// Supported platforms
+const SUPPORTED_PLATFORMS = ['macOS', 'Windows'];
 
 /**
  * Detect user's operating system
@@ -119,23 +119,24 @@ function formatNumber(num) {
  */
 function updateDownloadSection(os) {
   const macosDownloads = document.getElementById('macos-downloads');
-  const comingSoon = document.getElementById('coming-soon');
-  const detectedOSSpan = document.getElementById('detected-os');
+  const windowsDownloads = document.getElementById('windows-downloads');
 
   // Only update if elements exist (home page only)
-  if (!macosDownloads || !comingSoon) {
+  if (!macosDownloads || !windowsDownloads) {
     return;
   }
 
-  if (SUPPORTED_PLATFORMS.includes(os)) {
+  // Show appropriate download section based on OS
+  if (os === 'macOS') {
     macosDownloads.classList.remove('hidden');
-    comingSoon.classList.add('hidden');
-  } else {
+    windowsDownloads.classList.add('hidden');
+  } else if (os === 'Windows') {
     macosDownloads.classList.add('hidden');
-    comingSoon.classList.remove('hidden');
-    if (detectedOSSpan) {
-      detectedOSSpan.textContent = os;
-    }
+    windowsDownloads.classList.remove('hidden');
+  } else {
+    // For unsupported OS, show macOS downloads as default
+    macosDownloads.classList.remove('hidden');
+    windowsDownloads.classList.add('hidden');
   }
 }
 
@@ -183,6 +184,7 @@ async function updateVersionInfo() {
   const assets = release.assets || [];
   const arm64Asset = assets.find(a => a.name.includes('arm64.dmg'));
   const x64Asset = assets.find(a => a.name.includes('x64.dmg'));
+  const windowsAsset = assets.find(a => a.name.includes('Setup') && a.name.endsWith('.exe'));
 
   // Update file size (home page only)
   const fileSizeEl = document.getElementById('file-size');
@@ -208,6 +210,16 @@ async function updateVersionInfo() {
   } else if (downloadX64) {
     // Fallback to constructed URL
     downloadX64.href = `https://github.com/${GITHUB_REPO}/releases/download/${version}/Claude-Owl-${versionWithoutV}-x64.dmg`;
+  }
+
+  // Update Windows download link
+  const downloadWindows = document.getElementById('download-windows');
+  if (downloadWindows && windowsAsset) {
+    downloadWindows.href = windowsAsset.browser_download_url;
+    downloadWindows.onclick = () => trackDownload('Windows', 'x64', version);
+  } else if (downloadWindows) {
+    // Fallback to constructed URL
+    downloadWindows.href = `https://github.com/${GITHUB_REPO}/releases/download/${version}/Claude-Owl-Setup-${versionWithoutV}.exe`;
   }
 
   // Calculate total downloads across all releases
@@ -284,6 +296,42 @@ function setupMobileMenu() {
 }
 
 /**
+ * Setup platform tabs on installation page
+ */
+function setupPlatformTabs() {
+  const tabs = document.querySelectorAll('.platform-tab');
+  const macosSection = document.getElementById('macos-section');
+  const windowsSection = document.getElementById('windows-section');
+
+  if (!tabs.length || !macosSection || !windowsSection) {
+    return; // Not on installation page
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const platform = tab.dataset.platform;
+
+      // Update active tab styling
+      tabs.forEach(t => {
+        t.classList.remove('active', 'bg-blue-600');
+        t.classList.add('bg-slate-700');
+      });
+      tab.classList.add('active', 'bg-blue-600');
+      tab.classList.remove('bg-slate-700');
+
+      // Show/hide sections
+      if (platform === 'macos') {
+        macosSection.classList.remove('hidden');
+        windowsSection.classList.add('hidden');
+      } else if (platform === 'windows') {
+        macosSection.classList.add('hidden');
+        windowsSection.classList.remove('hidden');
+      }
+    });
+  });
+}
+
+/**
  * Initialize the page
  */
 async function init() {
@@ -307,6 +355,9 @@ async function init() {
 
   // Setup mobile menu
   setupMobileMenu();
+
+  // Setup platform tabs (installation page only)
+  setupPlatformTabs();
 
   // Smooth scrolling for anchor links
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
