@@ -58,7 +58,7 @@ function createWindow() {
     title: 'Claude Owl',
     titleBarStyle: 'default',
     show: false,
-    icon: iconPath, // Set icon for BrowserWindow
+    ...(iconPath && { icon: iconPath }), // Set icon for BrowserWindow if available
   };
 
   mainWindow = new BrowserWindow(browserWindowConfig);
