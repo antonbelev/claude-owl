@@ -8,6 +8,17 @@
     "dist/**/*",
     "package.json"
   ],
+  "afterPack": "./scripts/afterPack.js",
+  "extraResources": [
+    {
+      "from": "assets/icon.ico",
+      "to": "icon.ico"
+    },
+    {
+      "from": "assets/icon.png",
+      "to": "icon.png"
+    }
+  ],
   "publish": {
     "provider": "github",
     "owner": "antonbelev",
@@ -51,7 +62,10 @@
       }
     ],
     "icon": "assets/icon.ico",
-    "publisherName": "Claude Owl Contributors"
+    "publisherName": "Claude Owl Contributors",
+    "signAndEditExecutable": false,
+    "signDlls": false,
+    "verifyUpdateCodeSignature": false
   },
   "nsis": {
     "oneClick": false,
@@ -59,7 +73,9 @@
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "Claude Owl"
+    "shortcutName": "Claude Owl",
+    "installerIcon": "assets/icon.ico",
+    "uninstallerIcon": "assets/icon.ico"
   },
   "linux": {
     "target": [
