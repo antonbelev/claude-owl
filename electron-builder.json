@@ -51,7 +51,10 @@
       }
     ],
     "icon": "assets/icon.ico",
-    "publisherName": "Claude Owl Contributors"
+    "publisherName": "Claude Owl Contributors",
+    "signAndEditExecutable": false,
+    "signDlls": false,
+    "verifyUpdateCodeSignature": false
   },
   "nsis": {
     "oneClick": false,
