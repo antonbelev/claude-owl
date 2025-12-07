@@ -62,7 +62,9 @@
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "Claude Owl"
+    "shortcutName": "Claude Owl",
+    "installerIcon": "assets/icon.ico",
+    "uninstallerIcon": "assets/icon.ico"
   },
   "linux": {
     "target": [

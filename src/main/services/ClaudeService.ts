@@ -58,6 +58,7 @@ export class ClaudeService {
       const userProfile = env.USERPROFILE || 'C:\\Users\\Default';
       const paths = [
         env.PATH || '',
+        path.join(userProfile, '.local', 'bin'), // Claude Code default install location
         'C:\\Program Files\\nodejs\\',
         path.join(userProfile, 'AppData', 'Roaming', 'npm'),
         'C:\\Windows\\System32',
