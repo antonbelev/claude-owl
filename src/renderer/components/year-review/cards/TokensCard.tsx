@@ -36,7 +36,7 @@ export const TokensCard: React.FC<ReviewCardProps> = ({ data }) => {
         </div>
         <div className="bg-white/5 rounded-lg p-4">
           <div className="text-2xl font-bold text-purple-400">
-            {formatNumber(summary.totalCacheReadTokens)}
+            {formatNumber(summary.totalCacheCreationTokens + summary.totalCacheReadTokens)}
           </div>
           <div className="text-xs text-white/60 mt-1">Cached</div>
         </div>
