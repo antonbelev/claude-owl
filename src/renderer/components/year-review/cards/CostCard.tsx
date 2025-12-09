@@ -15,14 +15,10 @@ export const CostCard: React.FC<ReviewCardProps> = ({ data }) => {
       <p className="text-white/70 text-lg mb-2">Your 2025 AI Spend</p>
 
       <div className="my-8">
-        <div className="text-6xl font-bold text-emerald-400">
-          ${summary.totalCost.toFixed(2)}
-        </div>
+        <div className="text-6xl font-bold text-emerald-400">${summary.totalCost.toFixed(2)}</div>
       </div>
 
-      <p className="text-lg text-white/80 mb-4">
-        💰 {costComparison}
-      </p>
+      <p className="text-lg text-white/80 mb-4">💰 {costComparison}</p>
 
       <p className="text-white/60 mb-8">
         That&apos;s about ${dailyAverage.toFixed(2)}/day on average
@@ -42,9 +38,7 @@ export const CostCard: React.FC<ReviewCardProps> = ({ data }) => {
         </div>
       )}
 
-      <p className="mt-8 text-amber-400 font-medium">
-        &ldquo;Money well spent!&rdquo; 💪
-      </p>
+      <p className="mt-8 text-amber-400 font-medium">&ldquo;Money well spent!&rdquo; 💪</p>
     </div>
   );
 };

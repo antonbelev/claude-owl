@@ -19,9 +19,7 @@ export const TokensCard: React.FC<ReviewCardProps> = ({ data }) => {
         <div className="text-2xl text-white/80 mt-2">tokens</div>
       </div>
 
-      <p className="text-lg text-amber-300/90 mb-8">
-        📚 {tokenComparison}
-      </p>
+      <p className="text-lg text-amber-300/90 mb-8">📚 {tokenComparison}</p>
 
       <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
         <div className="bg-white/5 rounded-lg p-4">

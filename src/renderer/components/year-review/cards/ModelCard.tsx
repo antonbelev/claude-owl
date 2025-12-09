@@ -16,7 +16,7 @@ export const ModelCard: React.FC<ReviewCardProps> = ({ data }) => {
       .replace('claude-', '')
       .replace(/-\d{8}$/, '')
       .split('-')
-      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+      .map(s => s.charAt(0).toUpperCase() + s.slice(1))
       .join(' ');
   };
 
@@ -46,9 +46,7 @@ export const ModelCard: React.FC<ReviewCardProps> = ({ data }) => {
         <p className="text-xl text-amber-300">&ldquo;{modelPersonality.title}&rdquo;</p>
       </div>
 
-      <p className="text-white/80 mb-8 max-w-sm mx-auto">
-        {modelPersonality.description}
-      </p>
+      <p className="text-white/80 mb-8 max-w-sm mx-auto">{modelPersonality.description}</p>
 
       {/* Model breakdown */}
       <div className="space-y-3 max-w-sm mx-auto">
@@ -61,13 +59,9 @@ export const ModelCard: React.FC<ReviewCardProps> = ({ data }) => {
               <span className={`text-lg font-bold ${colors[index]}`}>
                 {Math.round(model.percentage)}%
               </span>
-              <span className="text-white/90 text-sm">
-                {formatModelName(model.model)}
-              </span>
+              <span className="text-white/90 text-sm">{formatModelName(model.model)}</span>
             </div>
-            <span className="text-white/60 text-sm">
-              {formatTokens(model.totalTokens)} tokens
-            </span>
+            <span className="text-white/60 text-sm">{formatTokens(model.totalTokens)} tokens</span>
           </div>
         ))}
       </div>

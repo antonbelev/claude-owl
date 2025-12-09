@@ -111,9 +111,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
       </div>
 
       {/* Keyboard hint */}
-      <p className="text-center text-white/40 text-xs mt-4">
-        Use arrow keys or click to navigate
-      </p>
+      <p className="text-center text-white/40 text-xs mt-4">Use arrow keys or click to navigate</p>
     </div>
   );
 };

@@ -31,13 +31,13 @@ export function YearReviewPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex items-center justify-center p-8">
         <div className="text-center text-white max-w-md">
           <div className="text-6xl mb-6">🎄</div>
-          <h2 className="text-2xl font-bold mb-4">
-            The 2025 Year in Review has ended
-          </h2>
-          <p className="text-white/70 mb-6">
-            Check back next December for your 2026 review!
-          </p>
-          <Button onClick={() => navigate('/metrics')} variant="outline" className="text-white border-white/30 hover:bg-white/10">
+          <h2 className="text-2xl font-bold mb-4">The 2025 Year in Review has ended</h2>
+          <p className="text-white/70 mb-6">Check back next December for your 2026 review!</p>
+          <Button
+            onClick={() => navigate('/metrics')}
+            variant="outline"
+            className="text-white border-white/30 hover:bg-white/10"
+          >
             Go to Metrics
           </Button>
         </div>
@@ -52,9 +52,7 @@ export function YearReviewPage() {
         <SnowflakesOverlay count={30} />
         <div className="text-center text-white z-10">
           <Loader2 className="h-16 w-16 animate-spin text-amber-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-semibold mb-2">
-            Preparing your 2025 journey...
-          </h2>
+          <h2 className="text-2xl font-semibold mb-2">Preparing your 2025 journey...</h2>
           <p className="text-white/60">Crunching the numbers</p>
         </div>
       </div>
@@ -70,7 +68,11 @@ export function YearReviewPage() {
           <div className="text-6xl mb-6">😢</div>
           <h2 className="text-2xl font-bold mb-4">Oops! Something went wrong</h2>
           <p className="text-white/70 mb-6">{error}</p>
-          <Button onClick={() => navigate('/metrics')} variant="outline" className="text-white border-white/30 hover:bg-white/10">
+          <Button
+            onClick={() => navigate('/metrics')}
+            variant="outline"
+            className="text-white border-white/30 hover:bg-white/10"
+          >
             Go to Metrics
           </Button>
         </div>
@@ -87,10 +89,14 @@ export function YearReviewPage() {
           <div className="text-6xl mb-6">🎄 ❄️ 🎅</div>
           <h2 className="text-2xl font-bold mb-4">No 2025 Data Yet</h2>
           <p className="text-white/70 mb-6">
-            Start using Claude Code to build your year in review! Your stats will
-            appear here once you have some sessions.
+            Start using Claude Code to build your year in review! Your stats will appear here once
+            you have some sessions.
           </p>
-          <Button onClick={() => navigate('/metrics')} variant="outline" className="text-white border-white/30 hover:bg-white/10">
+          <Button
+            onClick={() => navigate('/metrics')}
+            variant="outline"
+            className="text-white border-white/30 hover:bg-white/10"
+          >
             Go to Metrics
           </Button>
         </div>
@@ -113,7 +119,7 @@ export function YearReviewPage() {
 
   const handleNext = () => {
     if (currentCard < cards.length - 1) {
-      setCurrentCard((prev) => prev + 1);
+      setCurrentCard(prev => prev + 1);
     } else {
       // Finished - go back to metrics
       navigate('/metrics');
@@ -122,7 +128,7 @@ export function YearReviewPage() {
 
   const handlePrevious = () => {
     if (currentCard > 0) {
-      setCurrentCard((prev) => prev - 1);
+      setCurrentCard(prev => prev - 1);
     }
   };
 

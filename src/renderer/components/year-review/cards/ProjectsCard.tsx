@@ -19,30 +19,19 @@ export const ProjectsCard: React.FC<ReviewCardProps> = ({ data }) => {
 
       <div className="space-y-4 max-w-md mx-auto">
         {topProjects.map((project, index) => (
-          <div
-            key={project.projectPath}
-            className="bg-white/5 rounded-lg p-4 text-left"
-          >
+          <div key={project.projectPath} className="bg-white/5 rounded-lg p-4 text-left">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <span className="text-3xl">{medals[index]}</span>
                 <div>
-                  <div className="font-semibold text-white text-lg">
-                    {project.projectName}
-                  </div>
-                  <div className="text-white/50 text-sm italic">
-                    &ldquo;{titles[index]}&rdquo;
-                  </div>
+                  <div className="font-semibold text-white text-lg">{project.projectName}</div>
+                  <div className="text-white/50 text-sm italic">&ldquo;{titles[index]}&rdquo;</div>
                 </div>
               </div>
             </div>
             <div className="mt-3 flex justify-between text-sm">
-              <span className="text-white/60">
-                {project.sessionCount} sessions
-              </span>
-              <span className="text-emerald-400 font-medium">
-                ${project.cost.toFixed(2)}
-              </span>
+              <span className="text-white/60">{project.sessionCount} sessions</span>
+              <span className="text-emerald-400 font-medium">${project.cost.toFixed(2)}</span>
             </div>
           </div>
         ))}
@@ -56,8 +45,8 @@ export const ProjectsCard: React.FC<ReviewCardProps> = ({ data }) => {
 
       <div className="mt-6 bg-amber-500/20 rounded-lg p-4 max-w-sm mx-auto">
         <p className="text-amber-300">
-          🎨 You worked on <span className="font-bold">{byProject.length}</span> different
-          projects this year!
+          🎨 You worked on <span className="font-bold">{byProject.length}</span> different projects
+          this year!
         </p>
       </div>
     </div>

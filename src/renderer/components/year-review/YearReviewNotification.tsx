@@ -92,8 +92,7 @@ export const YearReviewNotification: React.FC = () => {
             Your 2025 Year in Review is ready!
           </DialogTitle>
           <DialogDescription className="text-center text-white/70 text-base mt-2">
-            See how you used Claude Code this year - your tokens, projects, and AI
-            adventures await!
+            See how you used Claude Code this year - your tokens, projects, and AI adventures await!
           </DialogDescription>
         </DialogHeader>
 
@@ -118,13 +117,10 @@ export const YearReviewNotification: React.FC = () => {
             <Checkbox
               id="dontShow"
               checked={dontShowAgain}
-              onCheckedChange={(checked) => setDontShowAgain(checked === true)}
+              onCheckedChange={checked => setDontShowAgain(checked === true)}
               className="border-white/40 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
             />
-            <Label
-              htmlFor="dontShow"
-              className="text-sm text-white/60 cursor-pointer"
-            >
+            <Label htmlFor="dontShow" className="text-sm text-white/60 cursor-pointer">
               Don&apos;t show this again
             </Label>
           </div>

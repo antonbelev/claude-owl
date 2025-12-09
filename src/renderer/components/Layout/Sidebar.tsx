@@ -47,7 +47,13 @@ const allNavItems: NavItem[] = [
   { path: '/hooks', label: 'Hooks', icon: Webhook },
   { path: '/mcp', label: 'MCP Servers', icon: Link2 },
   { path: '/metrics', label: 'Metrics', icon: TrendingUp },
-  { path: '/year-review', label: '2025 Year Review', icon: Sparkles, seasonal: true, festive: true },
+  {
+    path: '/year-review',
+    label: '2025 Year Review',
+    icon: Sparkles,
+    seasonal: true,
+    festive: true,
+  },
   { path: '/tests', label: 'Test Runner', icon: TestTube, underDevelopment: true },
   { path: '/logs', label: 'Debug Logs', icon: FileCode },
   { path: '/about', label: 'About', icon: Info },
@@ -118,8 +124,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
             >
               <Icon className={cn('w-5 h-5 flex-shrink-0', item.festive && 'text-amber-400')} />
               {!isCollapsed && (
-                <span className={cn('text-sm overflow-hidden text-ellipsis', item.festive && 'font-medium')}>
-                  {item.festive ? '🎄 ' : ''}{item.label}
+                <span
+                  className={cn(
+                    'text-sm overflow-hidden text-ellipsis',
+                    item.festive && 'font-medium'
+                  )}
+                >
+                  {item.festive ? '🎄 ' : ''}
+                  {item.label}
                 </span>
               )}
             </NavLink>

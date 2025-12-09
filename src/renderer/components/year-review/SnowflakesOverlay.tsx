@@ -18,10 +18,7 @@ interface SnowflakesOverlayProps {
  * Animated snowflakes overlay for festive Year in Review experience
  * Respects prefers-reduced-motion for accessibility
  */
-export const SnowflakesOverlay: React.FC<SnowflakesOverlayProps> = ({
-  className,
-  count = 50,
-}) => {
+export const SnowflakesOverlay: React.FC<SnowflakesOverlayProps> = ({ className, count = 50 }) => {
   const snowflakes = useMemo<SnowflakeProps[]>(() => {
     return Array.from({ length: count }, () => ({
       left: `${Math.random() * 100}%`,
@@ -34,10 +31,7 @@ export const SnowflakesOverlay: React.FC<SnowflakesOverlayProps> = ({
 
   return (
     <div
-      className={cn(
-        'fixed inset-0 pointer-events-none z-50 overflow-hidden',
-        className
-      )}
+      className={cn('fixed inset-0 pointer-events-none z-50 overflow-hidden', className)}
       aria-hidden="true"
     >
       {snowflakes.map((flake, index) => (
