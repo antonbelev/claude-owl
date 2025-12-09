@@ -14,9 +14,11 @@ import { CommandsPage } from './pages/CommandsPage';
 import { HooksPage } from './pages/HooksPage';
 import { MCPPage } from './pages/MCPPage';
 import { MetricsPage } from './pages/MetricsPage';
+import { YearReviewPage } from './pages/YearReviewPage';
 import { TestsPage } from './pages/TestsPage';
 import { LogsPage } from './pages/LogsPage';
 import { AboutPage } from './pages/AboutPage';
+import { YearReviewNotification } from './components/year-review';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -34,6 +36,7 @@ export const App: React.FC = () => {
       <QueryClientProvider client={queryClient}>
         <ProjectProvider>
           <HashRouter>
+            <YearReviewNotification />
             <Routes>
               <Route path="/" element={<AppLayout />}>
                 <Route index element={<Dashboard />} />
@@ -46,6 +49,7 @@ export const App: React.FC = () => {
                 <Route path="hooks" element={<HooksPage />} />
                 <Route path="mcp" element={<MCPPage />} />
                 <Route path="metrics" element={<MetricsPage />} />
+                <Route path="year-review" element={<YearReviewPage />} />
                 <Route path="tests" element={<TestsPage />} />
                 <Route path="logs" element={<LogsPage />} />
                 <Route path="about" element={<AboutPage />} />

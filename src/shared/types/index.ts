@@ -12,6 +12,7 @@ export * from './project.types';
 export * from './metrics.types';
 export * from './ipc.metrics.types';
 export * from './ipc.types';
+export * from './year-review.types';
 
 // Model constants and utilities
 export * from '../constants/models';

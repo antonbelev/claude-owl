@@ -21,6 +21,20 @@ For a complete list of features, see [SCREENSHOTS.md](SCREENSHOTS.md) and [CHANG
 
 ![Claude Owl Dashboard](screenshots/claude-owl-dashboard.png)
 
+### 🎄 2025 Year in Review
+
+Celebrate your year of AI-powered development! Claude Owl now includes a festive Year in Review feature that showcases your 2025 coding journey with Claude Code:
+
+- **📊 Beautiful Stats**: Token usage, costs, sessions, and activity patterns
+- **🏆 Achievement Badges**: Earn badges for milestones and coding habits
+- **🎯 Model Insights**: See your favorite Claude models and usage breakdown
+- **📈 Activity Analytics**: Peak coding months, longest streaks, and daily patterns
+- **🎁 Social Sharing**: Share your year with customizable stats for Twitter/X
+
+![Year in Review 2025](screenshots/year-in-review-2025-total-tokens.png)
+
+Available now through January 1, 2026!
+
 ## Installation
 
 ### Prerequisites
