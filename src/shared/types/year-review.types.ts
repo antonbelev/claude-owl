@@ -2,7 +2,13 @@
  * Types for the 2025 Year in Review feature
  */
 
-import type { MetricsData, DailyStats, ModelStats, ProjectStats, MetricsSummary } from './metrics.types';
+import type {
+  MetricsData,
+  DailyStats,
+  ModelStats,
+  ProjectStats,
+  MetricsSummary,
+} from './metrics.types';
 
 /**
  * Year Review configuration constants
@@ -43,7 +49,13 @@ export interface ActivityStats {
     dayOfWeek: string;
     sessions: number;
   } | null;
-  monthlyData: Array<{ month: string; monthName: string; sessions: number; tokens: number; cost: number }>;
+  monthlyData: Array<{
+    month: string;
+    monthName: string;
+    sessions: number;
+    tokens: number;
+    cost: number;
+  }>;
   longestStreak: number;
   totalDaysActive: number;
 }

@@ -1,9 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { YearReviewData, ComputeMetricsResponse } from '@/shared/types';
-import {
-  isYearReviewActive,
-  buildYearReviewData,
-} from '@/shared/utils/year-review.utils';
+import { isYearReviewActive, buildYearReviewData } from '@/shared/utils/year-review.utils';
 
 export interface YearReviewState {
   data: YearReviewData | null;
@@ -27,7 +24,7 @@ export function useYearReview() {
 
   const loadYearReview = useCallback(async () => {
     console.log('[useYearReview] Loading year in review data');
-    setState((prev) => ({ ...prev, loading: true, error: null }));
+    setState(prev => ({ ...prev, loading: true, error: null }));
 
     // Check if feature is active
     if (!isYearReviewActive()) {
@@ -74,7 +71,7 @@ export function useYearReview() {
 
         console.log('[useYearReview] Year review data built:', {
           sessions: yearReviewData.metrics.sessions.length,
-          badges: yearReviewData.badges.filter((b) => b.earned).length,
+          badges: yearReviewData.badges.filter(b => b.earned).length,
           hasData,
         });
 

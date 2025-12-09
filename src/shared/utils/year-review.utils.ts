@@ -36,12 +36,12 @@ export function filter2025Data(data: MetricsData): MetricsData {
   const startOf2025 = new Date('2025-01-01T00:00:00');
   const endOf2025 = new Date('2025-12-31T23:59:59');
 
-  const filteredSessions = data.sessions.filter((s) => {
+  const filteredSessions = data.sessions.filter(s => {
     const date = new Date(s.startTime);
     return date >= startOf2025 && date <= endOf2025;
   });
 
-  const filteredDaily = data.daily.filter((d) => {
+  const filteredDaily = data.daily.filter(d => {
     const date = new Date(d.date);
     return date >= startOf2025 && date <= endOf2025;
   });
@@ -86,9 +86,11 @@ function recomputeSummary(sessions: SessionWithCost[], daily: DailyStats[]): Met
     }
   }
 
-  const totalTokens = totalInputTokens + totalOutputTokens + totalCacheCreationTokens + totalCacheReadTokens;
+  const totalTokens =
+    totalInputTokens + totalOutputTokens + totalCacheCreationTokens + totalCacheReadTokens;
   const totalCacheTokens = totalCacheCreationTokens + totalCacheReadTokens;
-  const cacheEfficiency = totalCacheTokens > 0 ? (totalCacheReadTokens / totalCacheTokens) * 100 : 0;
+  const cacheEfficiency =
+    totalCacheTokens > 0 ? (totalCacheReadTokens / totalCacheTokens) * 100 : 0;
 
   // Find top model by total tokens (not session count)
   const modelTokenCounts = new Map<string, number>();
@@ -98,7 +100,8 @@ function recomputeSummary(sessions: SessionWithCost[], daily: DailyStats[]): Met
       if (!msg.model || msg.model === 'unknown' || msg.model.includes('synthetic')) {
         continue;
       }
-      const tokens = msg.inputTokens + msg.outputTokens + msg.cacheCreationTokens + msg.cacheReadTokens;
+      const tokens =
+        msg.inputTokens + msg.outputTokens + msg.cacheCreationTokens + msg.cacheReadTokens;
       modelTokenCounts.set(msg.model, (modelTokenCounts.get(msg.model) || 0) + tokens);
     }
   }
@@ -111,7 +114,7 @@ function recomputeSummary(sessions: SessionWithCost[], daily: DailyStats[]): Met
     }
   }
 
-  const dates = daily.map((d) => d.date).sort();
+  const dates = daily.map(d => d.date).sort();
   const today = new Date().toISOString().split('T')[0] || new Date().toISOString().slice(0, 10);
   const startDate = dates[0];
   const endDate = dates[dates.length - 1];
@@ -189,7 +192,11 @@ function recomputeModelStats(sessions: SessionWithCost[]): ModelStats[] {
   // Calculate total tokens for percentage
   const allTokens = Array.from(modelMap.values()).reduce(
     (sum, stats) =>
-      sum + stats.inputTokens + stats.outputTokens + stats.cacheCreationTokens + stats.cacheReadTokens,
+      sum +
+      stats.inputTokens +
+      stats.outputTokens +
+      stats.cacheCreationTokens +
+      stats.cacheReadTokens,
     0
   );
 
@@ -355,7 +362,9 @@ export function computeActivityStats(daily: DailyStats[]): ActivityStats {
 export function computeLongestStreak(daily: DailyStats[]): number {
   if (daily.length === 0) return 0;
 
-  const sortedDays = [...daily].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const sortedDays = [...daily].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
 
   let maxStreak = 1;
   let currentStreak = 1;
@@ -390,7 +399,7 @@ const BADGE_DEFINITIONS = [
     emoji: '🌅',
     description: '20+ sessions before 8am',
     check: (sessions: SessionWithCost[], _summary: MetricsSummary, _daily: DailyStats[]) => {
-      const earlyCount = sessions.filter((s) => new Date(s.startTime).getHours() < 8).length;
+      const earlyCount = sessions.filter(s => new Date(s.startTime).getHours() < 8).length;
       return { earned: earlyCount >= 20, detail: `${earlyCount} sessions before 8am` };
     },
   },
@@ -400,7 +409,7 @@ const BADGE_DEFINITIONS = [
     emoji: '🦉',
     description: '20+ sessions after 10pm',
     check: (sessions: SessionWithCost[], _summary: MetricsSummary, _daily: DailyStats[]) => {
-      const lateCount = sessions.filter((s) => new Date(s.startTime).getHours() >= 22).length;
+      const lateCount = sessions.filter(s => new Date(s.startTime).getHours() >= 22).length;
       return { earned: lateCount >= 20, detail: `${lateCount} sessions after 10pm` };
     },
   },
@@ -444,7 +453,7 @@ const BADGE_DEFINITIONS = [
     emoji: '🐰',
     description: '10+ different projects',
     check: (sessions: SessionWithCost[], _summary: MetricsSummary, _daily: DailyStats[]) => {
-      const projects = new Set(sessions.map((s) => s.projectPath));
+      const projects = new Set(sessions.map(s => s.projectPath));
       return { earned: projects.size >= 10, detail: `${projects.size} different projects` };
     },
   },
@@ -456,7 +465,7 @@ const BADGE_DEFINITIONS = [
     check: (sessions: SessionWithCost[], _summary: MetricsSummary, _daily: DailyStats[]) => {
       let opusCount = 0;
       for (const session of sessions) {
-        if (session.messages.some((m) => m.model.toLowerCase().includes('opus'))) {
+        if (session.messages.some(m => m.model.toLowerCase().includes('opus'))) {
           opusCount++;
         }
       }
@@ -469,7 +478,7 @@ const BADGE_DEFINITIONS = [
     emoji: '⚔️',
     description: '30+ weekend sessions',
     check: (sessions: SessionWithCost[], _summary: MetricsSummary, _daily: DailyStats[]) => {
-      const weekendCount = sessions.filter((s) => {
+      const weekendCount = sessions.filter(s => {
         const day = new Date(s.startTime).getDay();
         return day === 0 || day === 6;
       }).length;
@@ -491,7 +500,10 @@ const BADGE_DEFINITIONS = [
     emoji: '💸',
     description: '$50+ invested in AI',
     check: (_sessions: SessionWithCost[], summary: MetricsSummary, _daily: DailyStats[]) => {
-      return { earned: summary.totalCost >= 50, detail: `$${summary.totalCost.toFixed(2)} invested` };
+      return {
+        earned: summary.totalCost >= 50,
+        detail: `$${summary.totalCost.toFixed(2)} invested`,
+      };
     },
   },
 ];
@@ -504,7 +516,7 @@ export function computeBadges(
   summary: MetricsSummary,
   daily: DailyStats[]
 ): Badge[] {
-  return BADGE_DEFINITIONS.map((def) => {
+  return BADGE_DEFINITIONS.map(def => {
     const result = def.check(sessions, summary, daily);
     return {
       id: def.id,
@@ -613,10 +625,7 @@ export function getCostComparison(totalCost: number): string {
 /**
  * Compute fun facts from metrics
  */
-export function computeFunFacts(
-  sessions: SessionWithCost[],
-  summary: MetricsSummary
-): FunFact[] {
+export function computeFunFacts(sessions: SessionWithCost[], summary: MetricsSummary): FunFact[] {
   const funFacts: FunFact[] = [];
 
   // Average session duration (estimated)
@@ -679,7 +688,7 @@ export function computeFunFacts(
   });
 
   // Projects count
-  const uniqueProjects = new Set(sessions.map((s) => s.projectPath));
+  const uniqueProjects = new Set(sessions.map(s => s.projectPath));
   funFacts.push({
     id: 'projects',
     icon: '📁',
@@ -718,7 +727,7 @@ export function computeShareStats(
     .replace('claude-', '')
     .replace(/-\d{8}$/, '')
     .split('-')
-    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+    .map(s => s.charAt(0).toUpperCase() + s.slice(1))
     .join(' ');
 
   return {
@@ -731,7 +740,7 @@ export function computeShareStats(
     topModelShort,
     topProject: byProject[0]?.projectName ?? 'Various',
     cacheEfficiency: summary.cacheEfficiency,
-    badgeCount: badges.filter((b) => b.earned).length,
+    badgeCount: badges.filter(b => b.earned).length,
   };
 }
 
