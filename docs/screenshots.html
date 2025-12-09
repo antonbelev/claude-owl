@@ -103,6 +103,7 @@
       <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
         <h2 class="text-xl font-semibold mb-4">Jump to Section</h2>
         <div class="grid md:grid-cols-3 gap-3 text-sm">
+          <a href="#year-review" class="text-amber-400 hover:underline font-semibold">🎄 2025 Year in Review</a>
           <a href="#dashboard" class="text-blue-400 hover:underline">🏠 Dashboard</a>
           <a href="#settings" class="text-blue-400 hover:underline">⚙️ Settings</a>
           <a href="#subagents" class="text-blue-400 hover:underline">🤖 Subagents</a>
@@ -113,6 +114,44 @@
           <a href="#metrics" class="text-blue-400 hover:underline">📈 Usage Metrics</a>
           <a href="#statusline" class="text-blue-400 hover:underline">📊 Status Line</a>
           <a href="#logs" class="text-blue-400 hover:underline">📝 Debug Logs</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Year in Review -->
+  <section id="year-review" class="py-12 px-6 bg-gradient-to-br from-amber-900/20 to-red-900/20">
+    <div class="container mx-auto max-w-5xl">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-3xl font-bold flex items-center">
+          <span class="text-4xl mr-3">🎄</span> 2025 Year in Review
+        </h2>
+        <span class="bg-amber-500 text-white text-xs font-semibold px-3 py-1 rounded-full">NEW</span>
+      </div>
+      <p class="text-slate-400 mb-6">Celebrate your year of AI-powered development with beautiful stats, badges, and social sharing</p>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-amber-300">Year in Review Dashboard</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/year-in-review-2025-total-tokens.png"
+               alt="2025 Year in Review"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            View your 2025 coding journey: token usage stats, AI spending, achievement badges, model insights, activity patterns, and social sharing. Features 9 interactive cards with snowfall animations. Available through January 1, 2026.
+          </p>
+        </div>
+
+        <div class="bg-amber-900/30 border border-amber-500/50 rounded-xl p-6">
+          <h4 class="font-semibold text-amber-300 mb-3">Key Features</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li>📊 <strong>Beautiful Stats:</strong> Total tokens, costs, sessions, and daily activity patterns</li>
+            <li>🏆 <strong>10 Achievement Badges:</strong> Early Bird, Night Owl, Cache Master, Hot Streak, Million Club, and more</li>
+            <li>🎯 <strong>Model Insights:</strong> Favorite Claude model with personality, usage breakdown by tokens</li>
+            <li>📈 <strong>Activity Analytics:</strong> Peak month, peak day, longest coding streak, monthly charts</li>
+            <li>🎁 <strong>Social Sharing:</strong> Copy stats or tweet your year with one click (opens in default browser)</li>
+            <li>❄️ <strong>Festive UI:</strong> Animated snowflakes with accessibility support (respects prefers-reduced-motion)</li>
+          </ul>
         </div>
       </div>
     </div>

@@ -11,6 +11,7 @@ import {
   Webhook,
   Link2,
   TrendingUp,
+  Sparkles,
   TestTube,
   FileCode,
   Info,
@@ -19,6 +20,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/renderer/lib/utils';
 import logoImage from '../../assets/claude-owl-logo.png';
+import { isYearReviewActive } from '@/shared/utils/year-review.utils';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -30,6 +32,8 @@ interface NavItem {
   label: string;
   icon: React.ElementType;
   underDevelopment?: boolean;
+  seasonal?: boolean;
+  festive?: boolean;
 }
 
 const allNavItems: NavItem[] = [
@@ -43,6 +47,7 @@ const allNavItems: NavItem[] = [
   { path: '/hooks', label: 'Hooks', icon: Webhook },
   { path: '/mcp', label: 'MCP Servers', icon: Link2 },
   { path: '/metrics', label: 'Metrics', icon: TrendingUp },
+  { path: '/year-review', label: '2025 Year Review', icon: Sparkles, seasonal: true, festive: true },
   { path: '/tests', label: 'Test Runner', icon: TestTube, underDevelopment: true },
   { path: '/logs', label: 'Debug Logs', icon: FileCode },
   { path: '/about', label: 'About', icon: Info },
@@ -65,7 +70,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
     return () => window.removeEventListener('showUnderDevelopmentChanged', handleDevelopmentToggle);
   }, []);
 
-  const navItems = allNavItems.filter(item => !item.underDevelopment || showUnderDevelopment);
+  // Filter items based on development mode and seasonal availability
+  const navItems = allNavItems.filter(item => {
+    // Filter out under-development items unless enabled
+    if (item.underDevelopment && !showUnderDevelopment) return false;
+    // Filter out seasonal items if not in season
+    if (item.seasonal && !isYearReviewActive()) return false;
+    return true;
+  });
 
   return (
     <aside
@@ -98,14 +110,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
                 cn(
                   'flex items-center gap-3 px-4 py-3 text-white/70 no-underline transition-all border-l-2 border-transparent whitespace-nowrap',
                   'hover:bg-white/5 hover:text-white/90',
-                  isActive && 'bg-accent-500/15 text-accent-400 border-l-accent-400'
+                  isActive && 'bg-accent-500/15 text-accent-400 border-l-accent-400',
+                  item.festive && 'text-amber-400/90 hover:text-amber-300'
                 )
               }
               title={isCollapsed ? item.label : undefined}
             >
-              <Icon className="w-5 h-5 flex-shrink-0" />
+              <Icon className={cn('w-5 h-5 flex-shrink-0', item.festive && 'text-amber-400')} />
               {!isCollapsed && (
-                <span className="text-sm overflow-hidden text-ellipsis">{item.label}</span>
+                <span className={cn('text-sm overflow-hidden text-ellipsis', item.festive && 'font-medium')}>
+                  {item.festive ? '🎄 ' : ''}{item.label}
+                </span>
               )}
             </NavLink>
           );
