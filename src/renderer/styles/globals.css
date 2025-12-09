@@ -166,3 +166,33 @@
 .incident-item:hover {
   @apply bg-neutral-100/50;
 }
+
+/* Year in Review - Snowfall Animation */
+@keyframes snowfall {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.animate-snowfall {
+  animation: snowfall linear infinite;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-snowfall {
+    animation: none;
+    opacity: 0.2;
+  }
+}
