@@ -14,7 +14,26 @@ import type { YearReviewData } from '@/shared/types';
 
 const mockData: YearReviewData = {
   metrics: {
-    sessions: [],
+    sessions: [
+      {
+        sessionId: 'session-1',
+        projectPath: '/home/user/project1',
+        startTime: new Date('2025-06-01T10:00:00Z'),
+        messages: [
+          {
+            model: 'claude-sonnet-4-5-20250929',
+            inputTokens: 500000,
+            outputTokens: 500000,
+            cacheCreationTokens: 50000,
+            cacheReadTokens: 100000,
+            timestamp: new Date('2025-06-01T10:00:00Z'),
+          },
+        ],
+        cost: 50.0,
+        totalTokens: 1150000,
+        cacheEfficiency: 66.7,
+      },
+    ],
     daily: [],
     byModel: [],
     byProject: [],
