@@ -587,27 +587,48 @@ describe('year-review.utils', () => {
     });
 
     it('includes cache savings when available', () => {
-      const sessions: SessionWithCost[] = [];
+      const sessions: SessionWithCost[] = [
+        {
+          sessionId: 'session-1',
+          projectPath: '/test/project',
+          startTime: new Date('2025-06-01T10:00:00Z'),
+          messages: [
+            {
+              model: 'claude-sonnet-4-5-20250929',
+              inputTokens: 50000,
+              outputTokens: 50000,
+              cacheCreationTokens: 10000,
+              cacheReadTokens: 100000, // Will save: 100K * $2.70 per MTok = $0.27
+              timestamp: new Date('2025-06-01T10:00:00Z'),
+            },
+          ],
+          cost: 2.0,
+          totalTokens: 210000,
+          cacheEfficiency: 90,
+        },
+      ];
       const summary = {
-        totalSessions: 10,
-        totalMessages: 100,
+        totalSessions: 1,
+        totalMessages: 1,
         totalInputTokens: 50000,
         totalOutputTokens: 50000,
         totalCacheCreationTokens: 10000,
         totalCacheReadTokens: 100000,
         totalTokens: 210000,
-        totalCost: 20.0,
-        daysActive: 10,
-        topModel: 'claude-3-sonnet',
+        totalCost: 2.0,
+        daysActive: 1,
+        topModel: 'claude-sonnet-4-5-20250929',
         averageCostPerSession: 2.0,
         cacheEfficiency: 90,
-        dateRange: { start: '2025-06-01', end: '2025-06-10' },
+        dateRange: { start: '2025-06-01', end: '2025-06-01' },
       };
 
       const funFacts = computeFunFacts(sessions, summary);
 
       const cacheSavings = funFacts.find((f) => f.id === 'cache-savings');
       expect(cacheSavings).toBeDefined();
+      // Should show savings: 100K tokens * $2.70/MTok = $0.27
+      expect(cacheSavings?.value).toBe('$0.27');
     });
   });
 

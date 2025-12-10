@@ -2,13 +2,41 @@ import React from 'react';
 import type { ReviewCardProps } from '@/shared/types';
 
 /**
+ * Calculate accurate cache savings from sessions
+ */
+function calculateCacheSavings(data: ReviewCardProps['data']): number {
+  // Model pricing for cache savings calculation
+  const modelSavingsRate: Record<string, number> = {
+    'claude-opus-4-5-20251101': 4.5,
+    'claude-opus-4-20250514': 4.5,
+    'claude-sonnet-4-5-20250929': 2.7,
+    'claude-sonnet-3-5-20241022': 2.7,
+    'claude-haiku-4-5-20251001': 0.9,
+    'claude-haiku-3-5-20241022': 0.72,
+  };
+
+  let totalSavings = 0;
+
+  for (const session of data.metrics.sessions) {
+    for (const msg of session.messages) {
+      const savingsRate = modelSavingsRate[msg.model] || 0;
+      if (savingsRate > 0 && msg.cacheReadTokens > 0) {
+        totalSavings += (msg.cacheReadTokens / 1_000_000) * savingsRate;
+      }
+    }
+  }
+
+  return totalSavings;
+}
+
+/**
  * Cost card - Shows spending with fun comparison and cache savings
  */
 export const CostCard: React.FC<ReviewCardProps> = ({ data }) => {
   const { summary, costComparison } = data;
 
   const dailyAverage = summary.totalCost / Math.max(summary.daysActive, 1);
-  const cacheSavings = (summary.totalCacheReadTokens / 1_000_000) * 2.7; // Rough estimate
+  const cacheSavings = calculateCacheSavings(data);
 
   return (
     <div className="text-center text-white">
@@ -29,7 +57,7 @@ export const CostCard: React.FC<ReviewCardProps> = ({ data }) => {
           <div className="flex items-center justify-center gap-2 text-emerald-400">
             <span className="text-2xl">🟢</span>
             <span className="font-semibold">
-              You saved ~${cacheSavings.toFixed(2)} with prompt caching!
+              You saved ${cacheSavings.toFixed(2)} with prompt caching!
             </span>
           </div>
           <p className="text-sm text-white/60 mt-2">
