@@ -623,6 +623,40 @@ export function getCostComparison(totalCost: number): string {
 }
 
 /**
+ * Calculate accurate cache savings across all sessions
+ * Uses per-model pricing to compute actual savings
+ */
+function calculateTotalCacheSavings(sessions: SessionWithCost[]): number {
+  // Model pricing for cache savings calculation
+  // Savings = (input cost - cache read cost) per million tokens
+  const modelSavingsRate: Record<string, number> = {
+    // Opus 4.5: $5 input - $0.50 cache read = $4.50 savings per MTok
+    'claude-opus-4-5-20251101': 4.5,
+    'claude-opus-4-20250514': 4.5,
+    // Sonnet 4.5: $3 input - $0.30 cache read = $2.70 savings per MTok (standard context)
+    'claude-sonnet-4-5-20250929': 2.7,
+    'claude-sonnet-3-5-20241022': 2.7,
+    // Haiku 4.5: $1 input - $0.10 cache read = $0.90 savings per MTok
+    'claude-haiku-4-5-20251001': 0.9,
+    // Haiku 3.5: $0.80 input - $0.08 cache read = $0.72 savings per MTok
+    'claude-haiku-3-5-20241022': 0.72,
+  };
+
+  let totalSavings = 0;
+
+  for (const session of sessions) {
+    for (const msg of session.messages) {
+      const savingsRate = modelSavingsRate[msg.model] || 0;
+      if (savingsRate > 0 && msg.cacheReadTokens > 0) {
+        totalSavings += (msg.cacheReadTokens / 1_000_000) * savingsRate;
+      }
+    }
+  }
+
+  return totalSavings;
+}
+
+/**
  * Compute fun facts from metrics
  */
 export function computeFunFacts(sessions: SessionWithCost[], summary: MetricsSummary): FunFact[] {
@@ -697,16 +731,15 @@ export function computeFunFacts(sessions: SessionWithCost[], summary: MetricsSum
     detail: `You worked on ${uniqueProjects.size} different projects`,
   });
 
-  // Cache savings estimate
-  const cacheReadTokens = summary.totalCacheReadTokens;
-  const estimatedSavings = (cacheReadTokens / 1_000_000) * 2.7; // Rough estimate
-  if (estimatedSavings > 0.01) {
+  // Cache savings - accurate calculation per model
+  const cacheSavings = calculateTotalCacheSavings(sessions);
+  if (cacheSavings > 0.01) {
     funFacts.push({
       id: 'cache-savings',
       icon: '💰',
       title: 'Cache Savings',
-      value: `~$${estimatedSavings.toFixed(2)}`,
-      detail: `Estimated savings from prompt caching`,
+      value: `$${cacheSavings.toFixed(2)}`,
+      detail: `Savings from prompt caching`,
     });
   }
 
