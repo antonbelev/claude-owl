@@ -20,6 +20,9 @@ import type {
   GetGitHubRepoInfoResponse,
   GetPluginHealthRequest,
   GetPluginHealthResponse,
+  ValidateMarketplaceRequest,
+  ValidateMarketplaceResponse,
+  MarketplaceValidationResult,
   GitHubRepoInfo,
   PluginHealthScore,
 } from '@/shared/types';
@@ -325,6 +328,40 @@ export function usePlugins() {
     []
   );
 
+  /**
+   * Validate a marketplace URL
+   */
+  const validateMarketplace = useCallback(
+    async (url: string): Promise<MarketplaceValidationResult | null> => {
+      if (!window.electronAPI) {
+        console.error('[usePlugins] electronAPI not available');
+        return null;
+      }
+
+      console.log('[usePlugins] Validating marketplace:', url);
+
+      try {
+        const request: ValidateMarketplaceRequest = { url };
+        const response = (await window.electronAPI.validateMarketplace(
+          request
+        )) as ValidateMarketplaceResponse;
+
+        console.log('[usePlugins] Validation response:', response);
+
+        if (response.success && response.data) {
+          return response.data;
+        }
+
+        console.error('[usePlugins] Validation failed:', response.error);
+        return null;
+      } catch (error) {
+        console.error('[usePlugins] Exception validating marketplace:', error);
+        return null;
+      }
+    },
+    []
+  );
+
   // Load plugin data on mount
   useEffect(() => {
     loadPluginData();
@@ -340,6 +377,7 @@ export function usePlugins() {
     togglePlugin,
     getGitHubRepoInfo,
     getPluginHealth,
+    validateMarketplace,
     refetch: loadPluginData,
   };
 }

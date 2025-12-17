@@ -130,32 +130,18 @@ export class PluginsService {
   ): Promise<{ success: boolean; error?: string }> {
     console.log('[PluginsService] Adding marketplace:', { name, source });
 
-    // If ClaudeService is available, delegate to CLI
-    if (this.claudeService) {
-      console.log('[PluginsService] Delegating to Claude CLI...');
-      try {
-        const result = await this.claudeService.addPluginMarketplace(source);
-        if (result.success) {
-          console.log('[PluginsService] Marketplace added via CLI successfully');
-          return { success: true };
-        } else {
-          console.error('[PluginsService] CLI add marketplace failed:', result.error);
-          return {
-            success: false,
-            error: result.error || 'Failed to add marketplace via CLI',
-          };
-        }
-      } catch (error) {
-        console.error('[PluginsService] CLI delegation failed:', error);
-        return {
-          success: false,
-          error: error instanceof Error ? error.message : 'Failed to add marketplace',
-        };
-      }
-    }
+    // TODO: CLI delegation disabled - the `claude /plugin marketplace add` command
+    // doesn't exist in the current Claude CLI (causes crash at cli.js:1087)
+    // Re-enable when the CLI supports this command
+    // if (this.claudeService) {
+    //   console.log('[PluginsService] Delegating to Claude CLI...');
+    //   const result = await this.claudeService.addPluginMarketplace(source);
+    //   if (result.success) return { success: true };
+    //   // Fall through to legacy mode on failure
+    // }
 
-    // Fallback to direct file manipulation (legacy mode)
-    console.log('[PluginsService] Using legacy file manipulation mode');
+    // Use direct file manipulation
+    console.log('[PluginsService] Using direct file manipulation mode');
     try {
       // Validate marketplace by fetching manifest
       console.log('[PluginsService] Validating marketplace manifest...');

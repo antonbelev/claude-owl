@@ -113,6 +113,9 @@ export type {
   GetGitHubRepoInfoResponse,
   GetPluginHealthRequest,
   GetPluginHealthResponse,
+  ValidateMarketplaceRequest,
+  ValidateMarketplaceResponse,
+  MarketplaceValidationResult,
 } from './ipc.plugins.types';
 
 // Re-export hooks types

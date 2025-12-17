@@ -74,3 +74,22 @@ export interface GetPluginHealthRequest {
 }
 
 export interface GetPluginHealthResponse extends IPCResponse<PluginHealthScore> {}
+
+/**
+ * Marketplace validation request/response types
+ */
+
+export interface ValidateMarketplaceRequest {
+  url: string;
+}
+
+export interface MarketplaceValidationResult {
+  valid: boolean;
+  url: string;
+  hasManifest: boolean;
+  manifestPath?: string;
+  error?: string;
+  suggestions?: string[];
+}
+
+export interface ValidateMarketplaceResponse extends IPCResponse<MarketplaceValidationResult> {}

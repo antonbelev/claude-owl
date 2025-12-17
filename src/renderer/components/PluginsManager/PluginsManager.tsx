@@ -47,6 +47,7 @@ export const PluginsManager: React.FC = () => {
     installPlugin,
     uninstallPlugin,
     togglePlugin,
+    validateMarketplace,
   } = usePlugins();
 
   const [activeTab, setActiveTab] = useState<TabView>('browse');
@@ -419,6 +420,7 @@ export const PluginsManager: React.FC = () => {
         <AddMarketplaceModal
           onClose={() => setShowAddMarketplaceModal(false)}
           onAdd={addMarketplace}
+          onValidate={validateMarketplace}
         />
       )}
 
@@ -677,13 +679,44 @@ const PluginCard: React.FC<PluginCardProps> = ({
 interface AddMarketplaceModalProps {
   onClose: () => void;
   onAdd: (name: string, source: string) => Promise<boolean>;
+  onValidate: (url: string) => Promise<any>;
 }
 
-const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({ onClose, onAdd }) => {
+const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({
+  onClose,
+  onAdd,
+  onValidate,
+}) => {
   const [name, setName] = useState('');
   const [source, setSource] = useState('');
   const [adding, setAdding] = useState(false);
+  const [validating, setValidating] = useState(false);
+  const [validationResult, setValidationResult] = useState<any>(null);
   const [error, setError] = useState('');
+
+  const handleValidate = async () => {
+    if (!source.trim()) {
+      setError('Please enter a source URL first');
+      return;
+    }
+
+    setValidating(true);
+    setError('');
+    setValidationResult(null);
+
+    console.log('[AddMarketplaceModal] Validating:', source.trim());
+
+    const result = await onValidate(source.trim());
+
+    console.log('[AddMarketplaceModal] Validation result:', result);
+
+    setValidationResult(result);
+    setValidating(false);
+
+    if (!result || !result.valid) {
+      setError(result?.error || 'Validation failed');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -704,8 +737,9 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({ onClose, onAd
       console.log('[AddMarketplaceModal] Marketplace added successfully');
       onClose();
     } else {
-      const errorMsg = 'Failed to add marketplace. Check the console for details.';
-      console.error('[AddMarketplaceModal]', errorMsg);
+      // Show a generic error - the actual error will be logged
+      const errorMsg = 'Failed to add marketplace. Please check the console logs for details.';
+      console.error('[AddMarketplaceModal] Failed to add marketplace');
       setError(errorMsg);
     }
 
@@ -760,21 +794,64 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({ onClose, onAd
             <Label htmlFor="marketplace-source">
               Source <span className="text-red-500">*</span>
             </Label>
-            <Input
-              id="marketplace-source"
-              type="text"
-              value={source}
-              onChange={e => setSource(e.target.value)}
-              placeholder="https://github.com/owner/repo"
-              required
-              className="mt-2"
-            />
+            <div className="flex gap-2 mt-2">
+              <Input
+                id="marketplace-source"
+                type="text"
+                value={source}
+                onChange={e => {
+                  setSource(e.target.value);
+                  setValidationResult(null); // Clear validation when source changes
+                }}
+                placeholder="https://github.com/owner/repo"
+                required
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                onClick={handleValidate}
+                disabled={validating || !source.trim()}
+                variant="outline"
+              >
+                {validating ? 'Verifying...' : 'Verify'}
+              </Button>
+            </div>
             <small className="block mt-1 text-sm text-gray-500">
               Repository must contain .claude-plugin/marketplace.json
             </small>
             <small className="block mt-1 text-xs text-gray-400">
               Example: https://github.com/myorg/claude-plugins
             </small>
+
+            {/* Validation Result Display */}
+            {validationResult && (
+              <div className="mt-3">
+                {validationResult.valid ? (
+                  <Alert>
+                    <AlertDescription className="text-green-700">
+                      ✓ Marketplace validated successfully!
+                      <div className="mt-1 text-xs text-gray-600">
+                        Found marketplace.json at {validationResult.manifestPath}
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <Alert variant="destructive">
+                    <AlertDescription>
+                      <div className="font-semibold">✗ Validation Failed</div>
+                      <div className="mt-1">{validationResult.error}</div>
+                      {validationResult.suggestions && validationResult.suggestions.length > 0 && (
+                        <ul className="mt-2 text-xs list-disc list-inside space-y-1">
+                          {validationResult.suggestions.map((suggestion: string, i: number) => (
+                            <li key={i}>{suggestion}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t">

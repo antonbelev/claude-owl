@@ -1,0 +1,144 @@
+{
+  "name": "anthropic-official",
+  "owner": {
+    "name": "Anthropic",
+    "email": "[email protected]"
+  },
+  "metadata": {
+    "description": "Official plugins from Anthropic for Claude Code",
+    "version": "1.0.0",
+    "website": "https://github.com/anthropics/claude-code"
+  },
+  "plugins": [
+    {
+      "name": "agent-sdk-dev",
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code",
+        "path": "plugins/agent-sdk-dev"
+      },
+      "description": "Development kit for working with the Claude Agent SDK with interactive setup commands and validation agents",
+      "category": "development"
+    },
+    {
+      "name": "claude-opus-4-5-migration",
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code",
+        "path": "plugins/claude-opus-4-5-migration"
+      },
+      "description": "Facilitates transitioning code and prompts from earlier model versions to Opus 4.5",
+      "category": "migration"
+    },
+    {
+      "name": "code-review",
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code",
+        "path": "plugins/code-review"
+      },
+      "description": "Automated PR code review using multiple specialized agents with confidence-based scoring",
+      "category": "quality"
+    },
+    {
+      "name": "commit-commands",
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code",
+        "path": "plugins/commit-commands"
+      },
+      "description": "Streamlines git operations including commits, pushes, and pull request creation",
+      "category": "git"
+    },
+    {
+      "name": "explanatory-output-style",
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code",
+        "path": "plugins/explanatory-output-style"
+      },
+      "description": "Supplements sessions with educational context about implementation decisions and codebase patterns",
+      "category": "learning"
+    },
+    {
+      "name": "feature-dev",
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code",
+        "path": "plugins/feature-dev"
+      },
+      "description": "Structured 7-phase workflow for comprehensive feature development using specialized agents",
+      "category": "development"
+    },
+    {
+      "name": "frontend-design",
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code",
+        "path": "plugins/frontend-design"
+      },
+      "description": "Guides creation of distinctive, production-grade frontend interfaces",
+      "category": "design"
+    },
+    {
+      "name": "hookify",
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code",
+        "path": "plugins/hookify"
+      },
+      "description": "Create custom hooks to prevent unwanted behaviors by analyzing conversation patterns",
+      "category": "customization"
+    },
+    {
+      "name": "learning-output-style",
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code",
+        "path": "plugins/learning-output-style"
+      },
+      "description": "Interactive mode requesting meaningful code contributions at decision points",
+      "category": "learning"
+    },
+    {
+      "name": "plugin-dev",
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code",
+        "path": "plugins/plugin-dev"
+      },
+      "description": "Comprehensive toolkit for developing Claude Code plugins with 7 expert skills",
+      "category": "development"
+    },
+    {
+      "name": "pr-review-toolkit",
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code",
+        "path": "plugins/pr-review-toolkit"
+      },
+      "description": "Specialized review agents focusing on comments, tests, error handling, and code quality",
+      "category": "quality"
+    },
+    {
+      "name": "ralph-wiggum",
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code",
+        "path": "plugins/ralph-wiggum"
+      },
+      "description": "Autonomous iteration loops where Claude repeatedly works on tasks until completion",
+      "category": "automation"
+    },
+    {
+      "name": "security-guidance",
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code",
+        "path": "plugins/security-guidance"
+      },
+      "description": "Monitors file edits for security patterns including command injection, XSS, and dangerous operations",
+      "category": "security"
+    }
+  ]
+}
