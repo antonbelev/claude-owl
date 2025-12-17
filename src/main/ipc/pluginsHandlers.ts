@@ -4,6 +4,7 @@
 
 import { ipcMain } from 'electron';
 import { PluginsService } from '../services/PluginsService';
+import { ClaudeService } from '../services/ClaudeService';
 import type {
   AddMarketplaceRequest,
   RemoveMarketplaceRequest,
@@ -29,10 +30,11 @@ const PLUGINS_CHANNELS = {
   GET_PLUGIN_HEALTH: 'plugins:get-health',
 } as const;
 
-const pluginsService = new PluginsService();
+const claudeService = new ClaudeService();
+const pluginsService = new PluginsService(claudeService);
 
 export function registerPluginsHandlers(): void {
-  console.log('[PluginsHandlers] Registering plugin IPC handlers');
+  console.log('[PluginsHandlers] Registering plugin IPC handlers with CLI delegation');
 
   // Get all marketplaces
   ipcMain.handle(PLUGINS_CHANNELS.GET_MARKETPLACES, async () => {

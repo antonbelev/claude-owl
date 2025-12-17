@@ -15,25 +15,29 @@ import {
   GitHubRepoInfo,
   PluginHealthScore,
 } from '../../shared/types/plugin.types';
+import type { ClaudeService } from './ClaudeService';
 
 export class PluginsService {
   private claudeUserDir: string;
   private pluginsDir: string;
   private marketplacesFile: string;
   private installedPluginsFile: string;
+  private claudeService: ClaudeService | null = null;
 
-  constructor() {
+  constructor(claudeService?: ClaudeService) {
     const homeDir = process.env.HOME || process.env.USERPROFILE || '';
     this.claudeUserDir = path.join(homeDir, '.claude');
     this.pluginsDir = path.join(this.claudeUserDir, 'plugins');
     this.marketplacesFile = path.join(this.pluginsDir, 'known_marketplaces.json');
     this.installedPluginsFile = path.join(this.pluginsDir, 'installed_plugins.json');
+    this.claudeService = claudeService || null;
 
     console.log('[PluginsService] Initialized with paths:', {
       claudeUserDir: this.claudeUserDir,
       pluginsDir: this.pluginsDir,
       marketplacesFile: this.marketplacesFile,
       installedPluginsFile: this.installedPluginsFile,
+      hasCLIDelegation: !!this.claudeService,
     });
   }
 
@@ -126,6 +130,32 @@ export class PluginsService {
   ): Promise<{ success: boolean; error?: string }> {
     console.log('[PluginsService] Adding marketplace:', { name, source });
 
+    // If ClaudeService is available, delegate to CLI
+    if (this.claudeService) {
+      console.log('[PluginsService] Delegating to Claude CLI...');
+      try {
+        const result = await this.claudeService.addPluginMarketplace(source);
+        if (result.success) {
+          console.log('[PluginsService] Marketplace added via CLI successfully');
+          return { success: true };
+        } else {
+          console.error('[PluginsService] CLI add marketplace failed:', result.error);
+          return {
+            success: false,
+            error: result.error || 'Failed to add marketplace via CLI',
+          };
+        }
+      } catch (error) {
+        console.error('[PluginsService] CLI delegation failed:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to add marketplace',
+        };
+      }
+    }
+
+    // Fallback to direct file manipulation (legacy mode)
+    console.log('[PluginsService] Using legacy file manipulation mode');
     try {
       // Validate marketplace by fetching manifest
       console.log('[PluginsService] Validating marketplace manifest...');
