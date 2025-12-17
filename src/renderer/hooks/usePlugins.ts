@@ -126,8 +126,11 @@ export function usePlugins() {
   const addMarketplace = useCallback(
     async (name: string, source: string): Promise<boolean> => {
       if (!window.electronAPI) {
+        console.error('[usePlugins] electronAPI not available');
         return false;
       }
+
+      console.log('[usePlugins] Adding marketplace:', { name, source });
 
       try {
         const request: AddMarketplaceRequest = { name, source };
@@ -135,15 +138,18 @@ export function usePlugins() {
           request
         )) as AddMarketplaceResponse;
 
+        console.log('[usePlugins] Add marketplace response:', response);
+
         if (response.success) {
+          console.log('[usePlugins] Marketplace added, reloading data...');
           await loadPluginData();
           return true;
         } else {
-          console.error('Failed to add marketplace:', response.error);
+          console.error('[usePlugins] Failed to add marketplace:', response.error);
           return false;
         }
       } catch (error) {
-        console.error('Failed to add marketplace:', error);
+        console.error('[usePlugins] Exception adding marketplace:', error);
         return false;
       }
     },

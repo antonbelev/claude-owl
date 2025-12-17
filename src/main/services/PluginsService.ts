@@ -51,48 +51,55 @@ export class PluginsService {
       );
       const marketplaces: Marketplace[] = [];
 
-      // The file format is { "marketplace-name": { source: { source, repo }, installLocation, lastUpdated } }
-      for (const [name, marketplaceData] of Object.entries(data)) {
-        const sourceData = (marketplaceData as any).source;
-        if (!sourceData) {
-          console.warn('[PluginsService] Skipping marketplace with no source:', name);
+      // The file format we write is: { "marketplaces": { "name": "url" } }
+      const marketplacesData = data.marketplaces || {};
+
+      console.log('[PluginsService] Found', Object.keys(marketplacesData).length, 'marketplaces');
+
+      for (const [name, source] of Object.entries(marketplacesData)) {
+        // Source is directly a string (URL)
+        if (typeof source !== 'string') {
+          console.warn('[PluginsService] Skipping marketplace with invalid source:', name, source);
           continue;
         }
 
-        // Convert source object to string format (e.g., "github:anthropics/skills")
-        let sourceString: string;
-        if (typeof sourceData === 'string') {
-          sourceString = sourceData;
-        } else if (sourceData.source === 'github' && sourceData.repo) {
-          sourceString = `github:${sourceData.repo}`;
-        } else {
-          console.warn('[PluginsService] Unknown source format for marketplace:', name, sourceData);
-          continue;
-        }
-
-        console.log('[PluginsService] Processing marketplace:', { name, sourceString });
+        console.log('[PluginsService] Processing marketplace:', { name, source });
 
         try {
-          const manifest = await this.fetchMarketplaceManifest(sourceString);
+          const manifest = await this.fetchMarketplaceManifest(source);
+
+          if (!manifest) {
+            console.warn('[PluginsService] No manifest found for marketplace:', name);
+            marketplaces.push({
+              name,
+              source,
+              pluginCount: 0,
+              addedAt: new Date().toISOString(),
+              available: false,
+              error: 'Marketplace manifest not found',
+            });
+            continue;
+          }
+
           const marketplace: Marketplace = {
             name,
-            source: sourceString,
-            pluginCount: manifest?.plugins?.length || 0,
-            addedAt: (marketplaceData as any).lastUpdated || new Date().toISOString(),
+            source,
+            pluginCount: manifest.plugins?.length || 0,
+            addedAt: new Date().toISOString(),
             available: true,
           };
-          if (manifest?.owner) marketplace.owner = manifest.owner;
-          if (manifest?.description) marketplace.description = manifest.description;
-          if (manifest?.version) marketplace.version = manifest.version;
+          if (manifest.owner) marketplace.owner = manifest.owner;
+          if (manifest.description) marketplace.description = manifest.description;
+          if (manifest.version) marketplace.version = manifest.version;
           marketplaces.push(marketplace);
-          console.log('[PluginsService] Successfully loaded marketplace:', name);
+          console.log('[PluginsService] Successfully loaded marketplace:', name, 'with', marketplace.pluginCount, 'plugins');
         } catch (error) {
           console.error('[PluginsService] Failed to load marketplace:', name, error);
           marketplaces.push({
             name,
-            source: sourceString,
+            source,
             pluginCount: 0,
-            addedAt: (marketplaceData as any).lastUpdated || new Date().toISOString(),
+            addedAt: new Date().toISOString(),
             available: false,
             error: error instanceof Error ? error.message : 'Unknown error',
           });
@@ -102,8 +109,10 @@ export class PluginsService {
       return marketplaces;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        console.log('[PluginsService] No marketplaces file found, returning empty array');
         return [];
       }
+      console.error('[PluginsService] Error reading marketplaces file:', error);
       throw error;
     }
   }
@@ -115,9 +124,25 @@ export class PluginsService {
     name: string,
     source: string
   ): Promise<{ success: boolean; error?: string }> {
+    console.log('[PluginsService] Adding marketplace:', { name, source });
+
     try {
       // Validate marketplace by fetching manifest
-      await this.fetchMarketplaceManifest(source);
+      console.log('[PluginsService] Validating marketplace manifest...');
+      const manifest = await this.fetchMarketplaceManifest(source);
+
+      if (!manifest) {
+        const errorMsg = `Cannot find marketplace manifest at ${source}. ` +
+          `Please ensure the URL points to a valid marketplace with a .claude-plugin/marketplace.json file. ` +
+          `For GitHub repos, use: github:owner/repo or https://github.com/owner/repo`;
+        console.error('[PluginsService]', errorMsg);
+        return {
+          success: false,
+          error: errorMsg,
+        };
+      }
+
+      console.log('[PluginsService] Marketplace manifest validated successfully');
 
       // Read current marketplaces
       let marketplaces: Record<string, string> = {};
@@ -126,6 +151,7 @@ export class PluginsService {
         const data = JSON.parse(content);
         marketplaces = data.marketplaces || {};
       } catch (error) {
+        console.log('[PluginsService] No existing marketplaces file, will create new one');
         // File doesn't exist, will create new one
       }
 
@@ -136,8 +162,10 @@ export class PluginsService {
       await fs.mkdir(this.claudeUserDir, { recursive: true });
       await fs.writeFile(this.marketplacesFile, JSON.stringify({ marketplaces }, null, 2), 'utf-8');
 
+      console.log('[PluginsService] Marketplace added successfully:', name);
       return { success: true };
     } catch (error) {
+      console.error('[PluginsService] Failed to add marketplace:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to add marketplace',

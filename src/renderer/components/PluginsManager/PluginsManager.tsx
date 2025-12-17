@@ -696,12 +696,17 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({ onClose, onAd
     setAdding(true);
     setError('');
 
+    console.log('[AddMarketplaceModal] Submitting:', { name: name.trim(), source: source.trim() });
+
     const success = await onAdd(name.trim(), source.trim());
 
     if (success) {
+      console.log('[AddMarketplaceModal] Marketplace added successfully');
       onClose();
     } else {
-      setError('Failed to add marketplace. Please check the source and try again.');
+      const errorMsg = 'Failed to add marketplace. Check the console for details.';
+      console.error('[AddMarketplaceModal]', errorMsg);
+      setError(errorMsg);
     }
 
     setAdding(false);
@@ -760,12 +765,15 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({ onClose, onAd
               type="text"
               value={source}
               onChange={e => setSource(e.target.value)}
-              placeholder="https://github.com/user/repo or /path/to/local/marketplace"
+              placeholder="https://github.com/owner/repo"
               required
               className="mt-2"
             />
             <small className="block mt-1 text-sm text-gray-500">
-              GitHub URL, Git URL, or local file path
+              Repository must contain .claude-plugin/marketplace.json
+            </small>
+            <small className="block mt-1 text-xs text-gray-400">
+              Example: https://github.com/myorg/claude-plugins
             </small>
           </div>
 
