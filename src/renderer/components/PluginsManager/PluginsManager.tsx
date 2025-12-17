@@ -34,6 +34,38 @@ import {
 type TabView = 'browse' | 'installed' | 'marketplaces';
 type ViewMode = 'grid' | 'list';
 
+/**
+ * Build a GitHub URL from marketplace source and plugin source
+ * @param marketplaceSource - The marketplace source URL (e.g., "https://github.com/anthropics/claude-code")
+ * @param pluginSource - The plugin source path (e.g., "./plugins/code-review" or full URL)
+ * @returns Full GitHub URL to the plugin source, or undefined if cannot be built
+ */
+function buildPluginSourceUrl(
+  marketplaceSource: string | undefined,
+  pluginSource: string | undefined
+): string | undefined {
+  if (!pluginSource) return undefined;
+
+  // If plugin source is already a full URL, return it
+  if (pluginSource.startsWith('http://') || pluginSource.startsWith('https://')) {
+    return pluginSource;
+  }
+
+  // If plugin source is a relative path and we have marketplace source
+  if (pluginSource.startsWith('./') && marketplaceSource) {
+    // Extract GitHub repo from marketplace source
+    const githubMatch = marketplaceSource.match(/github\.com\/([^/]+\/[^/]+)/);
+    if (githubMatch) {
+      const repoPath = githubMatch[1];
+      // Remove leading './' from plugin source
+      const cleanPluginPath = pluginSource.replace(/^\.\//, '');
+      return `https://github.com/${repoPath}/tree/main/${cleanPluginPath}`;
+    }
+  }
+
+  return undefined;
+}
+
 export const PluginsManager: React.FC = () => {
   const {
     marketplaces,
@@ -367,6 +399,7 @@ export const PluginsManager: React.FC = () => {
                   key={'id' in plugin ? plugin.id : `${plugin.name}@${plugin.marketplace}`}
                   plugin={plugin}
                   viewMode={viewMode}
+                  marketplaces={marketplaces}
                   onView={setSelectedPlugin}
                   onInstall={handleInstallPlugin}
                   onUninstall={handleUninstallPlugin}
@@ -404,6 +437,7 @@ export const PluginsManager: React.FC = () => {
                   key={'id' in plugin ? plugin.id : `${plugin.name}@${plugin.marketplace}`}
                   plugin={plugin}
                   viewMode={viewMode}
+                  marketplaces={marketplaces}
                   onView={setSelectedPlugin}
                   onInstall={handleInstallPlugin}
                   onUninstall={handleUninstallPlugin}
@@ -559,6 +593,7 @@ const MarketplacesView: React.FC<MarketplacesViewProps> = ({ marketplaces, onRem
 interface PluginCardProps {
   plugin: MarketplacePlugin | InstalledPlugin;
   viewMode: ViewMode;
+  marketplaces: Marketplace[];
   onView: (plugin: MarketplacePlugin | InstalledPlugin) => void;
   onInstall: (plugin: MarketplacePlugin) => void;
   onUninstall: (plugin: InstalledPlugin) => void;
@@ -568,6 +603,7 @@ interface PluginCardProps {
 const PluginCard: React.FC<PluginCardProps> = ({
   plugin,
   viewMode: _viewMode,
+  marketplaces,
   onView,
   onInstall,
   onUninstall,
@@ -575,6 +611,13 @@ const PluginCard: React.FC<PluginCardProps> = ({
 }) => {
   const isInstalled = 'id' in plugin;
   const marketplaceBadge = plugin.marketplace;
+
+  // Find marketplace to get its source URL
+  const marketplace = marketplaces.find(m => m.name === plugin.marketplace);
+  const sourceUrl = buildPluginSourceUrl(
+    marketplace?.source,
+    'source' in plugin ? plugin.source : undefined
+  );
 
   const handleInstall = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -597,6 +640,18 @@ const PluginCard: React.FC<PluginCardProps> = ({
     }
   };
 
+  const handleSourceClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (sourceUrl && window.electronAPI?.openExternal) {
+      window.electronAPI.openExternal(sourceUrl).catch(() => {
+        window.open(sourceUrl, '_blank');
+      });
+    } else if (sourceUrl) {
+      window.open(sourceUrl, '_blank');
+    }
+  };
+
   return (
     <Card
       className={`cursor-pointer transition-all hover:border-blue-500 hover:shadow-md ${
@@ -605,12 +660,27 @@ const PluginCard: React.FC<PluginCardProps> = ({
       onClick={() => onView(plugin)}
     >
       <CardHeader className="pb-3">
-        <div className="flex justify-between items-start gap-2">
-          <div className="flex items-baseline gap-2 flex-1">
-            <h3 className="text-lg font-semibold">{plugin.name}</h3>
-            {plugin.version && <span className="text-sm text-gray-500">v{plugin.version}</span>}
+        <div className="space-y-2">
+          {/* Title row - single line with ellipsis */}
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold truncate flex-1 min-w-0">{plugin.name}</h3>
+            {plugin.version && (
+              <span className="text-sm text-gray-500 shrink-0">v{plugin.version}</span>
+            )}
+            {sourceUrl && (
+              <button
+                onClick={handleSourceClick}
+                className="text-blue-600 hover:text-blue-800 shrink-0 transition-colors"
+                title="View source on GitHub"
+                type="button"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </button>
+            )}
           </div>
-          <div className="flex gap-2 flex-wrap justify-end">
+
+          {/* Badges row */}
+          <div className="flex gap-2 flex-wrap">
             <Badge variant="outline" className="shrink-0">
               {marketplaceBadge}
             </Badge>
