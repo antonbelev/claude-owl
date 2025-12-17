@@ -2,6 +2,8 @@
  * Type definitions for Claude Code plugins and marketplaces
  */
 
+import type { PluginSecurityContext, OfficialPluginCategory } from './plugin-security.types';
+
 /**
  * Plugin metadata from plugin.json
  */
@@ -61,7 +63,7 @@ export interface MarketplacePlugin {
   repository?: string;
   license?: string;
   keywords?: string[];
-  category?: string;
+  category?: string | OfficialPluginCategory;
 
   // Marketplace context
   marketplace: string;
@@ -70,6 +72,13 @@ export interface MarketplacePlugin {
   installed?: boolean;
   installedVersion?: string;
   updateAvailable?: boolean;
+
+  // Security context
+  security?: PluginSecurityContext;
+
+  // Official plugin flags
+  isOfficial?: boolean;
+  featured?: boolean;
 }
 
 /**

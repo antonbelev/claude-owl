@@ -42,7 +42,7 @@ const allNavItems: NavItem[] = [
   { path: '/statusline', label: 'Status Line', icon: AlignLeft },
   { path: '/agents', label: 'Subagents', icon: Bot },
   { path: '/skills', label: 'Skills', icon: Zap },
-  { path: '/plugins', label: 'Plugins', icon: Package, underDevelopment: true },
+  { path: '/plugins', label: 'Plugins', icon: Package },
   { path: '/commands', label: 'Slash Commands', icon: Terminal },
   { path: '/hooks', label: 'Hooks', icon: Webhook },
   { path: '/mcp', label: 'MCP Servers', icon: Link2 },

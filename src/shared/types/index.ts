@@ -7,6 +7,7 @@ export * from './config.types';
 export * from './agent.types';
 export * from './hook.types';
 export * from './plugin.types';
+export * from './plugin-security.types';
 export * from './permissions.types';
 export * from './project.types';
 export * from './metrics.types';
