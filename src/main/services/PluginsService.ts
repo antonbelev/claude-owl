@@ -15,6 +15,7 @@ import {
   PluginHealthScore,
 } from '../../shared/types/plugin.types';
 import type { ClaudeService } from './ClaudeService';
+import type { SettingsService } from './SettingsService';
 
 export class PluginsService {
   private claudeUserDir: string;
@@ -22,14 +23,16 @@ export class PluginsService {
   private marketplacesFile: string;
   private installedPluginsFile: string;
   private claudeService: ClaudeService | null = null;
+  private settingsService: SettingsService | null = null;
 
-  constructor(claudeService?: ClaudeService) {
+  constructor(claudeService?: ClaudeService, settingsService?: SettingsService) {
     const homeDir = process.env.HOME || process.env.USERPROFILE || '';
     this.claudeUserDir = path.join(homeDir, '.claude');
     this.pluginsDir = path.join(this.claudeUserDir, 'plugins');
     this.marketplacesFile = path.join(this.pluginsDir, 'known_marketplaces.json');
     this.installedPluginsFile = path.join(this.pluginsDir, 'installed_plugins.json');
     this.claudeService = claudeService || null;
+    this.settingsService = settingsService || null;
 
     console.log('[PluginsService] Initialized with paths:', {
       claudeUserDir: this.claudeUserDir,
@@ -37,6 +40,7 @@ export class PluginsService {
       marketplacesFile: this.marketplacesFile,
       installedPluginsFile: this.installedPluginsFile,
       hasCLIDelegation: !!this.claudeService,
+      hasSettingsService: !!this.settingsService,
     });
   }
 
@@ -316,6 +320,18 @@ export class PluginsService {
       );
       const plugins: InstalledPlugin[] = [];
 
+      // Read enabled state from settings
+      let enabledPlugins: Record<string, boolean> = {};
+      if (this.settingsService) {
+        try {
+          const settings = await this.settingsService.readSettings('user');
+          enabledPlugins = settings.content?.enabledPlugins || {};
+          console.log('[PluginsService] Loaded enabled plugins from settings:', enabledPlugins);
+        } catch (error) {
+          console.warn('[PluginsService] Failed to read enabled plugins from settings:', error);
+        }
+      }
+
       // CLI format: plugins are arrays of installations (can have multiple scopes)
       for (const [id, pluginInstalls] of Object.entries(data.plugins || {})) {
         // pluginInstalls is an array of plugin installations
@@ -345,12 +361,15 @@ export class PluginsService {
             // Extract marketplace name from ID (format: "pluginName@marketplace")
             const marketplace: string = id.includes('@') ? id.split('@')[1] || 'unknown' : 'unknown';
 
+            // Check enabled state from settings (defaults to true if not found)
+            const isEnabled = enabledPlugins[id] !== undefined ? enabledPlugins[id] : true;
+
             plugins.push({
               ...metadata,
               id,
               marketplace,
               installPath,
-              enabled: true, // CLI-installed plugins are enabled by default
+              enabled: isEnabled,
               installedAt: plugin.installedAt || new Date().toISOString(),
               componentCounts,
             });

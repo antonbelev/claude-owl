@@ -5,6 +5,7 @@
 import { ipcMain } from 'electron';
 import { PluginsService } from '../services/PluginsService';
 import { ClaudeService } from '../services/ClaudeService';
+import { SettingsService } from '../services/SettingsService';
 import { MarketplaceValidationService } from '../services/MarketplaceValidationService';
 import type {
   AddMarketplaceRequest,
@@ -34,7 +35,8 @@ const PLUGINS_CHANNELS = {
 } as const;
 
 const claudeService = new ClaudeService();
-const pluginsService = new PluginsService(claudeService);
+const settingsService = new SettingsService();
+const pluginsService = new PluginsService(claudeService, settingsService);
 const validationService = new MarketplaceValidationService();
 
 export function registerPluginsHandlers(): void {
