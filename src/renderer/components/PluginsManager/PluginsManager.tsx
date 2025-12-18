@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { usePlugins } from '../../hooks/usePlugins';
 import type { MarketplacePlugin, InstalledPlugin, Marketplace } from '@/shared/types';
 import { ConfirmDialog } from '../common/ConfirmDialog';
@@ -96,6 +96,9 @@ export const PluginsManager: React.FC = () => {
   );
   const [uninstallConfirm, setUninstallConfirm] = useState<InstalledPlugin | null>(null);
 
+  // Ref for search input to enable keyboard shortcut
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   // Get unique categories
   const categories = useMemo(() => {
     const cats = new Set<string>();
@@ -104,6 +107,21 @@ export const PluginsManager: React.FC = () => {
     });
     return Array.from(cats).sort();
   }, [availablePlugins, installedPlugins]);
+
+  // Keyboard shortcut: Cmd+F (Mac) or Ctrl+F (Windows/Linux) to focus search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for Cmd+F (Mac) or Ctrl+F (Windows/Linux)
+      if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Filter plugins based on active tab and filters
   const filteredPlugins = useMemo(() => {
@@ -258,8 +276,9 @@ export const PluginsManager: React.FC = () => {
           <div className="mt-6 space-y-4">
             <div className="relative">
               <Input
+                ref={searchInputRef}
                 type="text"
-                placeholder="Search plugins by name, description, or keywords..."
+                placeholder="Search plugins by name, description, or keywords... (Cmd+F)"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 className="pr-10"
@@ -540,23 +559,43 @@ const MarketplacesView: React.FC<MarketplacesViewProps> = ({ marketplaces, onRem
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="space-y-4">
+              {/* Source URL - Clickable */}
               <div>
                 <span className="text-sm font-semibold text-gray-700">Source:</span>
-                <code className="block text-sm text-gray-600 mt-1 bg-gray-50 p-2 rounded">
-                  {marketplace.source}
-                </code>
-              </div>
-              <div>
-                <span className="text-sm font-semibold text-gray-700">Plugins:</span>
-                <span className="block text-sm text-gray-600 mt-1">{marketplace.pluginCount}</span>
-              </div>
-              {marketplace.version && (
-                <div>
-                  <span className="text-sm font-semibold text-gray-700">Version:</span>
-                  <span className="block text-sm text-gray-600 mt-1">{marketplace.version}</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <button
+                    onClick={() => window.electronAPI?.openExternal(marketplace.source)}
+                    className="text-sm text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 bg-gray-50 p-2 rounded flex-1 overflow-hidden cursor-pointer text-left"
+                    title={marketplace.source}
+                  >
+                    <span className="truncate">{marketplace.source}</span>
+                    <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                  </button>
                 </div>
-              )}
+              </div>
+
+              {/* Metadata Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div>
+                  <span className="text-sm font-semibold text-gray-700">Plugins:</span>
+                  <span className="block text-sm text-gray-600 mt-1">{marketplace.pluginCount}</span>
+                </div>
+                {marketplace.version && (
+                  <div>
+                    <span className="text-sm font-semibold text-gray-700">Version:</span>
+                    <span className="block text-sm text-gray-600 mt-1">{marketplace.version}</span>
+                  </div>
+                )}
+                {marketplace.addedAt && (
+                  <div>
+                    <span className="text-sm font-semibold text-gray-700">Added:</span>
+                    <span className="block text-sm text-gray-600 mt-1">
+                      {new Date(marketplace.addedAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {marketplace.error && (
@@ -764,6 +803,17 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({
   const [validationResult, setValidationResult] = useState<any>(null);
   const [error, setError] = useState('');
 
+  // ESC key to close modal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
   const handleValidate = async () => {
     if (!source.trim()) {
       setError('Please enter a source URL first');
@@ -956,6 +1006,17 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
 }) => {
   const isInstalled = 'id' in plugin;
 
+  // ESC key to close modal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -1022,29 +1083,25 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
               {plugin.repository && (
                 <div>
                   <span className="text-sm font-semibold text-gray-700">Repository:</span>
-                  <a
-                    href={plugin.repository}
-                    className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 mt-1"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => window.electronAPI?.openExternal(plugin.repository!)}
+                    className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 mt-1 cursor-pointer hover:underline"
                   >
                     {plugin.repository}
                     <ExternalLink className="h-3 w-3" />
-                  </a>
+                  </button>
                 </div>
               )}
               {plugin.homepage && (
                 <div>
                   <span className="text-sm font-semibold text-gray-700">Homepage:</span>
-                  <a
-                    href={plugin.homepage}
-                    className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 mt-1"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => window.electronAPI?.openExternal(plugin.homepage!)}
+                    className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 mt-1 cursor-pointer hover:underline"
                   >
                     {plugin.homepage}
                     <ExternalLink className="h-3 w-3" />
-                  </a>
+                  </button>
                 </div>
               )}
             </div>

@@ -584,7 +584,7 @@ export class ClaudeService {
   // ========================================================================
 
   /**
-   * Install a plugin via `claude /plugin install` command
+   * Install a plugin via `claude plugin install` command
    */
   async installPlugin(
     pluginName: string,
@@ -594,7 +594,9 @@ export class ClaudeService {
     console.log('[ClaudeService] Installing plugin:', { pluginName, marketplaceName, projectPath });
 
     try {
-      const command = `claude /plugin install ${this.escapeArg(pluginName)}@${this.escapeArg(marketplaceName)}`;
+      // Construct the full plugin identifier and escape it as a single argument
+      const pluginId = `${pluginName}@${marketplaceName}`;
+      const command = `claude plugin install ${this.escapeArg(pluginId)}`;
       const cwd = projectPath || undefined;
 
       console.log('[ClaudeService] Executing command:', command, { cwd });
@@ -628,7 +630,7 @@ export class ClaudeService {
   }
 
   /**
-   * Uninstall a plugin via `claude /plugin uninstall` command
+   * Uninstall a plugin via `claude plugin uninstall` command
    */
   async uninstallPlugin(
     pluginName: string,
@@ -638,7 +640,9 @@ export class ClaudeService {
     console.log('[ClaudeService] Uninstalling plugin:', { pluginName, marketplaceName, projectPath });
 
     try {
-      const command = `claude /plugin uninstall ${this.escapeArg(pluginName)}@${this.escapeArg(marketplaceName)}`;
+      // Construct the full plugin identifier and escape it as a single argument
+      const pluginId = `${pluginName}@${marketplaceName}`;
+      const command = `claude plugin uninstall ${this.escapeArg(pluginId)}`;
       const cwd = projectPath || undefined;
 
       console.log('[ClaudeService] Executing command:', command, { cwd });
@@ -670,7 +674,7 @@ export class ClaudeService {
   }
 
   /**
-   * Enable a plugin via `claude /plugin enable` command
+   * Enable a plugin via `claude plugin enable` command
    */
   async enablePlugin(
     pluginName: string,
@@ -680,7 +684,9 @@ export class ClaudeService {
     console.log('[ClaudeService] Enabling plugin:', { pluginName, marketplaceName, projectPath });
 
     try {
-      const command = `claude /plugin enable ${this.escapeArg(pluginName)}@${this.escapeArg(marketplaceName)}`;
+      // Construct the full plugin identifier and escape it as a single argument
+      const pluginId = `${pluginName}@${marketplaceName}`;
+      const command = `claude plugin enable ${this.escapeArg(pluginId)}`;
       const cwd = projectPath || undefined;
 
       console.log('[ClaudeService] Executing command:', command, { cwd });
@@ -712,7 +718,7 @@ export class ClaudeService {
   }
 
   /**
-   * Disable a plugin via `claude /plugin disable` command
+   * Disable a plugin via `claude plugin disable` command
    */
   async disablePlugin(
     pluginName: string,
@@ -722,7 +728,9 @@ export class ClaudeService {
     console.log('[ClaudeService] Disabling plugin:', { pluginName, marketplaceName, projectPath });
 
     try {
-      const command = `claude /plugin disable ${this.escapeArg(pluginName)}@${this.escapeArg(marketplaceName)}`;
+      // Construct the full plugin identifier and escape it as a single argument
+      const pluginId = `${pluginName}@${marketplaceName}`;
+      const command = `claude plugin disable ${this.escapeArg(pluginId)}`;
       const cwd = projectPath || undefined;
 
       console.log('[ClaudeService] Executing command:', command, { cwd });
@@ -754,13 +762,13 @@ export class ClaudeService {
   }
 
   /**
-   * Add a marketplace via `claude /plugin marketplace add` command
+   * Add a marketplace via `claude plugin marketplace add` command
    */
   async addPluginMarketplace(source: string): Promise<MCPCommandResult> {
     console.log('[ClaudeService] Adding plugin marketplace:', source);
 
     try {
-      const command = `claude /plugin marketplace add ${this.escapeArg(source)}`;
+      const command = `claude plugin marketplace add ${this.escapeArg(source)}`;
 
       console.log('[ClaudeService] Executing command:', command);
 
@@ -791,13 +799,13 @@ export class ClaudeService {
   }
 
   /**
-   * Remove a marketplace via `claude /plugin marketplace remove` command
+   * Remove a marketplace via `claude plugin marketplace remove` command
    */
   async removePluginMarketplace(name: string): Promise<MCPCommandResult> {
     console.log('[ClaudeService] Removing plugin marketplace:', name);
 
     try {
-      const command = `claude /plugin marketplace remove ${this.escapeArg(name)}`;
+      const command = `claude plugin marketplace remove ${this.escapeArg(name)}`;
 
       console.log('[ClaudeService] Executing command:', command);
 
