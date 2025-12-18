@@ -109,6 +109,7 @@
           <a href="#subagents" class="text-blue-400 hover:underline">🤖 Subagents</a>
           <a href="#skills" class="text-blue-400 hover:underline">🎯 Skills</a>
           <a href="#commands" class="text-blue-400 hover:underline">⚡ Slash Commands</a>
+          <a href="#plugins" class="text-blue-400 hover:underline">🧩 Plugins</a>
           <a href="#hooks" class="text-blue-400 hover:underline">🪝 Hooks</a>
           <a href="#mcp" class="text-blue-400 hover:underline">🔌 MCP Servers</a>
           <a href="#metrics" class="text-blue-400 hover:underline">📈 Usage Metrics</a>
@@ -431,6 +432,77 @@
               Confirmation with imported command details and quick links.
             </p>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Plugins & Marketplaces -->
+  <section id="plugins" class="py-12 px-6 bg-slate-800/30">
+    <div class="container mx-auto max-w-5xl">
+      <h2 class="text-3xl font-bold mb-2 flex items-center">
+        <span class="text-4xl mr-3">🧩</span> Plugins & Marketplaces
+      </h2>
+      <p class="text-slate-400 mb-6">Browse, install, and manage Claude Code plugins from marketplaces</p>
+
+      <div class="space-y-8">
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-blue-300">Browse Marketplace Plugins</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/browse-marketplace-plugins.png"
+               alt="Browse Marketplace Plugins"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            Discover available plugins from configured marketplaces with descriptions, component counts, and quick install capability.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-blue-300">View Installed Plugins</h3>
+            <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/view-installed-plugins.png"
+                 alt="View Installed Plugins"
+                 class="screenshot-img w-full"
+                 onclick="openModal(this.src, this.alt)">
+            <p class="text-sm text-slate-400 mt-2">
+              See all installed plugins with enable/disable toggle, component breakdown, and installation details.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold mb-3 text-blue-300">Manage Installed Plugins</h3>
+            <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/manage-installed-plugins.png"
+                 alt="Manage Installed Plugins"
+                 class="screenshot-img w-full"
+                 onclick="openModal(this.src, this.alt)">
+            <p class="text-sm text-slate-400 mt-2">
+              Manage plugin lifecycle with enable/disable controls, uninstall capability, and marketplace information.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-xl font-semibold mb-3 text-blue-300">Browse Plugin Contents</h3>
+          <img src="https://raw.githubusercontent.com/antonbelev/claude-owl/main/screenshots/browse-and-view-installed-plugins-commands-and-skills.png"
+               alt="Browse Plugin Commands and Skills"
+               class="screenshot-img w-full"
+               onclick="openModal(this.src, this.alt)">
+          <p class="text-sm text-slate-400 mt-2">
+            Explore plugin folder structure with tree view, view command and skill files, and browse plugin components with file viewer modal.
+          </p>
+        </div>
+
+        <div class="bg-blue-900/30 border border-blue-500/50 rounded-xl p-6">
+          <h4 class="font-semibold text-blue-300 mb-3">Key Features</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li>🏪 <strong>Marketplace Management:</strong> Add, validate, and manage plugin marketplaces from GitHub repositories</li>
+            <li>📦 <strong>Plugin Discovery:</strong> Browse available plugins with descriptions, component counts, and installation status</li>
+            <li>⚡ <strong>Quick Install:</strong> One-click plugin installation directly from marketplace view</li>
+            <li>🔄 <strong>Enable/Disable:</strong> Toggle plugins on/off without uninstalling to manage context and performance</li>
+            <li>📁 <strong>File Browser:</strong> Explore plugin structure, view commands, agents, and skills in tree view with syntax highlighting</li>
+            <li>🗑️ <strong>Lifecycle Management:</strong> Uninstall plugins with confirmation dialogs and cleanup</li>
+            <li>✅ <strong>Marketplace Validation:</strong> Pre-installation validation ensures marketplace compatibility and structure</li>
+          </ul>
         </div>
       </div>
     </div>
