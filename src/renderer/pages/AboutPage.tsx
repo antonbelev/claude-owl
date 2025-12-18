@@ -154,9 +154,6 @@ export const AboutPage: React.FC = () => {
           </p>
           <ul className="development-list">
             <li>
-              <strong>Plugins</strong> - Plugin management system
-            </li>
-            <li>
               <strong>Commands</strong> - Custom slash commands editor
             </li>
             <li>

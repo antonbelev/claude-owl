@@ -4,6 +4,9 @@
 
 import { ipcMain } from 'electron';
 import { PluginsService } from '../services/PluginsService';
+import { ClaudeService } from '../services/ClaudeService';
+import { SettingsService } from '../services/SettingsService';
+import { MarketplaceValidationService } from '../services/MarketplaceValidationService';
 import type {
   AddMarketplaceRequest,
   RemoveMarketplaceRequest,
@@ -12,6 +15,7 @@ import type {
   TogglePluginRequest,
   GetGitHubRepoInfoRequest,
   GetPluginHealthRequest,
+  ValidateMarketplaceRequest,
 } from '../../shared/types/ipc.types';
 
 // Define channels directly to prevent tree-shaking in build
@@ -27,12 +31,16 @@ const PLUGINS_CHANNELS = {
   TOGGLE_PLUGIN: 'plugins:toggle',
   GET_GITHUB_REPO_INFO: 'plugins:get-github-info',
   GET_PLUGIN_HEALTH: 'plugins:get-health',
+  VALIDATE_MARKETPLACE: 'plugins:validate-marketplace',
 } as const;
 
-const pluginsService = new PluginsService();
+const claudeService = new ClaudeService();
+const settingsService = new SettingsService();
+const pluginsService = new PluginsService(claudeService, settingsService);
+const validationService = new MarketplaceValidationService();
 
 export function registerPluginsHandlers(): void {
-  console.log('[PluginsHandlers] Registering plugin IPC handlers');
+  console.log('[PluginsHandlers] Registering plugin IPC handlers with CLI delegation');
 
   // Get all marketplaces
   ipcMain.handle(PLUGINS_CHANNELS.GET_MARKETPLACES, async () => {
@@ -54,8 +62,10 @@ export function registerPluginsHandlers(): void {
   ipcMain.handle(PLUGINS_CHANNELS.ADD_MARKETPLACE, async (_, request: AddMarketplaceRequest) => {
     console.log('[PluginsHandlers] ADD_MARKETPLACE request:', request);
     try {
-      const result = await pluginsService.addMarketplace(request.name, request.source);
-      console.log('[PluginsHandlers] ADD_MARKETPLACE success:', { name: request.name });
+      const result = await pluginsService.addMarketplace(request.source);
+      console.log('[PluginsHandlers] ADD_MARKETPLACE success:', {
+        marketplaceName: result.marketplaceName,
+      });
       return result;
     } catch (error) {
       console.error('[PluginsHandlers] ADD_MARKETPLACE failed:', error);
@@ -208,6 +218,28 @@ export function registerPluginsHandlers(): void {
       };
     }
   });
+
+  // Validate marketplace
+  ipcMain.handle(
+    PLUGINS_CHANNELS.VALIDATE_MARKETPLACE,
+    async (_, request: ValidateMarketplaceRequest) => {
+      console.log('[PluginsHandlers] VALIDATE_MARKETPLACE request:', request);
+      try {
+        const result = await validationService.validateMarketplace(request.url);
+        console.log('[PluginsHandlers] VALIDATE_MARKETPLACE result:', {
+          valid: result.valid,
+          hasManifest: result.hasManifest,
+        });
+        return { success: true, data: result };
+      } catch (error) {
+        console.error('[PluginsHandlers] VALIDATE_MARKETPLACE failed:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to validate marketplace',
+        };
+      }
+    }
+  );
 
   console.log('[PluginsHandlers] All plugin IPC handlers registered successfully');
 }

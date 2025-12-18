@@ -20,6 +20,9 @@ import type {
   GetGitHubRepoInfoResponse,
   GetPluginHealthRequest,
   GetPluginHealthResponse,
+  ValidateMarketplaceRequest,
+  ValidateMarketplaceResponse,
+  MarketplaceValidationResult,
   GitHubRepoInfo,
   PluginHealthScore,
 } from '@/shared/types';
@@ -122,29 +125,38 @@ export function usePlugins() {
 
   /**
    * Add a new marketplace
+   * The marketplace name is automatically determined from the .claude-plugin/marketplace.json file
    */
   const addMarketplace = useCallback(
-    async (name: string, source: string): Promise<boolean> => {
+    async (
+      source: string
+    ): Promise<{ success: boolean; marketplaceName?: string; error?: string }> => {
       if (!window.electronAPI) {
-        return false;
+        console.error('[usePlugins] electronAPI not available');
+        return { success: false, error: 'electronAPI not available' };
       }
 
+      console.log('[usePlugins] Adding marketplace from source:', source);
+
       try {
-        const request: AddMarketplaceRequest = { name, source };
+        const request: AddMarketplaceRequest = { source };
         const response = (await window.electronAPI.addMarketplace(
           request
         )) as AddMarketplaceResponse;
 
+        console.log('[usePlugins] Add marketplace response:', response);
+
         if (response.success) {
+          console.log('[usePlugins] Marketplace added, reloading data...');
           await loadPluginData();
-          return true;
+          return { success: true, marketplaceName: (response as any).marketplaceName };
         } else {
-          console.error('Failed to add marketplace:', response.error);
-          return false;
+          console.error('[usePlugins] Failed to add marketplace:', response.error);
+          return { success: false, error: response.error || 'Failed to add marketplace' };
         }
       } catch (error) {
-        console.error('Failed to add marketplace:', error);
-        return false;
+        console.error('[usePlugins] Exception adding marketplace:', error);
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
       }
     },
     [loadPluginData]
@@ -319,6 +331,40 @@ export function usePlugins() {
     []
   );
 
+  /**
+   * Validate a marketplace URL
+   */
+  const validateMarketplace = useCallback(
+    async (url: string): Promise<MarketplaceValidationResult | null> => {
+      if (!window.electronAPI) {
+        console.error('[usePlugins] electronAPI not available');
+        return null;
+      }
+
+      console.log('[usePlugins] Validating marketplace:', url);
+
+      try {
+        const request: ValidateMarketplaceRequest = { url };
+        const response = (await window.electronAPI.validateMarketplace(
+          request
+        )) as ValidateMarketplaceResponse;
+
+        console.log('[usePlugins] Validation response:', response);
+
+        if (response.success && response.data) {
+          return response.data;
+        }
+
+        console.error('[usePlugins] Validation failed:', response.error);
+        return null;
+      } catch (error) {
+        console.error('[usePlugins] Exception validating marketplace:', error);
+        return null;
+      }
+    },
+    []
+  );
+
   // Load plugin data on mount
   useEffect(() => {
     loadPluginData();
@@ -334,6 +380,7 @@ export function usePlugins() {
     togglePlugin,
     getGitHubRepoInfo,
     getPluginHealth,
+    validateMarketplace,
     refetch: loadPluginData,
   };
 }

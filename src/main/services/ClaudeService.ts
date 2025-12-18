@@ -578,4 +578,265 @@ export class ClaudeService {
     console.log('[ClaudeService] Parsed', servers.length, 'servers from text output');
     return servers;
   }
+
+  // ========================================================================
+  // Plugin Management Methods
+  // ========================================================================
+
+  /**
+   * Install a plugin via `claude plugin install` command
+   */
+  async installPlugin(
+    pluginName: string,
+    marketplaceName: string,
+    projectPath?: string
+  ): Promise<MCPCommandResult> {
+    console.log('[ClaudeService] Installing plugin:', { pluginName, marketplaceName, projectPath });
+
+    try {
+      // Construct the full plugin identifier and escape it as a single argument
+      const pluginId = `${pluginName}@${marketplaceName}`;
+      const command = `claude plugin install ${this.escapeArg(pluginId)}`;
+      const cwd = projectPath || undefined;
+
+      console.log('[ClaudeService] Executing command:', command, { cwd });
+
+      const { stdout, stderr } = await execAsync(command, { cwd, env: this.getExecEnv() });
+
+      const output = stdout + stderr;
+      const success =
+        !stderr.toLowerCase().includes('error') &&
+        !output.toLowerCase().includes('failed') &&
+        (output.toLowerCase().includes('successfully installed') ||
+          output.toLowerCase().includes('installed'));
+
+      console.log('[ClaudeService] Plugin install result:', { success, output });
+
+      const result: MCPCommandResult = {
+        success,
+        message: success ? `Successfully installed plugin: ${pluginName}` : output,
+      };
+      if (!success) {
+        result.error = output;
+      }
+      return result;
+    } catch (error) {
+      console.error('[ClaudeService] Failed to install plugin:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        error: `Failed to install plugin: ${errorMessage}`,
+      };
+    }
+  }
+
+  /**
+   * Uninstall a plugin via `claude plugin uninstall` command
+   */
+  async uninstallPlugin(
+    pluginName: string,
+    marketplaceName: string,
+    projectPath?: string
+  ): Promise<MCPCommandResult> {
+    console.log('[ClaudeService] Uninstalling plugin:', {
+      pluginName,
+      marketplaceName,
+      projectPath,
+    });
+
+    try {
+      // Construct the full plugin identifier and escape it as a single argument
+      const pluginId = `${pluginName}@${marketplaceName}`;
+      const command = `claude plugin uninstall ${this.escapeArg(pluginId)}`;
+      const cwd = projectPath || undefined;
+
+      console.log('[ClaudeService] Executing command:', command, { cwd });
+
+      const { stdout, stderr } = await execAsync(command, { cwd, env: this.getExecEnv() });
+
+      const output = stdout + stderr;
+      const success =
+        !stderr.toLowerCase().includes('error') && !output.toLowerCase().includes('failed');
+
+      console.log('[ClaudeService] Plugin uninstall result:', { success, output });
+
+      const result: MCPCommandResult = {
+        success,
+        message: success ? `Successfully uninstalled plugin: ${pluginName}` : output,
+      };
+      if (!success) {
+        result.error = output;
+      }
+      return result;
+    } catch (error) {
+      console.error('[ClaudeService] Failed to uninstall plugin:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        error: `Failed to uninstall plugin: ${errorMessage}`,
+      };
+    }
+  }
+
+  /**
+   * Enable a plugin via `claude plugin enable` command
+   */
+  async enablePlugin(
+    pluginName: string,
+    marketplaceName: string,
+    projectPath?: string
+  ): Promise<MCPCommandResult> {
+    console.log('[ClaudeService] Enabling plugin:', { pluginName, marketplaceName, projectPath });
+
+    try {
+      // Construct the full plugin identifier and escape it as a single argument
+      const pluginId = `${pluginName}@${marketplaceName}`;
+      const command = `claude plugin enable ${this.escapeArg(pluginId)}`;
+      const cwd = projectPath || undefined;
+
+      console.log('[ClaudeService] Executing command:', command, { cwd });
+
+      const { stdout, stderr } = await execAsync(command, { cwd, env: this.getExecEnv() });
+
+      const output = stdout + stderr;
+      const success =
+        !stderr.toLowerCase().includes('error') && !output.toLowerCase().includes('failed');
+
+      console.log('[ClaudeService] Plugin enable result:', { success, output });
+
+      const result: MCPCommandResult = {
+        success,
+        message: success ? `Successfully enabled plugin: ${pluginName}` : output,
+      };
+      if (!success) {
+        result.error = output;
+      }
+      return result;
+    } catch (error) {
+      console.error('[ClaudeService] Failed to enable plugin:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        error: `Failed to enable plugin: ${errorMessage}`,
+      };
+    }
+  }
+
+  /**
+   * Disable a plugin via `claude plugin disable` command
+   */
+  async disablePlugin(
+    pluginName: string,
+    marketplaceName: string,
+    projectPath?: string
+  ): Promise<MCPCommandResult> {
+    console.log('[ClaudeService] Disabling plugin:', { pluginName, marketplaceName, projectPath });
+
+    try {
+      // Construct the full plugin identifier and escape it as a single argument
+      const pluginId = `${pluginName}@${marketplaceName}`;
+      const command = `claude plugin disable ${this.escapeArg(pluginId)}`;
+      const cwd = projectPath || undefined;
+
+      console.log('[ClaudeService] Executing command:', command, { cwd });
+
+      const { stdout, stderr } = await execAsync(command, { cwd, env: this.getExecEnv() });
+
+      const output = stdout + stderr;
+      const success =
+        !stderr.toLowerCase().includes('error') && !output.toLowerCase().includes('failed');
+
+      console.log('[ClaudeService] Plugin disable result:', { success, output });
+
+      const result: MCPCommandResult = {
+        success,
+        message: success ? `Successfully disabled plugin: ${pluginName}` : output,
+      };
+      if (!success) {
+        result.error = output;
+      }
+      return result;
+    } catch (error) {
+      console.error('[ClaudeService] Failed to disable plugin:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        error: `Failed to disable plugin: ${errorMessage}`,
+      };
+    }
+  }
+
+  /**
+   * Add a marketplace via `claude plugin marketplace add` command
+   */
+  async addPluginMarketplace(source: string): Promise<MCPCommandResult> {
+    console.log('[ClaudeService] Adding plugin marketplace:', source);
+
+    try {
+      const command = `claude plugin marketplace add ${this.escapeArg(source)}`;
+
+      console.log('[ClaudeService] Executing command:', command);
+
+      const { stdout, stderr } = await execAsync(command, { env: this.getExecEnv() });
+
+      const output = stdout + stderr;
+      const success =
+        !stderr.toLowerCase().includes('error') && !output.toLowerCase().includes('failed');
+
+      console.log('[ClaudeService] Marketplace add result:', { success, output });
+
+      const result: MCPCommandResult = {
+        success,
+        message: success ? `Successfully added marketplace: ${source}` : output,
+      };
+      if (!success) {
+        result.error = output;
+      }
+      return result;
+    } catch (error) {
+      console.error('[ClaudeService] Failed to add marketplace:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        error: `Failed to add marketplace: ${errorMessage}`,
+      };
+    }
+  }
+
+  /**
+   * Remove a marketplace via `claude plugin marketplace remove` command
+   */
+  async removePluginMarketplace(name: string): Promise<MCPCommandResult> {
+    console.log('[ClaudeService] Removing plugin marketplace:', name);
+
+    try {
+      const command = `claude plugin marketplace remove ${this.escapeArg(name)}`;
+
+      console.log('[ClaudeService] Executing command:', command);
+
+      const { stdout, stderr } = await execAsync(command, { env: this.getExecEnv() });
+
+      const output = stdout + stderr;
+      const success =
+        !stderr.toLowerCase().includes('error') && !output.toLowerCase().includes('failed');
+
+      console.log('[ClaudeService] Marketplace remove result:', { success, output });
+
+      const result: MCPCommandResult = {
+        success,
+        message: success ? `Successfully removed marketplace: ${name}` : output,
+      };
+      if (!success) {
+        result.error = output;
+      }
+      return result;
+    } catch (error) {
+      console.error('[ClaudeService] Failed to remove marketplace:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        error: `Failed to remove marketplace: ${errorMessage}`,
+      };
+    }
+  }
 }

@@ -81,6 +81,7 @@ export const IPC_CHANNELS = {
   TOGGLE_PLUGIN: 'plugins:toggle',
   GET_GITHUB_REPO_INFO: 'plugins:get-github-info',
   GET_PLUGIN_HEALTH: 'plugins:get-health',
+  VALIDATE_MARKETPLACE: 'plugins:validate-marketplace',
 
   // Hooks
   GET_ALL_HOOKS: 'hooks:get-all',

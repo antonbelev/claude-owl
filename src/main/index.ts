@@ -16,6 +16,7 @@ import { registerStatusLineHandlers } from './ipc/statuslineHandlers';
 import { registerDebugLogsHandlers } from './ipc/debugLogsHandlers';
 import { registerGitHubImportHandlers } from './ipc/githubImportHandlers';
 import { registerProjectsHandlers } from './ipc/projectsHandlers';
+import { registerFileBrowserHandlers } from './ipc/fileBrowserHandlers';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -168,6 +169,7 @@ app.whenReady().then(() => {
   registerDebugLogsHandlers();
   registerGitHubImportHandlers();
   registerProjectsHandlers();
+  registerFileBrowserHandlers();
 
   createWindow();
 

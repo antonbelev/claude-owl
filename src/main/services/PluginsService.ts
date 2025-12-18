@@ -4,7 +4,6 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { execSync } from 'child_process';
 import {
   InstalledPlugin,
   Marketplace,
@@ -15,25 +14,33 @@ import {
   GitHubRepoInfo,
   PluginHealthScore,
 } from '../../shared/types/plugin.types';
+import type { ClaudeService } from './ClaudeService';
+import type { SettingsService } from './SettingsService';
 
 export class PluginsService {
   private claudeUserDir: string;
   private pluginsDir: string;
   private marketplacesFile: string;
   private installedPluginsFile: string;
+  private claudeService: ClaudeService | null = null;
+  private settingsService: SettingsService | null = null;
 
-  constructor() {
+  constructor(claudeService?: ClaudeService, settingsService?: SettingsService) {
     const homeDir = process.env.HOME || process.env.USERPROFILE || '';
     this.claudeUserDir = path.join(homeDir, '.claude');
     this.pluginsDir = path.join(this.claudeUserDir, 'plugins');
     this.marketplacesFile = path.join(this.pluginsDir, 'known_marketplaces.json');
     this.installedPluginsFile = path.join(this.pluginsDir, 'installed_plugins.json');
+    this.claudeService = claudeService || null;
+    this.settingsService = settingsService || null;
 
     console.log('[PluginsService] Initialized with paths:', {
       claudeUserDir: this.claudeUserDir,
       pluginsDir: this.pluginsDir,
       marketplacesFile: this.marketplacesFile,
       installedPluginsFile: this.installedPluginsFile,
+      hasCLIDelegation: !!this.claudeService,
+      hasSettingsService: !!this.settingsService,
     });
   }
 
@@ -51,48 +58,91 @@ export class PluginsService {
       );
       const marketplaces: Marketplace[] = [];
 
-      // The file format is { "marketplace-name": { source: { source, repo }, installLocation, lastUpdated } }
-      for (const [name, marketplaceData] of Object.entries(data)) {
-        const sourceData = (marketplaceData as any).source;
-        if (!sourceData) {
-          console.warn('[PluginsService] Skipping marketplace with no source:', name);
+      // CLI writes flat format: { "name": { source: {...}, installLocation: "...", lastUpdated: "..." } }
+      // No "marketplaces" wrapper
+      const marketplacesData = data;
+
+      console.log('[PluginsService] Found', Object.keys(marketplacesData).length, 'marketplaces');
+
+      for (const [name, marketplaceEntry] of Object.entries(marketplacesData)) {
+        // CLI format: { source: { source: "github", repo: "owner/repo" }, installLocation: "...", lastUpdated: "..." }
+        if (
+          typeof marketplaceEntry !== 'object' ||
+          !marketplaceEntry ||
+          !('source' in marketplaceEntry)
+        ) {
+          console.warn(
+            '[PluginsService] Skipping marketplace with invalid format:',
+            name,
+            marketplaceEntry
+          );
           continue;
         }
 
-        // Convert source object to string format (e.g., "github:anthropics/skills")
-        let sourceString: string;
-        if (typeof sourceData === 'string') {
-          sourceString = sourceData;
-        } else if (sourceData.source === 'github' && sourceData.repo) {
-          sourceString = `github:${sourceData.repo}`;
+        const entry = marketplaceEntry as {
+          source: { source: string; repo?: string; url?: string };
+          installLocation: string;
+          lastUpdated: string;
+        };
+
+        // Convert CLI's source object to a URL string for our internal use
+        let source: string;
+        if (entry.source.source === 'github' && entry.source.repo) {
+          source = `https://github.com/${entry.source.repo}`;
+        } else if (entry.source.url) {
+          source = entry.source.url;
         } else {
-          console.warn('[PluginsService] Unknown source format for marketplace:', name, sourceData);
+          console.warn(
+            '[PluginsService] Skipping marketplace with unknown source type:',
+            name,
+            entry.source
+          );
           continue;
         }
 
-        console.log('[PluginsService] Processing marketplace:', { name, sourceString });
+        console.log('[PluginsService] Processing marketplace:', { name, source });
 
         try {
-          const manifest = await this.fetchMarketplaceManifest(sourceString);
+          const manifest = await this.fetchMarketplaceManifest(source);
+
+          if (!manifest) {
+            console.warn('[PluginsService] No manifest found for marketplace:', name);
+            marketplaces.push({
+              name,
+              source,
+              pluginCount: 0,
+              addedAt: entry.lastUpdated || new Date().toISOString(),
+              available: false,
+              error: 'Marketplace manifest not found',
+            });
+            continue;
+          }
+
           const marketplace: Marketplace = {
             name,
-            source: sourceString,
-            pluginCount: manifest?.plugins?.length || 0,
-            addedAt: (marketplaceData as any).lastUpdated || new Date().toISOString(),
+            source,
+            pluginCount: manifest.plugins?.length || 0,
+            addedAt: entry.lastUpdated || new Date().toISOString(),
             available: true,
           };
-          if (manifest?.owner) marketplace.owner = manifest.owner;
-          if (manifest?.description) marketplace.description = manifest.description;
-          if (manifest?.version) marketplace.version = manifest.version;
+          if (manifest.owner) marketplace.owner = manifest.owner;
+          if (manifest.description) marketplace.description = manifest.description;
+          if (manifest.version) marketplace.version = manifest.version;
           marketplaces.push(marketplace);
-          console.log('[PluginsService] Successfully loaded marketplace:', name);
+          console.log(
+            '[PluginsService] Successfully loaded marketplace:',
+            name,
+            'with',
+            marketplace.pluginCount,
+            'plugins'
+          );
         } catch (error) {
           console.error('[PluginsService] Failed to load marketplace:', name, error);
           marketplaces.push({
             name,
-            source: sourceString,
+            source,
             pluginCount: 0,
-            addedAt: (marketplaceData as any).lastUpdated || new Date().toISOString(),
+            addedAt: entry.lastUpdated || new Date().toISOString(),
             available: false,
             error: error instanceof Error ? error.message : 'Unknown error',
           });
@@ -102,42 +152,76 @@ export class PluginsService {
       return marketplaces;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        console.log('[PluginsService] No marketplaces file found, returning empty array');
         return [];
       }
+      console.error('[PluginsService] Error reading marketplaces file:', error);
       throw error;
     }
   }
 
   /**
    * Add a new marketplace
+   * The marketplace name is determined by the "name" field in .claude-plugin/marketplace.json
+   * Delegates to Claude CLI which handles marketplace registration
    */
   async addMarketplace(
-    name: string,
     source: string
-  ): Promise<{ success: boolean; error?: string }> {
-    try {
-      // Validate marketplace by fetching manifest
-      await this.fetchMarketplaceManifest(source);
+  ): Promise<{ success: boolean; marketplaceName?: string; error?: string }> {
+    console.log('[PluginsService] Adding marketplace from source:', source);
 
-      // Read current marketplaces
-      let marketplaces: Record<string, string> = {};
-      try {
-        const content = await fs.readFile(this.marketplacesFile, 'utf-8');
-        const data = JSON.parse(content);
-        marketplaces = data.marketplaces || {};
-      } catch (error) {
-        // File doesn't exist, will create new one
+    if (!this.claudeService) {
+      return {
+        success: false,
+        error: 'Claude service not initialized',
+      };
+    }
+
+    try {
+      // Validate marketplace by fetching manifest first
+      console.log('[PluginsService] Fetching marketplace manifest to validate and get name...');
+      const manifest = await this.fetchMarketplaceManifest(source);
+
+      if (!manifest) {
+        const errorMsg =
+          `Cannot find marketplace manifest at ${source}. ` +
+          `Please ensure the URL points to a valid marketplace with a .claude-plugin/marketplace.json file. ` +
+          `For GitHub repos, use: https://github.com/owner/repo`;
+        console.error('[PluginsService]', errorMsg);
+        return {
+          success: false,
+          error: errorMsg,
+        };
       }
 
-      // Add new marketplace
-      marketplaces[name] = source;
+      if (!manifest.name) {
+        const errorMsg = `Marketplace manifest at ${source} is missing the required "name" field.`;
+        console.error('[PluginsService]', errorMsg);
+        return {
+          success: false,
+          error: errorMsg,
+        };
+      }
 
-      // Save updated marketplaces
-      await fs.mkdir(this.claudeUserDir, { recursive: true });
-      await fs.writeFile(this.marketplacesFile, JSON.stringify({ marketplaces }, null, 2), 'utf-8');
+      const marketplaceName = manifest.name;
+      console.log('[PluginsService] Marketplace name from manifest:', marketplaceName);
+      console.log('[PluginsService] Delegating to Claude CLI...');
 
-      return { success: true };
+      // Delegate to CLI which handles the marketplace registration
+      const result = await this.claudeService.addPluginMarketplace(source);
+
+      if (result.success) {
+        console.log('[PluginsService] Marketplace added successfully via CLI:', marketplaceName);
+        return { success: true, marketplaceName };
+      } else {
+        console.error('[PluginsService] CLI failed to add marketplace:', result.error);
+        return {
+          success: false,
+          error: result.error || 'Failed to add marketplace via CLI',
+        };
+      }
     } catch (error) {
+      console.error('[PluginsService] Failed to add marketplace:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to add marketplace',
@@ -147,23 +231,34 @@ export class PluginsService {
 
   /**
    * Remove a marketplace
+   * Delegates to Claude CLI which handles marketplace removal
    */
   async removeMarketplace(name: string): Promise<{ success: boolean; error?: string }> {
+    console.log('[PluginsService] Removing marketplace:', name);
+
+    if (!this.claudeService) {
+      return {
+        success: false,
+        error: 'Claude service not initialized',
+      };
+    }
+
     try {
-      const content = await fs.readFile(this.marketplacesFile, 'utf-8');
-      const data = JSON.parse(content);
-      const marketplaces = data.marketplaces || {};
+      // Delegate to CLI
+      const result = await this.claudeService.removePluginMarketplace(name);
 
-      if (!marketplaces[name]) {
-        return { success: false, error: 'Marketplace not found' };
+      if (result.success) {
+        console.log('[PluginsService] Marketplace removed successfully via CLI');
+        return { success: true };
+      } else {
+        console.error('[PluginsService] CLI failed to remove marketplace:', result.error);
+        return {
+          success: false,
+          error: result.error || 'Failed to remove marketplace via CLI',
+        };
       }
-
-      delete marketplaces[name];
-
-      await fs.writeFile(this.marketplacesFile, JSON.stringify({ marketplaces }, null, 2), 'utf-8');
-
-      return { success: true };
     } catch (error) {
+      console.error('[PluginsService] Failed to remove marketplace:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to remove marketplace',
@@ -192,8 +287,33 @@ export class PluginsService {
           const pluginId = `${plugin.name}@${marketplace.name}`;
           const installed = installedMap.get(pluginId);
 
+          // Normalize source to string
+          let sourceUrl: string;
+          if (typeof plugin.source === 'string') {
+            sourceUrl = plugin.source;
+          } else if (typeof plugin.source === 'object' && plugin.source !== null) {
+            // Handle object format from manifest: { source: "github", repo: "owner/repo" }
+            const sourceObj = plugin.source as { source?: string; repo?: string; url?: string };
+            if (sourceObj.source === 'github' && sourceObj.repo) {
+              sourceUrl = `https://github.com/${sourceObj.repo}`;
+            } else if (sourceObj.url) {
+              sourceUrl = sourceObj.url;
+            } else {
+              console.warn(
+                '[PluginsService] Unknown source format for plugin:',
+                plugin.name,
+                plugin.source
+              );
+              continue; // Skip this plugin
+            }
+          } else {
+            console.warn('[PluginsService] Invalid source for plugin:', plugin.name, plugin.source);
+            continue; // Skip this plugin
+          }
+
           const marketplacePlugin: MarketplacePlugin = {
             ...plugin,
+            source: sourceUrl, // Use normalized string source
             marketplace: marketplace.name,
             installed: !!installed,
           };
@@ -227,40 +347,69 @@ export class PluginsService {
       );
       const plugins: InstalledPlugin[] = [];
 
-      for (const [id, pluginData] of Object.entries(data.plugins || {})) {
-        const plugin = pluginData as any;
-        // The actual file has installPath field
-        const installPath = plugin.installPath || plugin.path;
+      // Read enabled state from settings
+      let enabledPlugins: Record<string, boolean> = {};
+      if (this.settingsService) {
+        try {
+          const settings = await this.settingsService.readSettings('user');
+          enabledPlugins = settings.content?.enabledPlugins || {};
+          console.log('[PluginsService] Loaded enabled plugins from settings:', enabledPlugins);
+        } catch (error) {
+          console.warn('[PluginsService] Failed to read enabled plugins from settings:', error);
+        }
+      }
 
-        if (!installPath) {
-          console.warn('[PluginsService] Plugin missing installPath:', id);
+      // CLI format: plugins are arrays of installations (can have multiple scopes)
+      for (const [id, pluginInstalls] of Object.entries(data.plugins || {})) {
+        // pluginInstalls is an array of plugin installations
+        if (!Array.isArray(pluginInstalls)) {
+          console.warn('[PluginsService] Plugin data is not an array:', id, pluginInstalls);
           continue;
         }
 
-        console.log('[PluginsService] Processing installed plugin:', { id, installPath });
+        // Process each installation (usually just one, but can be multiple with different scopes)
+        for (const plugin of pluginInstalls) {
+          const installPath = plugin.installPath || plugin.path;
 
-        try {
-          // Read plugin.json
-          const metadata = await this.readPluginMetadata(installPath);
+          if (!installPath) {
+            console.warn('[PluginsService] Plugin missing installPath:', id, plugin);
+            continue;
+          }
 
-          // Count components
-          const componentCounts = await this.countPluginComponents(installPath);
-
-          // Extract marketplace name from ID (format: "pluginName@marketplace")
-          const marketplace: string = id.includes('@') ? id.split('@')[1] || 'unknown' : 'unknown';
-
-          plugins.push({
-            ...metadata,
+          console.log('[PluginsService] Processing installed plugin:', {
             id,
-            marketplace,
             installPath,
-            enabled: !plugin.isLocal, // isLocal plugins are always enabled
-            installedAt: plugin.installedAt || new Date().toISOString(),
-            componentCounts,
+            scope: plugin.scope,
           });
-          console.log('[PluginsService] Successfully loaded installed plugin:', id);
-        } catch (error) {
-          console.error(`[PluginsService] Failed to read plugin ${id}:`, error);
+
+          try {
+            // Read plugin.json
+            const metadata = await this.readPluginMetadata(installPath);
+
+            // Count components
+            const componentCounts = await this.countPluginComponents(installPath);
+
+            // Extract marketplace name from ID (format: "pluginName@marketplace")
+            const marketplace: string = id.includes('@')
+              ? id.split('@')[1] || 'unknown'
+              : 'unknown';
+
+            // Check enabled state from settings (defaults to true if not found)
+            const isEnabled = enabledPlugins[id] !== undefined ? enabledPlugins[id] : true;
+
+            plugins.push({
+              ...metadata,
+              id,
+              marketplace,
+              installPath,
+              enabled: isEnabled,
+              installedAt: plugin.installedAt || new Date().toISOString(),
+              componentCounts,
+            });
+            console.log('[PluginsService] Successfully loaded installed plugin:', id);
+          } catch (error) {
+            console.error(`[PluginsService] Failed to read plugin ${id}:`, error);
+          }
         }
       }
 
@@ -276,50 +425,41 @@ export class PluginsService {
 
   /**
    * Install a plugin from marketplace
+   * Delegates to Claude CLI
    */
   async installPlugin(pluginName: string, marketplaceName: string): Promise<PluginInstallResult> {
+    console.log('[PluginsService] Installing plugin:', { pluginName, marketplaceName });
+
+    if (!this.claudeService) {
+      return {
+        success: false,
+        error: 'Claude service not initialized',
+      };
+    }
+
     try {
-      // Get marketplace source
+      // Validate marketplace exists
       const marketplaces = await this.getMarketplaces();
       const marketplace = marketplaces.find(m => m.name === marketplaceName);
       if (!marketplace) {
         return { success: false, error: 'Marketplace not found' };
       }
 
-      // Get plugin from marketplace
-      const manifest = await this.fetchMarketplaceManifest(marketplace.source);
-      const pluginEntry = manifest?.plugins?.find(p => p.name === pluginName);
-      if (!pluginEntry) {
-        return { success: false, error: 'Plugin not found in marketplace' };
+      console.log('[PluginsService] Delegating to Claude CLI...');
+      const result = await this.claudeService.installPlugin(pluginName, marketplaceName);
+
+      if (result.success) {
+        console.log('[PluginsService] Plugin installed successfully via CLI');
+        return { success: true };
+      } else {
+        console.error('[PluginsService] CLI failed to install plugin:', result.error);
+        return {
+          success: false,
+          error: result.error || 'Failed to install plugin via CLI',
+        };
       }
-
-      // Determine install path
-      const installPath = path.join(this.pluginsDir, pluginName);
-
-      // Clone/copy plugin
-      await this.fetchPluginSource(pluginEntry.source, installPath, marketplace.source);
-
-      // Read plugin metadata
-      const metadata = await this.readPluginMetadata(installPath);
-
-      // Count components
-      const componentCounts = await this.countPluginComponents(installPath);
-
-      // Register plugin
-      const plugin: InstalledPlugin = {
-        ...metadata,
-        id: `${pluginName}@${marketplaceName}`,
-        marketplace: marketplaceName,
-        installPath,
-        enabled: true,
-        installedAt: new Date().toISOString(),
-        componentCounts,
-      };
-
-      await this.registerInstalledPlugin(plugin);
-
-      return { success: true, plugin };
     } catch (error) {
+      console.error('[PluginsService] Installation failed:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Installation failed',
@@ -329,8 +469,18 @@ export class PluginsService {
 
   /**
    * Uninstall a plugin
+   * Delegates to Claude CLI
    */
   async uninstallPlugin(pluginId: string): Promise<{ success: boolean; error?: string }> {
+    console.log('[PluginsService] Uninstalling plugin:', pluginId);
+
+    if (!this.claudeService) {
+      return {
+        success: false,
+        error: 'Claude service not initialized',
+      };
+    }
+
     try {
       const plugins = await this.getInstalledPlugins();
       const plugin = plugins.find(p => p.id === pluginId);
@@ -338,14 +488,27 @@ export class PluginsService {
         return { success: false, error: 'Plugin not found' };
       }
 
-      // Remove plugin files
-      await fs.rm(plugin.installPath, { recursive: true, force: true });
+      // Extract plugin name and marketplace from ID (format: pluginName@marketplaceName)
+      const [pluginName, marketplaceName] = pluginId.split('@');
+      if (!pluginName || !marketplaceName) {
+        return { success: false, error: 'Invalid plugin ID format' };
+      }
 
-      // Unregister plugin
-      await this.unregisterInstalledPlugin(pluginId);
+      console.log('[PluginsService] Delegating to Claude CLI...');
+      const result = await this.claudeService.uninstallPlugin(pluginName, marketplaceName);
 
-      return { success: true };
+      if (result.success) {
+        console.log('[PluginsService] Plugin uninstalled successfully via CLI');
+        return { success: true };
+      } else {
+        console.error('[PluginsService] CLI failed to uninstall plugin:', result.error);
+        return {
+          success: false,
+          error: result.error || 'Failed to uninstall plugin via CLI',
+        };
+      }
     } catch (error) {
+      console.error('[PluginsService] Uninstallation failed:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Uninstallation failed',
@@ -355,25 +518,47 @@ export class PluginsService {
 
   /**
    * Enable/disable a plugin
+   * Delegates to Claude CLI
    */
   async togglePlugin(
     pluginId: string,
     enabled: boolean
   ): Promise<{ success: boolean; error?: string }> {
-    try {
-      const content = await fs.readFile(this.installedPluginsFile, 'utf-8');
-      const data = JSON.parse(content);
+    console.log('[PluginsService] Toggling plugin:', { pluginId, enabled });
 
-      if (!data.plugins[pluginId]) {
-        return { success: false, error: 'Plugin not found' };
+    if (!this.claudeService) {
+      return {
+        success: false,
+        error: 'Claude service not initialized',
+      };
+    }
+
+    try {
+      // Extract plugin name and marketplace from ID (format: pluginName@marketplaceName)
+      const [pluginName, marketplaceName] = pluginId.split('@');
+      if (!pluginName || !marketplaceName) {
+        return { success: false, error: 'Invalid plugin ID format' };
       }
 
-      data.plugins[pluginId].enabled = enabled;
+      console.log('[PluginsService] Delegating to Claude CLI...');
+      const result = enabled
+        ? await this.claudeService.enablePlugin(pluginName, marketplaceName)
+        : await this.claudeService.disablePlugin(pluginName, marketplaceName);
 
-      await fs.writeFile(this.installedPluginsFile, JSON.stringify(data, null, 2), 'utf-8');
-
-      return { success: true };
+      if (result.success) {
+        console.log(
+          `[PluginsService] Plugin ${enabled ? 'enabled' : 'disabled'} successfully via CLI`
+        );
+        return { success: true };
+      } else {
+        console.error('[PluginsService] CLI failed to toggle plugin:', result.error);
+        return {
+          success: false,
+          error: result.error || `Failed to ${enabled ? 'enable' : 'disable'} plugin via CLI`,
+        };
+      }
     } catch (error) {
+      console.error('[PluginsService] Toggle failed:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to toggle plugin',
@@ -513,56 +698,6 @@ export class PluginsService {
     }
   }
 
-  private async fetchPluginSource(
-    source: string,
-    installPath: string,
-    marketplaceSource: string
-  ): Promise<void> {
-    await fs.mkdir(installPath, { recursive: true });
-
-    // Handle relative paths (relative to marketplace)
-    if (!source.startsWith('http') && !source.startsWith('git@') && !path.isAbsolute(source)) {
-      // Resolve relative to marketplace location
-      const marketplaceDir = path.dirname(marketplaceSource);
-      source = path.join(marketplaceDir, source);
-    }
-
-    // Handle GitHub URLs or git URLs
-    if (source.includes('github.com') || source.startsWith('git@') || source.endsWith('.git')) {
-      execSync(`git clone ${source} ${installPath}`, { stdio: 'inherit' });
-      return;
-    }
-
-    // Handle HTTP URLs (download and extract)
-    if (source.startsWith('http://') || source.startsWith('https://')) {
-      // For now, treat as git URL
-      execSync(`git clone ${source} ${installPath}`, { stdio: 'inherit' });
-      return;
-    }
-
-    // Handle local paths (copy)
-    const sourcePath = source.startsWith('~')
-      ? source.replace('~', process.env.HOME || '')
-      : source;
-    await this.copyDirectory(sourcePath, installPath);
-  }
-
-  private async copyDirectory(source: string, dest: string): Promise<void> {
-    await fs.mkdir(dest, { recursive: true });
-    const entries = await fs.readdir(source, { withFileTypes: true });
-
-    for (const entry of entries) {
-      const srcPath = path.join(source, entry.name);
-      const destPath = path.join(dest, entry.name);
-
-      if (entry.isDirectory()) {
-        await this.copyDirectory(srcPath, destPath);
-      } else {
-        await fs.copyFile(srcPath, destPath);
-      }
-    }
-  }
-
   private async readPluginMetadata(pluginPath: string): Promise<PluginMetadata> {
     const manifestPath = path.join(pluginPath, '.claude-plugin', 'plugin.json');
     const content = await fs.readFile(manifestPath, 'utf-8');
@@ -627,34 +762,5 @@ export class PluginsService {
     }
 
     return counts;
-  }
-
-  private async registerInstalledPlugin(plugin: InstalledPlugin): Promise<void> {
-    let data: any = { plugins: {} };
-    try {
-      const content = await fs.readFile(this.installedPluginsFile, 'utf-8');
-      data = JSON.parse(content);
-    } catch {
-      // File doesn't exist yet, use empty template
-    }
-
-    data.plugins[plugin.id] = {
-      name: plugin.name,
-      marketplace: plugin.marketplace,
-      path: plugin.installPath,
-      enabled: plugin.enabled,
-      installedAt: plugin.installedAt,
-      version: plugin.version,
-    };
-
-    await fs.mkdir(this.claudeUserDir, { recursive: true });
-    await fs.writeFile(this.installedPluginsFile, JSON.stringify(data, null, 2), 'utf-8');
-  }
-
-  private async unregisterInstalledPlugin(pluginId: string): Promise<void> {
-    const content = await fs.readFile(this.installedPluginsFile, 'utf-8');
-    const data = JSON.parse(content);
-    delete data.plugins[pluginId];
-    await fs.writeFile(this.installedPluginsFile, JSON.stringify(data, null, 2), 'utf-8');
   }
 }
