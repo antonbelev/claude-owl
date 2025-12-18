@@ -581,7 +581,9 @@ const MarketplacesView: React.FC<MarketplacesViewProps> = ({ marketplaces, onRem
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
                   <span className="text-sm font-semibold text-gray-700">Plugins:</span>
-                  <span className="block text-sm text-gray-600 mt-1">{marketplace.pluginCount}</span>
+                  <span className="block text-sm text-gray-600 mt-1">
+                    {marketplace.pluginCount}
+                  </span>
                 </div>
                 {marketplace.version && (
                   <div>
@@ -789,8 +791,21 @@ const PluginCard: React.FC<PluginCardProps> = ({
 // Add Marketplace Modal
 interface AddMarketplaceModalProps {
   onClose: () => void;
-  onAdd: (source: string) => Promise<{ success: boolean; marketplaceName?: string; error?: string }>;
-  onValidate: (url: string) => Promise<{ valid: boolean; url: string; hasManifest: boolean; marketplaceName?: string; pluginCount?: number; manifestPath?: string; error?: string; suggestions?: string[] } | null>;
+  onAdd: (
+    source: string
+  ) => Promise<{ success: boolean; marketplaceName?: string; error?: string }>;
+  onValidate: (
+    url: string
+  ) => Promise<{
+    valid: boolean;
+    url: string;
+    hasManifest: boolean;
+    marketplaceName?: string;
+    pluginCount?: number;
+    manifestPath?: string;
+    error?: string;
+    suggestions?: string[];
+  } | null>;
 }
 
 const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({
@@ -801,7 +816,16 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({
   const [source, setSource] = useState('');
   const [adding, setAdding] = useState(false);
   const [validating, setValidating] = useState(false);
-  const [validationResult, setValidationResult] = useState<{ valid: boolean; url: string; hasManifest: boolean; marketplaceName?: string; pluginCount?: number; manifestPath?: string; error?: string; suggestions?: string[] } | null>(null);
+  const [validationResult, setValidationResult] = useState<{
+    valid: boolean;
+    url: string;
+    hasManifest: boolean;
+    marketplaceName?: string;
+    pluginCount?: number;
+    manifestPath?: string;
+    error?: string;
+    suggestions?: string[];
+  } | null>(null);
   const [error, setError] = useState('');
 
   // ESC key to close modal
@@ -865,7 +889,8 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({
       onClose();
     } else {
       // Show the actual error from the backend
-      const errorMsg = result.error || 'Failed to add marketplace. Please check the console logs for details.';
+      const errorMsg =
+        result.error || 'Failed to add marketplace. Please check the console logs for details.';
       console.error('[AddMarketplaceModal] Failed to add marketplace:', errorMsg);
       setError(errorMsg);
     }
@@ -905,8 +930,10 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
             <p className="font-semibold mb-1">📝 Marketplace Name</p>
             <p>
-              The marketplace name is automatically determined from the <code className="bg-blue-100 px-1 rounded">name</code> field
-              in the repository&apos;s <code className="bg-blue-100 px-1 rounded">.claude-plugin/marketplace.json</code> file.
+              The marketplace name is automatically determined from the{' '}
+              <code className="bg-blue-100 px-1 rounded">name</code> field in the repository&apos;s{' '}
+              <code className="bg-blue-100 px-1 rounded">.claude-plugin/marketplace.json</code>{' '}
+              file.
             </p>
           </div>
 
@@ -955,10 +982,14 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({
                           <div className="flex items-center justify-between">
                             <div>
                               <div className="text-sm font-semibold text-green-900">
-                                Marketplace: <code className="bg-green-100 px-2 py-0.5 rounded">{validationResult.marketplaceName}</code>
+                                Marketplace:{' '}
+                                <code className="bg-green-100 px-2 py-0.5 rounded">
+                                  {validationResult.marketplaceName}
+                                </code>
                               </div>
                               <div className="text-xs text-green-700 mt-1">
-                                {validationResult.pluginCount || 0} plugin{validationResult.pluginCount !== 1 ? 's' : ''} available
+                                {validationResult.pluginCount || 0} plugin
+                                {validationResult.pluginCount !== 1 ? 's' : ''} available
                               </div>
                             </div>
                           </div>
@@ -1207,10 +1238,7 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
           {/* File Browser for installed plugins */}
           {isInstalled && fileBrowser.nodes.length > 0 && (
             <div>
-              <FileBrowser
-                nodes={fileBrowser.nodes}
-                onFileClick={fileBrowser.readFileContent}
-              />
+              <FileBrowser nodes={fileBrowser.nodes} onFileClick={fileBrowser.readFileContent} />
               {fileBrowser.error && (
                 <Alert variant="destructive" className="mt-4">
                   <AlertDescription>{fileBrowser.error}</AlertDescription>

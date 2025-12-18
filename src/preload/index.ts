@@ -214,7 +214,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // File Browser
   readDirectory: (args: unknown) => ipcRenderer.invoke(FILEBROWSER_CHANNELS.READ_DIRECTORY, args),
-  readFileContent: (args: unknown) => ipcRenderer.invoke(FILEBROWSER_CHANNELS.READ_FILE_CONTENT, args),
+  readFileContent: (args: unknown) =>
+    ipcRenderer.invoke(FILEBROWSER_CHANNELS.READ_FILE_CONTENT, args),
 
   // CCUsage (deprecated - replaced by Metrics)
   checkCCUsageInstalled: () => ipcRenderer.invoke(CCUSAGE_CHANNELS.CHECK_CCUSAGE_INSTALLED),

@@ -607,7 +607,8 @@ export class ClaudeService {
       const success =
         !stderr.toLowerCase().includes('error') &&
         !output.toLowerCase().includes('failed') &&
-        (output.toLowerCase().includes('successfully installed') || output.toLowerCase().includes('installed'));
+        (output.toLowerCase().includes('successfully installed') ||
+          output.toLowerCase().includes('installed'));
 
       console.log('[ClaudeService] Plugin install result:', { success, output });
 
@@ -637,7 +638,11 @@ export class ClaudeService {
     marketplaceName: string,
     projectPath?: string
   ): Promise<MCPCommandResult> {
-    console.log('[ClaudeService] Uninstalling plugin:', { pluginName, marketplaceName, projectPath });
+    console.log('[ClaudeService] Uninstalling plugin:', {
+      pluginName,
+      marketplaceName,
+      projectPath,
+    });
 
     try {
       // Construct the full plugin identifier and escape it as a single argument
