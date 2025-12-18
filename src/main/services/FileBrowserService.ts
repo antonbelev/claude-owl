@@ -141,7 +141,9 @@ export class FileBrowserService {
   /**
    * Get file or directory info
    */
-  async getPathInfo(targetPath: string): Promise<{ exists: boolean; isDirectory: boolean; isFile: boolean; size?: number }> {
+  async getPathInfo(
+    targetPath: string
+  ): Promise<{ exists: boolean; isDirectory: boolean; isFile: boolean; size?: number }> {
     try {
       const stats = await fs.stat(targetPath);
       return {

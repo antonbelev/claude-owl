@@ -8,6 +8,111 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 
+## [0.5.0](https://github.com/antonbelev/claude-owl/compare/v0.1.3...v0.5.0) (2025-12-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* PathService methods now enforce explicit projectPath when
+location='project'. This prevents reliance on process.cwd() which returns
+incorrect paths when Claude Owl is launched from Start Menu on Windows.
+
+Core Implementation:
+- Platform-aware CLI detection (where vs which)
+- Windows PATH handling with semicolon separator
+- MCP cmd /c wrapper for npx commands on Windows
+- Managed settings path refactoring with path.join()
+- Debug logs path validation for Windows
+- Removed process.cwd() fallback per design constraint
+
+Windows-Specific Changes:
+- ClaudeService: Uses 'where' command on Windows, handles multiple paths
+- ClaudeService: Adds Windows paths (Program Files, AppData/npm, System32)
+- ClaudeService: Wraps npx stdio commands with 'cmd /c' on Windows
+- SettingsService: Uses ProgramData env var for managed settings
+- PathService: Validates APPDATA env var, logs Windows debug path
+- PathService: Enforces projectPath requirement with TypeScript overloads
+
+Testing:
+- Added 34+ Windows-specific unit tests
+- All existing tests passing (324 total)
+- TypeScript strict mode compliance
+- Production build verified
+
+Files Modified:
+- src/main/services/ClaudeService.ts
+- src/main/services/SettingsService.ts
+- src/main/services/core/PathService.ts
+- tests/unit/services/*.windows.test.ts (new)
+
+References: ADR-007, Claude Code docs (mcp, settings)
+Phase 1-2 Complete. Phase 3-4 (hooks, CI/CD) pending user testing.
+
+### ♻️ Code Refactoring
+
+* **gh-pages:** Extract header navigation into shared component ([7778a47](https://github.com/antonbelev/claude-owl/commit/7778a474fb928f76fda4efa3b8c1af44bd5ce209))
+
+
+### ✨ Features
+
+* **docs:** Add comprehensive security and risk assessment ([f39bc90](https://github.com/antonbelev/claude-owl/commit/f39bc9086a52748230645270341de03d01004001))
+* fix plugin CLI commands and add comprehensive improvements ([794f97f](https://github.com/antonbelev/claude-owl/commit/794f97f7168291df30aa5c1225d9a671ab8813b0))
+* **gh-pages:** Add Google Analytics 4 tracking to all pages ([4ca0b0f](https://github.com/antonbelev/claude-owl/commit/4ca0b0fa160f857d2198500a28e645af5d5ec099))
+* **gh-pages:** Configure Google Analytics with Measurement ID ([2e962b2](https://github.com/antonbelev/claude-owl/commit/2e962b277110668e752bc33ae80e5aff9728bab1))
+* implement 2025 Year in Review feature ([b640301](https://github.com/antonbelev/claude-owl/commit/b640301d501c6df860ca474ab2ecfc5c25fa1193))
+* implement Windows platform support (ADR-007 Phase 1-2) ([878e51e](https://github.com/antonbelev/claude-owl/commit/878e51e2483934b5245ea1c25f6c691b5df9b400))
+* implement Windows-aware statusline platform detection and execution ([0ee46c7](https://github.com/antonbelev/claude-owl/commit/0ee46c7f1d60e3aed3a4186c074f92fe2b628dac))
+* **metrics:** implement comprehensive metrics dashboard with token analysis ([ebaa51b](https://github.com/antonbelev/claude-owl/commit/ebaa51be355b7974ae767b15914acc8e02aa161e))
+* **plugins:** add file browser to view plugin contents ([3eee631](https://github.com/antonbelev/claude-owl/commit/3eee6313ffd1d9be867517008dfca07de47213d8))
+* **plugins:** add marketplace validation and fix CLI delegation ([e897b6a](https://github.com/antonbelev/claude-owl/commit/e897b6a127cebae638272e7ded9fe7badee49f6f))
+* **plugins:** delegate marketplace operations to Claude CLI ([1df12ca](https://github.com/antonbelev/claude-owl/commit/1df12ca0a4e439dd84156627893bf0849ef052d4))
+* **plugins:** implement ADR-011 phase 1 - production readiness foundation ([62b10d2](https://github.com/antonbelev/claude-owl/commit/62b10d2ae226ce7a75e7cfd36c9058203c6d4a21))
+* **plugins:** improve plugin card UI and add external source links ([36cc39a](https://github.com/antonbelev/claude-owl/commit/36cc39aac3e4349bc89bc5322ff987368dba0d50))
+* use official Claude Code model aliases for all model selection ([33ca49a](https://github.com/antonbelev/claude-owl/commit/33ca49a1fd493472535d528fa4272b67e1487dcb))
+
+
+### 🐛 Bug Fixes
+
+* add version badge to all pages and load version script ([0a92ac7](https://github.com/antonbelev/claude-owl/commit/0a92ac781bddfd7116f27791dcf31da098b0fc8d))
+* **build:** disable Windows code signing to fix packaging errors ([412ea4c](https://github.com/antonbelev/claude-owl/commit/412ea4c96cc58af55b6bc6a8cc8c81230cf7bcdb))
+* **ci:** disable auto code signing discovery for unsigned macOS builds ([5faa180](https://github.com/antonbelev/claude-owl/commit/5faa1806be6d359e172e6ef182c877946ee0892a))
+* **deps:** revert glob to v10.5.0 for Node.js 18 compatibility ([922429c](https://github.com/antonbelev/claude-owl/commit/922429cfdf82a429d6f25d4b10f1813ad972cd9e))
+* **gh-pages:** Embed header HTML inline to support local file:// testing ([d90683a](https://github.com/antonbelev/claude-owl/commit/d90683a173aecc265bc0c3850d0a21d5c27e3651))
+* **gh-pages:** Fix version badge and console errors on non-home pages ([a7fc618](https://github.com/antonbelev/claude-owl/commit/a7fc6188c54483a7f585a0459d81aed8712304e9))
+* include cache creation tokens in cached token display ([1dc56d6](https://github.com/antonbelev/claude-owl/commit/1dc56d65bad5789575a5e068d7e5003a422fa40a))
+* **mac:** use identity null to completely disable code signing ([cad049a](https://github.com/antonbelev/claude-owl/commit/cad049a5027d210f9ac5e06b0c85a9faad0e03c3))
+* marketplace name now correctly uses .claude-plugin/marketplace.json ([98d80ed](https://github.com/antonbelev/claude-owl/commit/98d80ed0f61fc84986824b1a8058acee97a84467))
+* **metrics:** improve ModelBreakdownChart Y-axis formatting ([25b3275](https://github.com/antonbelev/claude-owl/commit/25b3275eb28d07f1449642f316eb9cba187a67da))
+* **metrics:** increase Y-axis label padding ([1ff5c7a](https://github.com/antonbelev/claude-owl/commit/1ff5c7a5311146eb0d9b73a5c189b954f30f7b2a))
+* **plugins:** correct marketplace parsing to read from 'marketplaces' object ([e57022d](https://github.com/antonbelev/claude-owl/commit/e57022dec2bd5d9098d61d70323df2a535294495))
+* **plugins:** read enabled state from settings.json ([a59c3b0](https://github.com/antonbelev/claude-owl/commit/a59c3b067f6d6940f391d51ec7fdde9e0954c335))
+* remove unnecessary escape characters in regex patterns ([4a681c2](https://github.com/antonbelev/claude-owl/commit/4a681c29b9e785b6d5e00f8edd960f2cd2117578))
+* **security:** implement critical security fixes for Electron configuration and URL validation ([e00a8c0](https://github.com/antonbelev/claude-owl/commit/e00a8c0e7838bb3a587140b66d7f7e48392d372d))
+* **security:** update glob to patched version 10.5.0/11.1.0 to address CVE-2025-64756 ([37e4d8e](https://github.com/antonbelev/claude-owl/commit/37e4d8e2bb8c5e6d3f89ec4e9be04f555983aa4e))
+* show only model label in dropdown trigger, description in menu ([1a839a4](https://github.com/antonbelev/claude-owl/commit/1a839a492b06ec9ba4f426faacdbf1c456e2ac42))
+* simplify Windows platform tests to focus on cross-platform logic ([f091f27](https://github.com/antonbelev/claude-owl/commit/f091f27823a7385f34100bdf22d6f4b7686823fd))
+* **types:** use conditional spread for optional icon property ([a0fb77f](https://github.com/antonbelev/claude-owl/commit/a0fb77fc107120f7bb0d47b7e40a0955c580cf12))
+* update API pricing to match official Claude pricing ([102792e](https://github.com/antonbelev/claude-owl/commit/102792e7d1f0bbaf6fc5958cd931ad74199cbaff))
+* use GitHub raw URL for year-in-review screenshot in homepage ([868dd75](https://github.com/antonbelev/claude-owl/commit/868dd75db36275da180a7111351eb03a1983fd4e))
+* **windows:** detect Claude in .local\bin and add installer icons ([c884a0d](https://github.com/antonbelev/claude-owl/commit/c884a0d474426105b08d6f5161a94a9d6a9f215d))
+* **windows:** embed icon into executable using afterPack hook ([aba7d38](https://github.com/antonbelev/claude-owl/commit/aba7d38459cf86528867da8d318e481814c64fcf))
+
+
+### 📚 Documentation
+
+* add ADR-008 for native usage metrics and analytics system ([ee66448](https://github.com/antonbelev/claude-owl/commit/ee6644848f70fc25fa31307af8f8832257eeb3a0))
+* add Anthropic disclaimer to README and homepage ([1060a0d](https://github.com/antonbelev/claude-owl/commit/1060a0ddb2cbfe39736b04417005bbda59cefc4e))
+* add macOS installation workaround and BETA indicators ([d85c8c5](https://github.com/antonbelev/claude-owl/commit/d85c8c5fa02e631bea6a59166134b3203d79ecf5))
+* add Plugins & Marketplaces section to screenshots page ([541655f](https://github.com/antonbelev/claude-owl/commit/541655f50c79f64191d0827d7d100e41f8920f79))
+* add Usage Metrics dashboard section to screenshots page ([72e49c3](https://github.com/antonbelev/claude-owl/commit/72e49c3b6d25088f312a70ed316c1bfe177c9ae2))
+* add Windows support to website and installation guide ([2691d16](https://github.com/antonbelev/claude-owl/commit/2691d16594b785fb89d400482d765d891f5690bc))
+* **adr-008:** refocus Phase 0 as MVP with live charts ([895b826](https://github.com/antonbelev/claude-owl/commit/895b8268f68032c5dab1eab088168b3c55a44a67))
+* **adr:** add ADR-007 comprehensive Windows support gaps analysis and remediation strategy ([f9896d0](https://github.com/antonbelev/claude-owl/commit/f9896d0c89bc3beb0e0d2f959ef276a1191d01d5))
+* consolidate Windows statusline ADR, remove duplicate ([3903121](https://github.com/antonbelev/claude-owl/commit/3903121a869533bf09aa4b9edff27a23052e6f29))
+* **security:** update security assessment to reflect resolved critical issues ([42d4762](https://github.com/antonbelev/claude-owl/commit/42d476211e7e0bdc39912e48dcca92bb9c6c124a))
+* simplify security.html for end users ([f182e6b](https://github.com/antonbelev/claude-owl/commit/f182e6b5a0e70c396437699e030c42ab9741b948))
+* update Anthropic legal entity name (PBC → Inc) ([6abd3b0](https://github.com/antonbelev/claude-owl/commit/6abd3b03739f29fc929153ac811b6ff6170378a8))
+
 ### [0.4.3](https://github.com/antonbelev/claude-owl/compare/v0.1.3...v0.4.3) (2025-12-10)
 
 

@@ -128,7 +128,9 @@ export function usePlugins() {
    * The marketplace name is automatically determined from the .claude-plugin/marketplace.json file
    */
   const addMarketplace = useCallback(
-    async (source: string): Promise<{ success: boolean; marketplaceName?: string; error?: string }> => {
+    async (
+      source: string
+    ): Promise<{ success: boolean; marketplaceName?: string; error?: string }> => {
       if (!window.electronAPI) {
         console.error('[usePlugins] electronAPI not available');
         return { success: false, error: 'electronAPI not available' };

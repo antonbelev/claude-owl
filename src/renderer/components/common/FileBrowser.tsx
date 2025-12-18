@@ -54,7 +54,11 @@ const TreeNode: React.FC<{
   // File extension to icon mapping
   const getFileIcon = () => {
     if (isDirectory) {
-      return expanded ? <FolderOpen className="h-4 w-4 text-blue-500" /> : <Folder className="h-4 w-4 text-blue-500" />;
+      return expanded ? (
+        <FolderOpen className="h-4 w-4 text-blue-500" />
+      ) : (
+        <Folder className="h-4 w-4 text-blue-500" />
+      );
     }
 
     const ext = node.extension?.toLowerCase();
@@ -86,7 +90,11 @@ const TreeNode: React.FC<{
         {/* Expand/Collapse icon for directories with children */}
         {isDirectory && hasChildren && (
           <span className="flex-shrink-0">
-            {expanded ? <ChevronDown className="h-4 w-4 text-gray-600" /> : <ChevronRight className="h-4 w-4 text-gray-600" />}
+            {expanded ? (
+              <ChevronDown className="h-4 w-4 text-gray-600" />
+            ) : (
+              <ChevronRight className="h-4 w-4 text-gray-600" />
+            )}
           </span>
         )}
         {isDirectory && !hasChildren && <span className="w-4" />}
@@ -132,7 +140,9 @@ export const FileViewer: React.FC<FileViewerProps> = ({ file, loading, onClose }
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b">
           <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-semibold truncate">{file?.path.split('/').pop() || 'Loading...'}</h2>
+            <h2 className="text-xl font-semibold truncate">
+              {file?.path.split('/').pop() || 'Loading...'}
+            </h2>
             {file && (
               <p className="text-sm text-gray-500 mt-1">
                 {file.size.toLocaleString()} bytes • {file.extension.toUpperCase()} file
@@ -182,12 +192,19 @@ export const FileBrowser: React.FC<FileBrowserProps> = ({ nodes, onFileClick, cl
     <Card className={className}>
       <CardHeader>
         <h3 className="text-lg font-semibold">Plugin Files</h3>
-        <p className="text-sm text-gray-500 mt-1">Browse and view plugin commands, agents, and configuration files</p>
+        <p className="text-sm text-gray-500 mt-1">
+          Browse and view plugin commands, agents, and configuration files
+        </p>
       </CardHeader>
       <CardContent className="p-0">
         <div className="border-t max-h-96 overflow-y-auto">
           {nodes.map((node, index) => (
-            <TreeNode key={`${node.path}-${index}`} node={node} level={0} onFileClick={onFileClick} />
+            <TreeNode
+              key={`${node.path}-${index}`}
+              node={node}
+              level={0}
+              onFileClick={onFileClick}
+            />
           ))}
         </div>
       </CardContent>

@@ -66,12 +66,24 @@ export class PluginsService {
 
       for (const [name, marketplaceEntry] of Object.entries(marketplacesData)) {
         // CLI format: { source: { source: "github", repo: "owner/repo" }, installLocation: "...", lastUpdated: "..." }
-        if (typeof marketplaceEntry !== 'object' || !marketplaceEntry || !('source' in marketplaceEntry)) {
-          console.warn('[PluginsService] Skipping marketplace with invalid format:', name, marketplaceEntry);
+        if (
+          typeof marketplaceEntry !== 'object' ||
+          !marketplaceEntry ||
+          !('source' in marketplaceEntry)
+        ) {
+          console.warn(
+            '[PluginsService] Skipping marketplace with invalid format:',
+            name,
+            marketplaceEntry
+          );
           continue;
         }
 
-        const entry = marketplaceEntry as { source: { source: string; repo?: string; url?: string }; installLocation: string; lastUpdated: string };
+        const entry = marketplaceEntry as {
+          source: { source: string; repo?: string; url?: string };
+          installLocation: string;
+          lastUpdated: string;
+        };
 
         // Convert CLI's source object to a URL string for our internal use
         let source: string;
@@ -80,7 +92,11 @@ export class PluginsService {
         } else if (entry.source.url) {
           source = entry.source.url;
         } else {
-          console.warn('[PluginsService] Skipping marketplace with unknown source type:', name, entry.source);
+          console.warn(
+            '[PluginsService] Skipping marketplace with unknown source type:',
+            name,
+            entry.source
+          );
           continue;
         }
 
@@ -113,7 +129,13 @@ export class PluginsService {
           if (manifest.description) marketplace.description = manifest.description;
           if (manifest.version) marketplace.version = manifest.version;
           marketplaces.push(marketplace);
-          console.log('[PluginsService] Successfully loaded marketplace:', name, 'with', marketplace.pluginCount, 'plugins');
+          console.log(
+            '[PluginsService] Successfully loaded marketplace:',
+            name,
+            'with',
+            marketplace.pluginCount,
+            'plugins'
+          );
         } catch (error) {
           console.error('[PluginsService] Failed to load marketplace:', name, error);
           marketplaces.push({
@@ -161,7 +183,8 @@ export class PluginsService {
       const manifest = await this.fetchMarketplaceManifest(source);
 
       if (!manifest) {
-        const errorMsg = `Cannot find marketplace manifest at ${source}. ` +
+        const errorMsg =
+          `Cannot find marketplace manifest at ${source}. ` +
           `Please ensure the URL points to a valid marketplace with a .claude-plugin/marketplace.json file. ` +
           `For GitHub repos, use: https://github.com/owner/repo`;
         console.error('[PluginsService]', errorMsg);
@@ -276,7 +299,11 @@ export class PluginsService {
             } else if (sourceObj.url) {
               sourceUrl = sourceObj.url;
             } else {
-              console.warn('[PluginsService] Unknown source format for plugin:', plugin.name, plugin.source);
+              console.warn(
+                '[PluginsService] Unknown source format for plugin:',
+                plugin.name,
+                plugin.source
+              );
               continue; // Skip this plugin
             }
           } else {
@@ -349,7 +376,11 @@ export class PluginsService {
             continue;
           }
 
-          console.log('[PluginsService] Processing installed plugin:', { id, installPath, scope: plugin.scope });
+          console.log('[PluginsService] Processing installed plugin:', {
+            id,
+            installPath,
+            scope: plugin.scope,
+          });
 
           try {
             // Read plugin.json
@@ -359,7 +390,9 @@ export class PluginsService {
             const componentCounts = await this.countPluginComponents(installPath);
 
             // Extract marketplace name from ID (format: "pluginName@marketplace")
-            const marketplace: string = id.includes('@') ? id.split('@')[1] || 'unknown' : 'unknown';
+            const marketplace: string = id.includes('@')
+              ? id.split('@')[1] || 'unknown'
+              : 'unknown';
 
             // Check enabled state from settings (defaults to true if not found)
             const isEnabled = enabledPlugins[id] !== undefined ? enabledPlugins[id] : true;
@@ -513,7 +546,9 @@ export class PluginsService {
         : await this.claudeService.disablePlugin(pluginName, marketplaceName);
 
       if (result.success) {
-        console.log(`[PluginsService] Plugin ${enabled ? 'enabled' : 'disabled'} successfully via CLI`);
+        console.log(
+          `[PluginsService] Plugin ${enabled ? 'enabled' : 'disabled'} successfully via CLI`
+        );
         return { success: true };
       } else {
         console.error('[PluginsService] CLI failed to toggle plugin:', result.error);

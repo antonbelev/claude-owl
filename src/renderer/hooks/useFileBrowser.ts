@@ -34,48 +34,51 @@ export function useFileBrowser() {
   /**
    * Read directory structure
    */
-  const readDirectory = useCallback(async (path: string, maxDepth: number = 3): Promise<boolean> => {
-    if (!window.electronAPI) {
-      console.error('[useFileBrowser] electronAPI not available');
-      return false;
-    }
+  const readDirectory = useCallback(
+    async (path: string, maxDepth: number = 3): Promise<boolean> => {
+      if (!window.electronAPI) {
+        console.error('[useFileBrowser] electronAPI not available');
+        return false;
+      }
 
-    console.log('[useFileBrowser] Reading directory:', path);
-    setState(prev => ({ ...prev, loading: true, error: null }));
+      console.log('[useFileBrowser] Reading directory:', path);
+      setState(prev => ({ ...prev, loading: true, error: null }));
 
-    try {
-      const request: ReadDirectoryRequest = { path, maxDepth };
-      const response = (await window.electronAPI.readDirectory(request)) as ReadDirectoryResponse;
+      try {
+        const request: ReadDirectoryRequest = { path, maxDepth };
+        const response = (await window.electronAPI.readDirectory(request)) as ReadDirectoryResponse;
 
-      console.log('[useFileBrowser] Directory read response:', response);
+        console.log('[useFileBrowser] Directory read response:', response);
 
-      if (response.success && response.data) {
+        if (response.success && response.data) {
+          setState(prev => ({
+            ...prev,
+            loading: false,
+            currentPath: path,
+            nodes: response.data!,
+            error: null,
+          }));
+          return true;
+        } else {
+          setState(prev => ({
+            ...prev,
+            loading: false,
+            error: response.error || 'Failed to read directory',
+          }));
+          return false;
+        }
+      } catch (error) {
+        console.error('[useFileBrowser] Exception reading directory:', error);
         setState(prev => ({
           ...prev,
           loading: false,
-          currentPath: path,
-          nodes: response.data!,
-          error: null,
-        }));
-        return true;
-      } else {
-        setState(prev => ({
-          ...prev,
-          loading: false,
-          error: response.error || 'Failed to read directory',
+          error: error instanceof Error ? error.message : 'Unknown error',
         }));
         return false;
       }
-    } catch (error) {
-      console.error('[useFileBrowser] Exception reading directory:', error);
-      setState(prev => ({
-        ...prev,
-        loading: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      }));
-      return false;
-    }
-  }, []);
+    },
+    []
+  );
 
   /**
    * Read file content
@@ -91,7 +94,9 @@ export function useFileBrowser() {
 
     try {
       const request: ReadFileContentRequest = { path };
-      const response = (await window.electronAPI.readFileContent(request)) as ReadFileContentResponse;
+      const response = (await window.electronAPI.readFileContent(
+        request
+      )) as ReadFileContentResponse;
 
       console.log('[useFileBrowser] File read response:', {
         success: response.success,

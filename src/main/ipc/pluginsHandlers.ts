@@ -63,7 +63,9 @@ export function registerPluginsHandlers(): void {
     console.log('[PluginsHandlers] ADD_MARKETPLACE request:', request);
     try {
       const result = await pluginsService.addMarketplace(request.source);
-      console.log('[PluginsHandlers] ADD_MARKETPLACE success:', { marketplaceName: result.marketplaceName });
+      console.log('[PluginsHandlers] ADD_MARKETPLACE success:', {
+        marketplaceName: result.marketplaceName,
+      });
       return result;
     } catch (error) {
       console.error('[PluginsHandlers] ADD_MARKETPLACE failed:', error);

@@ -131,12 +131,13 @@ export class MarketplaceValidationService {
   private normalizeGitHubUrl(url: string): string | null {
     try {
       // Remove trailing slashes and .git
-      const normalized = url.trim().replace(/\/+$/, '').replace(/\.git$/, '');
+      const normalized = url
+        .trim()
+        .replace(/\/+$/, '')
+        .replace(/\.git$/, '');
 
       // Handle github.com URLs
-      const githubMatch = normalized.match(
-        /(?:https?:\/\/)?(?:www\.)?github\.com\/([^/]+\/[^/]+)/
-      );
+      const githubMatch = normalized.match(/(?:https?:\/\/)?(?:www\.)?github\.com\/([^/]+\/[^/]+)/);
       if (githubMatch) {
         return `https://github.com/${githubMatch[1]}`;
       }

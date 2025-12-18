@@ -33,37 +33,31 @@ export function registerFileBrowserHandlers(): void {
   console.log('[FileBrowserHandlers] Registering file browser IPC handlers');
 
   // Read directory structure
-  ipcMain.handle(
-    FILEBROWSER_CHANNELS.READ_DIRECTORY,
-    async (_, request: ReadDirectoryRequest) => {
-      console.log('[FileBrowserHandlers] READ_DIRECTORY request:', request);
+  ipcMain.handle(FILEBROWSER_CHANNELS.READ_DIRECTORY, async (_, request: ReadDirectoryRequest) => {
+    console.log('[FileBrowserHandlers] READ_DIRECTORY request:', request);
 
-      try {
-        // Security check
-        if (!isPathAllowed(request.path)) {
-          console.error('[FileBrowserHandlers] Path not allowed:', request.path);
-          return {
-            success: false,
-            error: 'Access denied: Path is outside allowed directories',
-          };
-        }
-
-        const nodes = await fileBrowserService.readDirectory(
-          request.path,
-          request.maxDepth || 3
-        );
-
-        console.log('[FileBrowserHandlers] READ_DIRECTORY success:', { count: nodes.length });
-        return { success: true, data: nodes };
-      } catch (error) {
-        console.error('[FileBrowserHandlers] READ_DIRECTORY failed:', error);
+    try {
+      // Security check
+      if (!isPathAllowed(request.path)) {
+        console.error('[FileBrowserHandlers] Path not allowed:', request.path);
         return {
           success: false,
-          error: error instanceof Error ? error.message : 'Failed to read directory',
+          error: 'Access denied: Path is outside allowed directories',
         };
       }
+
+      const nodes = await fileBrowserService.readDirectory(request.path, request.maxDepth || 3);
+
+      console.log('[FileBrowserHandlers] READ_DIRECTORY success:', { count: nodes.length });
+      return { success: true, data: nodes };
+    } catch (error) {
+      console.error('[FileBrowserHandlers] READ_DIRECTORY failed:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to read directory',
+      };
     }
-  );
+  });
 
   // Read file content
   ipcMain.handle(
