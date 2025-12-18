@@ -54,6 +54,10 @@ export interface ElectronAPI {
   getGitHubRepoInfo: (args: unknown) => Promise<unknown>;
   getPluginHealth: (args: unknown) => Promise<unknown>;
 
+  // File Browser
+  readDirectory: (args: unknown) => Promise<unknown>;
+  readFileContent: (args: unknown) => Promise<unknown>;
+
   // CCUsage (deprecated - replaced by Metrics)
   checkCCUsageInstalled: () => Promise<unknown>;
   getCCUsageVersion: () => Promise<unknown>;

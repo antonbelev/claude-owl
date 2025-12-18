@@ -47,6 +47,13 @@ const PLUGINS_CHANNELS = {
   TOGGLE_PLUGIN: 'plugins:toggle',
   GET_GITHUB_REPO_INFO: 'plugins:get-github-info',
   GET_PLUGIN_HEALTH: 'plugins:get-health',
+  VALIDATE_MARKETPLACE: 'plugins:validate-marketplace',
+} as const;
+
+// Define file browser channel strings directly to avoid tree-shaking
+const FILEBROWSER_CHANNELS = {
+  READ_DIRECTORY: 'filebrowser:read-directory',
+  READ_FILE_CONTENT: 'filebrowser:read-file-content',
 } as const;
 
 // Define hooks channel strings directly to avoid tree-shaking
@@ -202,6 +209,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getGitHubRepoInfo: (args: unknown) =>
     ipcRenderer.invoke(PLUGINS_CHANNELS.GET_GITHUB_REPO_INFO, args),
   getPluginHealth: (args: unknown) => ipcRenderer.invoke(PLUGINS_CHANNELS.GET_PLUGIN_HEALTH, args),
+  validateMarketplace: (args: unknown) =>
+    ipcRenderer.invoke(PLUGINS_CHANNELS.VALIDATE_MARKETPLACE, args),
+
+  // File Browser
+  readDirectory: (args: unknown) => ipcRenderer.invoke(FILEBROWSER_CHANNELS.READ_DIRECTORY, args),
+  readFileContent: (args: unknown) => ipcRenderer.invoke(FILEBROWSER_CHANNELS.READ_FILE_CONTENT, args),
 
   // CCUsage (deprecated - replaced by Metrics)
   checkCCUsageInstalled: () => ipcRenderer.invoke(CCUSAGE_CHANNELS.CHECK_CCUSAGE_INSTALLED),
@@ -336,6 +349,9 @@ export interface ElectronAPI {
   togglePlugin: (args: unknown) => Promise<unknown>;
   getGitHubRepoInfo: (args: unknown) => Promise<unknown>;
   getPluginHealth: (args: unknown) => Promise<unknown>;
+  validateMarketplace: (args: unknown) => Promise<unknown>;
+  readDirectory: (args: unknown) => Promise<unknown>;
+  readFileContent: (args: unknown) => Promise<unknown>;
   executeCLI: (args: unknown) => Promise<unknown>;
   stopCLI: (args: unknown) => Promise<unknown>;
   readFile: (args: unknown) => Promise<unknown>;

@@ -1,8 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { usePlugins } from '../../hooks/usePlugins';
+import { useFileBrowser } from '../../hooks/useFileBrowser';
 import type { MarketplacePlugin, InstalledPlugin, Marketplace } from '@/shared/types';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { PageHeader } from '../common/PageHeader';
+import { FileBrowser, FileViewer } from '../common/FileBrowser';
 import { Card, CardContent, CardHeader, CardFooter } from '@/renderer/components/ui/card';
 import { Button } from '@/renderer/components/ui/button';
 import { Badge } from '@/renderer/components/ui/badge';
@@ -34,6 +36,38 @@ import {
 type TabView = 'browse' | 'installed' | 'marketplaces';
 type ViewMode = 'grid' | 'list';
 
+/**
+ * Build a GitHub URL from marketplace source and plugin source
+ * @param marketplaceSource - The marketplace source URL (e.g., "https://github.com/anthropics/claude-code")
+ * @param pluginSource - The plugin source path (e.g., "./plugins/code-review" or full URL)
+ * @returns Full GitHub URL to the plugin source, or undefined if cannot be built
+ */
+function buildPluginSourceUrl(
+  marketplaceSource: string | undefined,
+  pluginSource: string | undefined
+): string | undefined {
+  if (!pluginSource) return undefined;
+
+  // If plugin source is already a full URL, return it
+  if (pluginSource.startsWith('http://') || pluginSource.startsWith('https://')) {
+    return pluginSource;
+  }
+
+  // If plugin source is a relative path and we have marketplace source
+  if (pluginSource.startsWith('./') && marketplaceSource) {
+    // Extract GitHub repo from marketplace source
+    const githubMatch = marketplaceSource.match(/github\.com\/([^/]+\/[^/]+)/);
+    if (githubMatch) {
+      const repoPath = githubMatch[1];
+      // Remove leading './' from plugin source
+      const cleanPluginPath = pluginSource.replace(/^\.\//, '');
+      return `https://github.com/${repoPath}/tree/main/${cleanPluginPath}`;
+    }
+  }
+
+  return undefined;
+}
+
 export const PluginsManager: React.FC = () => {
   const {
     marketplaces,
@@ -47,6 +81,7 @@ export const PluginsManager: React.FC = () => {
     installPlugin,
     uninstallPlugin,
     togglePlugin,
+    validateMarketplace,
   } = usePlugins();
 
   const [activeTab, setActiveTab] = useState<TabView>('browse');
@@ -63,6 +98,9 @@ export const PluginsManager: React.FC = () => {
   );
   const [uninstallConfirm, setUninstallConfirm] = useState<InstalledPlugin | null>(null);
 
+  // Ref for search input to enable keyboard shortcut
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   // Get unique categories
   const categories = useMemo(() => {
     const cats = new Set<string>();
@@ -71,6 +109,21 @@ export const PluginsManager: React.FC = () => {
     });
     return Array.from(cats).sort();
   }, [availablePlugins, installedPlugins]);
+
+  // Keyboard shortcut: Cmd+F (Mac) or Ctrl+F (Windows/Linux) to focus search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for Cmd+F (Mac) or Ctrl+F (Windows/Linux)
+      if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Filter plugins based on active tab and filters
   const filteredPlugins = useMemo(() => {
@@ -225,8 +278,9 @@ export const PluginsManager: React.FC = () => {
           <div className="mt-6 space-y-4">
             <div className="relative">
               <Input
+                ref={searchInputRef}
                 type="text"
-                placeholder="Search plugins by name, description, or keywords..."
+                placeholder="Search plugins by name, description, or keywords... (Cmd+F)"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 className="pr-10"
@@ -366,6 +420,7 @@ export const PluginsManager: React.FC = () => {
                   key={'id' in plugin ? plugin.id : `${plugin.name}@${plugin.marketplace}`}
                   plugin={plugin}
                   viewMode={viewMode}
+                  marketplaces={marketplaces}
                   onView={setSelectedPlugin}
                   onInstall={handleInstallPlugin}
                   onUninstall={handleUninstallPlugin}
@@ -403,6 +458,7 @@ export const PluginsManager: React.FC = () => {
                   key={'id' in plugin ? plugin.id : `${plugin.name}@${plugin.marketplace}`}
                   plugin={plugin}
                   viewMode={viewMode}
+                  marketplaces={marketplaces}
                   onView={setSelectedPlugin}
                   onInstall={handleInstallPlugin}
                   onUninstall={handleUninstallPlugin}
@@ -419,6 +475,7 @@ export const PluginsManager: React.FC = () => {
         <AddMarketplaceModal
           onClose={() => setShowAddMarketplaceModal(false)}
           onAdd={addMarketplace}
+          onValidate={validateMarketplace}
         />
       )}
 
@@ -504,23 +561,43 @@ const MarketplacesView: React.FC<MarketplacesViewProps> = ({ marketplaces, onRem
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="space-y-4">
+              {/* Source URL - Clickable */}
               <div>
                 <span className="text-sm font-semibold text-gray-700">Source:</span>
-                <code className="block text-sm text-gray-600 mt-1 bg-gray-50 p-2 rounded">
-                  {marketplace.source}
-                </code>
-              </div>
-              <div>
-                <span className="text-sm font-semibold text-gray-700">Plugins:</span>
-                <span className="block text-sm text-gray-600 mt-1">{marketplace.pluginCount}</span>
-              </div>
-              {marketplace.version && (
-                <div>
-                  <span className="text-sm font-semibold text-gray-700">Version:</span>
-                  <span className="block text-sm text-gray-600 mt-1">{marketplace.version}</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <button
+                    onClick={() => window.electronAPI?.openExternal(marketplace.source)}
+                    className="text-sm text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 bg-gray-50 p-2 rounded flex-1 overflow-hidden cursor-pointer text-left"
+                    title={marketplace.source}
+                  >
+                    <span className="truncate">{marketplace.source}</span>
+                    <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                  </button>
                 </div>
-              )}
+              </div>
+
+              {/* Metadata Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div>
+                  <span className="text-sm font-semibold text-gray-700">Plugins:</span>
+                  <span className="block text-sm text-gray-600 mt-1">{marketplace.pluginCount}</span>
+                </div>
+                {marketplace.version && (
+                  <div>
+                    <span className="text-sm font-semibold text-gray-700">Version:</span>
+                    <span className="block text-sm text-gray-600 mt-1">{marketplace.version}</span>
+                  </div>
+                )}
+                {marketplace.addedAt && (
+                  <div>
+                    <span className="text-sm font-semibold text-gray-700">Added:</span>
+                    <span className="block text-sm text-gray-600 mt-1">
+                      {new Date(marketplace.addedAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {marketplace.error && (
@@ -557,6 +634,7 @@ const MarketplacesView: React.FC<MarketplacesViewProps> = ({ marketplaces, onRem
 interface PluginCardProps {
   plugin: MarketplacePlugin | InstalledPlugin;
   viewMode: ViewMode;
+  marketplaces: Marketplace[];
   onView: (plugin: MarketplacePlugin | InstalledPlugin) => void;
   onInstall: (plugin: MarketplacePlugin) => void;
   onUninstall: (plugin: InstalledPlugin) => void;
@@ -566,6 +644,7 @@ interface PluginCardProps {
 const PluginCard: React.FC<PluginCardProps> = ({
   plugin,
   viewMode: _viewMode,
+  marketplaces,
   onView,
   onInstall,
   onUninstall,
@@ -573,6 +652,13 @@ const PluginCard: React.FC<PluginCardProps> = ({
 }) => {
   const isInstalled = 'id' in plugin;
   const marketplaceBadge = plugin.marketplace;
+
+  // Find marketplace to get its source URL
+  const marketplace = marketplaces.find(m => m.name === plugin.marketplace);
+  const sourceUrl = buildPluginSourceUrl(
+    marketplace?.source,
+    'source' in plugin ? plugin.source : undefined
+  );
 
   const handleInstall = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -595,6 +681,18 @@ const PluginCard: React.FC<PluginCardProps> = ({
     }
   };
 
+  const handleSourceClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (sourceUrl && window.electronAPI?.openExternal) {
+      window.electronAPI.openExternal(sourceUrl).catch(() => {
+        window.open(sourceUrl, '_blank');
+      });
+    } else if (sourceUrl) {
+      window.open(sourceUrl, '_blank');
+    }
+  };
+
   return (
     <Card
       className={`cursor-pointer transition-all hover:border-blue-500 hover:shadow-md ${
@@ -603,12 +701,27 @@ const PluginCard: React.FC<PluginCardProps> = ({
       onClick={() => onView(plugin)}
     >
       <CardHeader className="pb-3">
-        <div className="flex justify-between items-start gap-2">
-          <div className="flex items-baseline gap-2 flex-1">
-            <h3 className="text-lg font-semibold">{plugin.name}</h3>
-            {plugin.version && <span className="text-sm text-gray-500">v{plugin.version}</span>}
+        <div className="space-y-2">
+          {/* Title row - single line with ellipsis */}
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold truncate flex-1 min-w-0">{plugin.name}</h3>
+            {plugin.version && (
+              <span className="text-sm text-gray-500 shrink-0">v{plugin.version}</span>
+            )}
+            {sourceUrl && (
+              <button
+                onClick={handleSourceClick}
+                className="text-blue-600 hover:text-blue-800 shrink-0 transition-colors"
+                title="View source on GitHub"
+                type="button"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </button>
+            )}
           </div>
-          <div className="flex gap-2 flex-wrap justify-end">
+
+          {/* Badges row */}
+          <div className="flex gap-2 flex-wrap">
             <Badge variant="outline" className="shrink-0">
               {marketplaceBadge}
             </Badge>
@@ -676,32 +789,85 @@ const PluginCard: React.FC<PluginCardProps> = ({
 // Add Marketplace Modal
 interface AddMarketplaceModalProps {
   onClose: () => void;
-  onAdd: (name: string, source: string) => Promise<boolean>;
+  onAdd: (source: string) => Promise<{ success: boolean; marketplaceName?: string; error?: string }>;
+  onValidate: (url: string) => Promise<{ valid: boolean; url: string; hasManifest: boolean; marketplaceName?: string; pluginCount?: number; manifestPath?: string; error?: string; suggestions?: string[] } | null>;
 }
 
-const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({ onClose, onAdd }) => {
-  const [name, setName] = useState('');
+const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({
+  onClose,
+  onAdd,
+  onValidate,
+}) => {
   const [source, setSource] = useState('');
   const [adding, setAdding] = useState(false);
+  const [validating, setValidating] = useState(false);
+  const [validationResult, setValidationResult] = useState<{ valid: boolean; url: string; hasManifest: boolean; marketplaceName?: string; pluginCount?: number; manifestPath?: string; error?: string; suggestions?: string[] } | null>(null);
   const [error, setError] = useState('');
+
+  // ESC key to close modal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  const handleValidate = async () => {
+    if (!source.trim()) {
+      setError('Please enter a source URL first');
+      return;
+    }
+
+    setValidating(true);
+    setError('');
+    setValidationResult(null);
+
+    console.log('[AddMarketplaceModal] Validating:', source.trim());
+
+    const result = await onValidate(source.trim());
+
+    console.log('[AddMarketplaceModal] Validation result:', result);
+
+    setValidationResult(result);
+    setValidating(false);
+
+    if (!result || !result.valid) {
+      setError(result?.error || 'Validation failed');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name.trim() || !source.trim()) {
-      setError('Name and source are required');
+    if (!source.trim()) {
+      setError('Source URL is required');
+      return;
+    }
+
+    // Require validation before submitting
+    if (!validationResult || !validationResult.valid) {
+      setError('Please verify the marketplace before adding');
       return;
     }
 
     setAdding(true);
     setError('');
 
-    const success = await onAdd(name.trim(), source.trim());
+    console.log('[AddMarketplaceModal] Submitting source:', source.trim());
 
-    if (success) {
+    const result = await onAdd(source.trim());
+
+    if (result.success) {
+      console.log('[AddMarketplaceModal] Marketplace added successfully:', result.marketplaceName);
       onClose();
     } else {
-      setError('Failed to add marketplace. Please check the source and try again.');
+      // Show the actual error from the backend
+      const errorMsg = result.error || 'Failed to add marketplace. Please check the console logs for details.';
+      console.error('[AddMarketplaceModal] Failed to add marketplace:', errorMsg);
+      setError(errorMsg);
     }
 
     setAdding(false);
@@ -736,37 +902,90 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({ onClose, onAd
             </Alert>
           )}
 
-          <div>
-            <Label htmlFor="marketplace-name">
-              Name <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="marketplace-name"
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder="my-marketplace"
-              required
-              className="mt-2"
-            />
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
+            <p className="font-semibold mb-1">📝 Marketplace Name</p>
+            <p>
+              The marketplace name is automatically determined from the <code className="bg-blue-100 px-1 rounded">name</code> field
+              in the repository&apos;s <code className="bg-blue-100 px-1 rounded">.claude-plugin/marketplace.json</code> file.
+            </p>
           </div>
 
           <div>
             <Label htmlFor="marketplace-source">
               Source <span className="text-red-500">*</span>
             </Label>
-            <Input
-              id="marketplace-source"
-              type="text"
-              value={source}
-              onChange={e => setSource(e.target.value)}
-              placeholder="https://github.com/user/repo or /path/to/local/marketplace"
-              required
-              className="mt-2"
-            />
+            <div className="flex gap-2 mt-2">
+              <Input
+                id="marketplace-source"
+                type="text"
+                value={source}
+                onChange={e => {
+                  setSource(e.target.value);
+                  setValidationResult(null); // Clear validation when source changes
+                }}
+                placeholder="https://github.com/owner/repo"
+                required
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                onClick={handleValidate}
+                disabled={validating || !source.trim()}
+                variant="outline"
+              >
+                {validating ? 'Verifying...' : 'Verify'}
+              </Button>
+            </div>
             <small className="block mt-1 text-sm text-gray-500">
-              GitHub URL, Git URL, or local file path
+              Repository must contain .claude-plugin/marketplace.json
             </small>
+            <small className="block mt-1 text-xs text-gray-400">
+              Example: https://github.com/myorg/claude-plugins
+            </small>
+
+            {/* Validation Result Display */}
+            {validationResult && (
+              <div className="mt-3">
+                {validationResult.valid ? (
+                  <Alert>
+                    <AlertDescription className="text-green-700">
+                      <div className="font-semibold">✓ Marketplace validated successfully!</div>
+                      {validationResult.marketplaceName && (
+                        <div className="mt-2 bg-green-50 p-3 rounded border border-green-200">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="text-sm font-semibold text-green-900">
+                                Marketplace: <code className="bg-green-100 px-2 py-0.5 rounded">{validationResult.marketplaceName}</code>
+                              </div>
+                              <div className="text-xs text-green-700 mt-1">
+                                {validationResult.pluginCount || 0} plugin{validationResult.pluginCount !== 1 ? 's' : ''} available
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <div className="mt-2 text-xs text-gray-600">
+                        Found marketplace.json at {validationResult.manifestPath}
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <Alert variant="destructive">
+                    <AlertDescription>
+                      <div className="font-semibold">✗ Validation Failed</div>
+                      <div className="mt-1">{validationResult.error}</div>
+                      {validationResult.suggestions && validationResult.suggestions.length > 0 && (
+                        <ul className="mt-2 text-xs list-disc list-inside space-y-1">
+                          {validationResult.suggestions.map((suggestion: string, i: number) => (
+                            <li key={i}>{suggestion}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t">
@@ -800,6 +1019,34 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
   onToggle,
 }) => {
   const isInstalled = 'id' in plugin;
+  const fileBrowser = useFileBrowser();
+
+  // Load plugin directory when modal opens for installed plugins
+  useEffect(() => {
+    if (isInstalled) {
+      const installPath = (plugin as InstalledPlugin).installPath;
+      if (installPath) {
+        console.log('[PluginDetailModal] Loading directory:', installPath);
+        fileBrowser.readDirectory(installPath);
+      }
+    }
+  }, [isInstalled, plugin]);
+
+  // ESC key to close modal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        // Close file viewer if open, otherwise close modal
+        if (fileBrowser.selectedFile) {
+          fileBrowser.clearSelectedFile();
+        } else {
+          onClose();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose, fileBrowser]);
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -867,29 +1114,25 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
               {plugin.repository && (
                 <div>
                   <span className="text-sm font-semibold text-gray-700">Repository:</span>
-                  <a
-                    href={plugin.repository}
-                    className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 mt-1"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => window.electronAPI?.openExternal(plugin.repository!)}
+                    className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 mt-1 cursor-pointer hover:underline"
                   >
                     {plugin.repository}
                     <ExternalLink className="h-3 w-3" />
-                  </a>
+                  </button>
                 </div>
               )}
               {plugin.homepage && (
                 <div>
                   <span className="text-sm font-semibold text-gray-700">Homepage:</span>
-                  <a
-                    href={plugin.homepage}
-                    className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 mt-1"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => window.electronAPI?.openExternal(plugin.homepage!)}
+                    className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 mt-1 cursor-pointer hover:underline"
                   >
                     {plugin.homepage}
                     <ExternalLink className="h-3 w-3" />
-                  </a>
+                  </button>
                 </div>
               )}
             </div>
@@ -960,6 +1203,21 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
               </div>
             </div>
           )}
+
+          {/* File Browser for installed plugins */}
+          {isInstalled && fileBrowser.nodes.length > 0 && (
+            <div>
+              <FileBrowser
+                nodes={fileBrowser.nodes}
+                onFileClick={fileBrowser.readFileContent}
+              />
+              {fileBrowser.error && (
+                <Alert variant="destructive" className="mt-4">
+                  <AlertDescription>{fileBrowser.error}</AlertDescription>
+                </Alert>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex justify-between p-6 border-t gap-3">
@@ -983,6 +1241,13 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
           )}
         </div>
       </div>
+
+      {/* File Viewer Modal */}
+      <FileViewer
+        file={fileBrowser.selectedFile}
+        loading={fileBrowser.loadingFile}
+        onClose={fileBrowser.clearSelectedFile}
+      />
     </div>
   );
 };
