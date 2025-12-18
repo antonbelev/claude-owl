@@ -787,7 +787,7 @@ const PluginCard: React.FC<PluginCardProps> = ({
 // Add Marketplace Modal
 interface AddMarketplaceModalProps {
   onClose: () => void;
-  onAdd: (name: string, source: string) => Promise<boolean>;
+  onAdd: (source: string) => Promise<{ success: boolean; marketplaceName?: string; error?: string }>;
   onValidate: (url: string) => Promise<any>;
 }
 
@@ -796,7 +796,6 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({
   onAdd,
   onValidate,
 }) => {
-  const [name, setName] = useState('');
   const [source, setSource] = useState('');
   const [adding, setAdding] = useState(false);
   const [validating, setValidating] = useState(false);
@@ -841,25 +840,31 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name.trim() || !source.trim()) {
-      setError('Name and source are required');
+    if (!source.trim()) {
+      setError('Source URL is required');
+      return;
+    }
+
+    // Require validation before submitting
+    if (!validationResult || !validationResult.valid) {
+      setError('Please verify the marketplace before adding');
       return;
     }
 
     setAdding(true);
     setError('');
 
-    console.log('[AddMarketplaceModal] Submitting:', { name: name.trim(), source: source.trim() });
+    console.log('[AddMarketplaceModal] Submitting source:', source.trim());
 
-    const success = await onAdd(name.trim(), source.trim());
+    const result = await onAdd(source.trim());
 
-    if (success) {
-      console.log('[AddMarketplaceModal] Marketplace added successfully');
+    if (result.success) {
+      console.log('[AddMarketplaceModal] Marketplace added successfully:', result.marketplaceName);
       onClose();
     } else {
-      // Show a generic error - the actual error will be logged
-      const errorMsg = 'Failed to add marketplace. Please check the console logs for details.';
-      console.error('[AddMarketplaceModal] Failed to add marketplace');
+      // Show the actual error from the backend
+      const errorMsg = result.error || 'Failed to add marketplace. Please check the console logs for details.';
+      console.error('[AddMarketplaceModal] Failed to add marketplace:', errorMsg);
       setError(errorMsg);
     }
 
@@ -895,19 +900,12 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({
             </Alert>
           )}
 
-          <div>
-            <Label htmlFor="marketplace-name">
-              Name <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="marketplace-name"
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder="my-marketplace"
-              required
-              className="mt-2"
-            />
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
+            <p className="font-semibold mb-1">📝 Marketplace Name</p>
+            <p>
+              The marketplace name is automatically determined from the <code className="bg-blue-100 px-1 rounded">name</code> field
+              in the repository's <code className="bg-blue-100 px-1 rounded">.claude-plugin/marketplace.json</code> file.
+            </p>
           </div>
 
           <div>
@@ -949,8 +947,22 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({
                 {validationResult.valid ? (
                   <Alert>
                     <AlertDescription className="text-green-700">
-                      ✓ Marketplace validated successfully!
-                      <div className="mt-1 text-xs text-gray-600">
+                      <div className="font-semibold">✓ Marketplace validated successfully!</div>
+                      {validationResult.marketplaceName && (
+                        <div className="mt-2 bg-green-50 p-3 rounded border border-green-200">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="text-sm font-semibold text-green-900">
+                                Marketplace: <code className="bg-green-100 px-2 py-0.5 rounded">{validationResult.marketplaceName}</code>
+                              </div>
+                              <div className="text-xs text-green-700 mt-1">
+                                {validationResult.pluginCount || 0} plugin{validationResult.pluginCount !== 1 ? 's' : ''} available
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <div className="mt-2 text-xs text-gray-600">
                         Found marketplace.json at {validationResult.manifestPath}
                       </div>
                     </AlertDescription>

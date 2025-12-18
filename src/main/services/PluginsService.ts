@@ -136,13 +136,13 @@ export class PluginsService {
 
   /**
    * Add a new marketplace
+   * The marketplace name is determined by the "name" field in .claude-plugin/marketplace.json
    * Delegates to Claude CLI which handles marketplace registration
    */
   async addMarketplace(
-    name: string,
     source: string
-  ): Promise<{ success: boolean; error?: string }> {
-    console.log('[PluginsService] Adding marketplace:', { name, source });
+  ): Promise<{ success: boolean; marketplaceName?: string; error?: string }> {
+    console.log('[PluginsService] Adding marketplace from source:', source);
 
     if (!this.claudeService) {
       return {
@@ -153,7 +153,7 @@ export class PluginsService {
 
     try {
       // Validate marketplace by fetching manifest first
-      console.log('[PluginsService] Validating marketplace manifest...');
+      console.log('[PluginsService] Fetching marketplace manifest to validate and get name...');
       const manifest = await this.fetchMarketplaceManifest(source);
 
       if (!manifest) {
@@ -167,15 +167,25 @@ export class PluginsService {
         };
       }
 
-      console.log('[PluginsService] Marketplace manifest validated, delegating to Claude CLI...');
+      if (!manifest.name) {
+        const errorMsg = `Marketplace manifest at ${source} is missing the required "name" field.`;
+        console.error('[PluginsService]', errorMsg);
+        return {
+          success: false,
+          error: errorMsg,
+        };
+      }
+
+      const marketplaceName = manifest.name;
+      console.log('[PluginsService] Marketplace name from manifest:', marketplaceName);
+      console.log('[PluginsService] Delegating to Claude CLI...');
 
       // Delegate to CLI which handles the marketplace registration
-      // Note: CLI auto-generates marketplace name from repo, ignoring our 'name' parameter
       const result = await this.claudeService.addPluginMarketplace(source);
 
       if (result.success) {
-        console.log('[PluginsService] Marketplace added successfully via CLI');
-        return { success: true };
+        console.log('[PluginsService] Marketplace added successfully via CLI:', marketplaceName);
+        return { success: true, marketplaceName };
       } else {
         console.error('[PluginsService] CLI failed to add marketplace:', result.error);
         return {

@@ -19,8 +19,8 @@ import type { IPCResponse } from './ipc.common.types';
 export interface GetMarketplacesResponse extends IPCResponse<Marketplace[]> {}
 
 export interface AddMarketplaceRequest {
-  name: string;
-  source: string;
+  source: string; // GitHub URL, Git URL, or local path
+  // Note: marketplace name comes from the .claude-plugin/marketplace.json file's "name" field
 }
 
 export interface AddMarketplaceResponse extends IPCResponse {}
@@ -88,6 +88,8 @@ export interface MarketplaceValidationResult {
   url: string;
   hasManifest: boolean;
   manifestPath?: string;
+  marketplaceName?: string; // Name from manifest.json
+  pluginCount?: number; // Number of plugins in manifest
   error?: string;
   suggestions?: string[];
 }

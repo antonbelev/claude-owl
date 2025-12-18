@@ -12,6 +12,8 @@ export interface MarketplaceValidationResult {
   url: string;
   hasManifest: boolean;
   manifestPath?: string;
+  marketplaceName?: string; // Name from manifest.json
+  pluginCount?: number; // Number of plugins in manifest
   error?: string;
   suggestions?: string[];
 }
@@ -101,11 +103,16 @@ export class MarketplaceValidationService {
         return result;
       }
 
+      // Parse manifest to get name and plugin count
+      const manifest: MarketplaceManifest = JSON.parse(manifestCheck.content!);
+
       return {
         valid: true,
         url: normalizedUrl,
         hasManifest: true,
         manifestPath: MarketplaceValidationService.MANIFEST_PATH,
+        marketplaceName: manifest.name,
+        pluginCount: manifest.plugins?.length || 0,
       };
     } catch (error) {
       console.error('[MarketplaceValidation] Validation failed:', error);

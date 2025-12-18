@@ -60,8 +60,8 @@ export function registerPluginsHandlers(): void {
   ipcMain.handle(PLUGINS_CHANNELS.ADD_MARKETPLACE, async (_, request: AddMarketplaceRequest) => {
     console.log('[PluginsHandlers] ADD_MARKETPLACE request:', request);
     try {
-      const result = await pluginsService.addMarketplace(request.name, request.source);
-      console.log('[PluginsHandlers] ADD_MARKETPLACE success:', { name: request.name });
+      const result = await pluginsService.addMarketplace(request.source);
+      console.log('[PluginsHandlers] ADD_MARKETPLACE success:', { marketplaceName: result.marketplaceName });
       return result;
     } catch (error) {
       console.error('[PluginsHandlers] ADD_MARKETPLACE failed:', error);

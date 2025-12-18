@@ -279,7 +279,7 @@ describe('PluginsService', () => {
   });
 
   describe('addMarketplace', () => {
-    it('should delegate to Claude CLI', async () => {
+    it('should delegate to Claude CLI and return marketplace name from manifest', async () => {
       vi.mocked(mockClaudeService.addPluginMarketplace).mockResolvedValue({
         success: true,
         message: 'Marketplace added',
@@ -292,11 +292,11 @@ describe('PluginsService', () => {
       });
 
       const result = await pluginsService.addMarketplace(
-        'test-marketplace',
         'https://github.com/test/marketplace'
       );
 
       expect(result.success).toBe(true);
+      expect(result.marketplaceName).toBe('test-marketplace');
       expect(mockClaudeService.addPluginMarketplace).toHaveBeenCalledWith(
         'https://github.com/test/marketplace'
       );
@@ -306,12 +306,27 @@ describe('PluginsService', () => {
       vi.spyOn(pluginsService as any, 'fetchMarketplaceManifest').mockResolvedValue(null);
 
       const result = await pluginsService.addMarketplace(
-        'invalid-marketplace',
         'https://github.com/test/invalid'
       );
 
       expect(result.success).toBe(false);
       expect(result.error).toContain('Cannot find marketplace manifest');
+      expect(mockClaudeService.addPluginMarketplace).not.toHaveBeenCalled();
+    });
+
+    it('should return error if manifest missing name field', async () => {
+      vi.spyOn(pluginsService as any, 'fetchMarketplaceManifest').mockResolvedValue({
+        owner: { name: 'Test', email: 'test@example.com' },
+        plugins: [],
+        // Missing 'name' field
+      });
+
+      const result = await pluginsService.addMarketplace(
+        'https://github.com/test/invalid'
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('missing the required "name" field');
       expect(mockClaudeService.addPluginMarketplace).not.toHaveBeenCalled();
     });
   });

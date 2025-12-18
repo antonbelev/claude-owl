@@ -125,18 +125,19 @@ export function usePlugins() {
 
   /**
    * Add a new marketplace
+   * The marketplace name is automatically determined from the .claude-plugin/marketplace.json file
    */
   const addMarketplace = useCallback(
-    async (name: string, source: string): Promise<boolean> => {
+    async (source: string): Promise<{ success: boolean; marketplaceName?: string; error?: string }> => {
       if (!window.electronAPI) {
         console.error('[usePlugins] electronAPI not available');
-        return false;
+        return { success: false, error: 'electronAPI not available' };
       }
 
-      console.log('[usePlugins] Adding marketplace:', { name, source });
+      console.log('[usePlugins] Adding marketplace from source:', source);
 
       try {
-        const request: AddMarketplaceRequest = { name, source };
+        const request: AddMarketplaceRequest = { source };
         const response = (await window.electronAPI.addMarketplace(
           request
         )) as AddMarketplaceResponse;
@@ -146,14 +147,14 @@ export function usePlugins() {
         if (response.success) {
           console.log('[usePlugins] Marketplace added, reloading data...');
           await loadPluginData();
-          return true;
+          return { success: true, marketplaceName: (response as any).marketplaceName };
         } else {
           console.error('[usePlugins] Failed to add marketplace:', response.error);
-          return false;
+          return { success: false, error: response.error || 'Failed to add marketplace' };
         }
       } catch (error) {
         console.error('[usePlugins] Exception adding marketplace:', error);
-        return false;
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
       }
     },
     [loadPluginData]
