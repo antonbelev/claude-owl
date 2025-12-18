@@ -50,6 +50,12 @@ const PLUGINS_CHANNELS = {
   VALIDATE_MARKETPLACE: 'plugins:validate-marketplace',
 } as const;
 
+// Define file browser channel strings directly to avoid tree-shaking
+const FILEBROWSER_CHANNELS = {
+  READ_DIRECTORY: 'filebrowser:read-directory',
+  READ_FILE_CONTENT: 'filebrowser:read-file-content',
+} as const;
+
 // Define hooks channel strings directly to avoid tree-shaking
 const HOOKS_CHANNELS = {
   GET_ALL_HOOKS: 'hooks:get-all',
@@ -206,6 +212,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   validateMarketplace: (args: unknown) =>
     ipcRenderer.invoke(PLUGINS_CHANNELS.VALIDATE_MARKETPLACE, args),
 
+  // File Browser
+  readDirectory: (args: unknown) => ipcRenderer.invoke(FILEBROWSER_CHANNELS.READ_DIRECTORY, args),
+  readFileContent: (args: unknown) => ipcRenderer.invoke(FILEBROWSER_CHANNELS.READ_FILE_CONTENT, args),
+
   // CCUsage (deprecated - replaced by Metrics)
   checkCCUsageInstalled: () => ipcRenderer.invoke(CCUSAGE_CHANNELS.CHECK_CCUSAGE_INSTALLED),
   getCCUsageVersion: () => ipcRenderer.invoke(CCUSAGE_CHANNELS.GET_CCUSAGE_VERSION),
@@ -340,6 +350,8 @@ export interface ElectronAPI {
   getGitHubRepoInfo: (args: unknown) => Promise<unknown>;
   getPluginHealth: (args: unknown) => Promise<unknown>;
   validateMarketplace: (args: unknown) => Promise<unknown>;
+  readDirectory: (args: unknown) => Promise<unknown>;
+  readFileContent: (args: unknown) => Promise<unknown>;
   executeCLI: (args: unknown) => Promise<unknown>;
   stopCLI: (args: unknown) => Promise<unknown>;
   readFile: (args: unknown) => Promise<unknown>;

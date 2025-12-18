@@ -1,8 +1,10 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { usePlugins } from '../../hooks/usePlugins';
+import { useFileBrowser } from '../../hooks/useFileBrowser';
 import type { MarketplacePlugin, InstalledPlugin, Marketplace } from '@/shared/types';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { PageHeader } from '../common/PageHeader';
+import { FileBrowser, FileViewer } from '../common/FileBrowser';
 import { Card, CardContent, CardHeader, CardFooter } from '@/renderer/components/ui/card';
 import { Button } from '@/renderer/components/ui/button';
 import { Badge } from '@/renderer/components/ui/badge';
@@ -788,7 +790,7 @@ const PluginCard: React.FC<PluginCardProps> = ({
 interface AddMarketplaceModalProps {
   onClose: () => void;
   onAdd: (source: string) => Promise<{ success: boolean; marketplaceName?: string; error?: string }>;
-  onValidate: (url: string) => Promise<any>;
+  onValidate: (url: string) => Promise<{ valid: boolean; url: string; hasManifest: boolean; marketplaceName?: string; pluginCount?: number; manifestPath?: string; error?: string; suggestions?: string[] } | null>;
 }
 
 const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({
@@ -799,7 +801,7 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({
   const [source, setSource] = useState('');
   const [adding, setAdding] = useState(false);
   const [validating, setValidating] = useState(false);
-  const [validationResult, setValidationResult] = useState<any>(null);
+  const [validationResult, setValidationResult] = useState<{ valid: boolean; url: string; hasManifest: boolean; marketplaceName?: string; pluginCount?: number; manifestPath?: string; error?: string; suggestions?: string[] } | null>(null);
   const [error, setError] = useState('');
 
   // ESC key to close modal
@@ -904,7 +906,7 @@ const AddMarketplaceModal: React.FC<AddMarketplaceModalProps> = ({
             <p className="font-semibold mb-1">📝 Marketplace Name</p>
             <p>
               The marketplace name is automatically determined from the <code className="bg-blue-100 px-1 rounded">name</code> field
-              in the repository's <code className="bg-blue-100 px-1 rounded">.claude-plugin/marketplace.json</code> file.
+              in the repository&apos;s <code className="bg-blue-100 px-1 rounded">.claude-plugin/marketplace.json</code> file.
             </p>
           </div>
 
@@ -1017,17 +1019,34 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
   onToggle,
 }) => {
   const isInstalled = 'id' in plugin;
+  const fileBrowser = useFileBrowser();
+
+  // Load plugin directory when modal opens for installed plugins
+  useEffect(() => {
+    if (isInstalled) {
+      const installPath = (plugin as InstalledPlugin).installPath;
+      if (installPath) {
+        console.log('[PluginDetailModal] Loading directory:', installPath);
+        fileBrowser.readDirectory(installPath);
+      }
+    }
+  }, [isInstalled, plugin]);
 
   // ESC key to close modal
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose();
+        // Close file viewer if open, otherwise close modal
+        if (fileBrowser.selectedFile) {
+          fileBrowser.clearSelectedFile();
+        } else {
+          onClose();
+        }
       }
     };
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
-  }, [onClose]);
+  }, [onClose, fileBrowser]);
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -1184,6 +1203,21 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
               </div>
             </div>
           )}
+
+          {/* File Browser for installed plugins */}
+          {isInstalled && fileBrowser.nodes.length > 0 && (
+            <div>
+              <FileBrowser
+                nodes={fileBrowser.nodes}
+                onFileClick={fileBrowser.readFileContent}
+              />
+              {fileBrowser.error && (
+                <Alert variant="destructive" className="mt-4">
+                  <AlertDescription>{fileBrowser.error}</AlertDescription>
+                </Alert>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex justify-between p-6 border-t gap-3">
@@ -1207,6 +1241,13 @@ const PluginDetailModal: React.FC<PluginDetailModalProps> = ({
           )}
         </div>
       </div>
+
+      {/* File Viewer Modal */}
+      <FileViewer
+        file={fileBrowser.selectedFile}
+        loading={fileBrowser.loadingFile}
+        onClose={fileBrowser.clearSelectedFile}
+      />
     </div>
   );
 };
