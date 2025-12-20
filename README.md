@@ -1,149 +1,109 @@
 # Claude Owl 🦉
 
-> A beautiful, open-source desktop UI for managing Claude Code configurations, settings, and features.
+**Stop editing JSON and MD files. Manage your Claude Code setup visually.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Beta](https://img.shields.io/badge/status-Beta-blue.svg)](#status)
-
-**Status:** 🚀 Beta - Actively developed, currently supports **macOS and Windows**.
+[![Beta](https://img.shields.io/badge/status-Beta-blue.svg)](#)
 
 ---
 
-## What is Claude Owl?
+## The Problem
 
-Claude Owl is a desktop application for managing [Claude Code](https://code.claude.com) configurations through an intuitive visual interface. Instead of manually editing JSON and YAML configuration files in your text editor or through the Claude Code CLI.
+Claude Code is powerful but configuration is painful:
+- Hand-editing JSON for permissions rules? Error-prone.
+- Managing MCP servers across projects? Copy-paste hell.
+- Finding that one subagent you created? Good luck grep-ing through `.claude/`.
+- You want to know any metrics about your Claude Code usage? You need to download yet another tool.
 
-## Current Features (Beta)
+## The Solution
 
-For a complete list of features, see [SCREENSHOTS.md](SCREENSHOTS.md) and [CHANGELOG.md](CHANGELOG.md).
+Claude Owl gives you a visual interface for everything Claude Code configuration:
 
 ![Claude Owl Dashboard](screenshots/claude-owl-dashboard.png)
 
-### 🎄 2025 Year in Review
+**No more terminal commands. No more JSON typos. Just point, click, done.**
 
-Celebrate your year of AI-powered development! Claude Owl now includes a festive Year in Review feature that showcases your 2025 coding journey with Claude Code:
+## What You Can Do
 
-- **📊 Beautiful Stats**: Token usage, costs, sessions, and activity patterns
-- **🏆 Achievement Badges**: Earn badges for milestones and coding habits
-- **🎯 Model Insights**: See your favorite Claude models and usage breakdown
-- **📈 Activity Analytics**: Peak coding months, longest streaks, and daily patterns
-- **🎁 Social Sharing**: Share your year with customizable stats for Twitter/X
+### Core Features
+- **Settings Editor** - User and project-level settings with search and validation
+- **Permission Rules** - Visual builder with 6 security templates
+- **MCP Servers** - Add, configure, and test Model Context Protocol integrations
+- **Subagents** - Create custom agents with tool restrictions and model selection
+- **Skills & Commands** - Manage skills and import slash commands from GitHub repos
+- **Plugins** - Browse marketplaces, install plugins, enable/disable without editing files
 
-![Year in Review 2025](screenshots/year-in-review-2025-total-tokens.png)
+### Power Features
+- **Usage Metrics** - Interactive charts showing spend, tokens, and model breakdown
+- **Status Line Templates** - 10+ pre-built templates with live preview
+- **Dashboard** - Real-time Claude Code detection and API status monitoring
+- **Debug Logs** - View and search Claude Code logs without terminal or importing the whole `.claude` directory into an IDE.
 
-Available now through January 1, 2026!
+[See all features with screenshots →](https://antonbelev.github.io/claude-owl/screenshots.html)
 
 ## Installation
 
-### Prerequisites
-
-- **Node.js** >= 18.0.0
-- **npm** >= 9.0.0
-- **Claude Code CLI** ([installation guide](https://code.claude.com/docs/en/quickstart))
-- **macOS or Windows**
-
-### Install from Source
-
-Claude Owl is currently in Beta and available for development/testing:
-
-```bash
-# Clone the repository
-git clone https://github.com/antonbelev/claude-owl.git
-cd claude-owl
-
-# Install dependencies
-npm install
-
-# Run in development mode
-npm run dev:electron
-```
-
-### Download Pre-built Binaries
-
-Pre-built installers are available for macOS and Windows:
+### Download (Recommended)
 
 **[📥 Download Latest Release](https://github.com/antonbelev/claude-owl/releases/latest)**
 
-- **macOS**: `.dmg` files for Intel and Apple Silicon
-- **Windows**: `.exe` installer for x64 and ARM64
+- macOS (Intel + Apple Silicon)
+- Windows (x64 + ARM64)
 
-For detailed installation instructions, see our [Installation Guide](https://antonbelev.github.io/claude-owl/installation.html).
+[Full installation guide →](https://antonbelev.github.io/claude-owl/installation.html)
 
 ### Build from Source
 
 ```bash
-npm run build
-npm run package
-```
-
-## Documentation
-
-- [Architecture Overview](docs/architecture.md) - System design and technical details
-- [Contributing Guide](CONTRIBUTING.md) - How to contribute
-- [Code of Conduct](CODE_OF_CONDUCT.md) - Community guidelines
-- [Development Notes](CLAUDE.md) - Development commands and project structure
-- [CHANGELOG.md](CHANGELOG.md) - List of changes and updates
-
-## Tech Stack
-
-- **Desktop Framework**: Electron
-- **Frontend**: React 18 + TypeScript
-- **Build Tool**: Vite
-- **State Management**: Zustand
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Testing**: Vitest + React Testing Library
-
-## Contributing
-
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-To get started:
-
-```bash
-# Fork and clone the repository
 git clone https://github.com/antonbelev/claude-owl.git
 cd claude-owl
-
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev:electron
 ```
 
+**Requirements:** Node.js 18+, Claude Code CLI installed
+
 ## FAQ
 
-### Does Claude Owl replace Claude Code?
+**Does this replace Claude Code?**
+No. Claude Owl is a UI layer on top of Claude Code CLI. You still need Claude Code installed.
 
-No, Claude Owl is a UI companion for Claude Code. It manages configurations visually but still uses the Claude Code CLI under the hood.
+**Is my data safe?**
+100% local. No telemetry, no external servers, no data collection. Everything stays on your machine.
 
-### Is my data safe?
+**What platforms work?**
+macOS (Intel + Apple Silicon) and Windows (x64 + ARM64). Linux support coming soon.
 
-Yes! Claude Owl is completely local-first. All configurations and data stay on your machine. No data is sent to external servers, and no telemetry is collected.
+## Contributing
 
-### What platforms are currently supported?
+PRs welcome! Check [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-- **macOS** (Intel & Apple Silicon) - ✅ Fully supported
-- **Windows** (x64 & ARM64) - ✅ Fully supported
+Quick start:
+```bash
+git clone https://github.com/antonbelev/claude-owl.git
+cd claude-owl
+npm install
+npm run dev:electron
+```
 
-### How can I contribute?
+## Tech Stack
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+Electron + React 18 + TypeScript + Vite + Zustand + Tailwind CSS
+
+See [CLAUDE.md](CLAUDE.md) for development notes and [docs/architecture.md](docs/architecture.md) for system design.
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=antonbelev/claude-owl&type=Date)](https://star-history.com/#antonbelev/claude-owl&Date)
 
 ## License
 
 Claude Owl is open-source software licensed under the [MIT License](LICENSE).
 
-## Support
-
-- 📖 [Documentation](docs/)
-- 💬 [Discussions](https://github.com/antonbelev/claude-owl/discussions)
-- 🐛 [Issue Tracker](https://github.com/antonbelev/claude-owl/issues)
-
-## Disclaimer
-
-Claude Owl is an independent community project and is **not affiliated with, endorsed by, or sponsored by Anthropic**. Claude is a trademark of Anthropic, Inc. This project uses Claude through the publicly available Claude Code CLI and is not an official Anthropic product.
-
 ---
+
+**Disclaimer:** Claude Owl is not affiliated with Anthropic. Claude is a trademark of Anthropic PCB.
+
+**Support:** [Issues](https://github.com/antonbelev/claude-owl/issues) • [Discussions](https://github.com/antonbelev/claude-owl/discussions) • [Documentation](https://antonbelev.github.io/claude-owl/)
