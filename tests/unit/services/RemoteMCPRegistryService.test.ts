@@ -9,7 +9,7 @@ import { RemoteMCPRegistryService } from '../../../src/main/services/RemoteMCPRe
 import * as fs from 'fs/promises';
 import * as dns from 'dns/promises';
 import { EventEmitter } from 'events';
-import type { RemoteMCPServer } from '../../../src/shared/types';
+import type { RemoteMCPServer as _RemoteMCPServer } from '../../../src/shared/types';
 
 // Mock modules
 vi.mock('fs/promises');
