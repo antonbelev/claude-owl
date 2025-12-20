@@ -278,21 +278,101 @@ function trackDownload(platform, arch, version) {
   console.log(`Download tracked: ${platform} ${arch} ${version}`);
   // Future: Send to analytics service
   // Example: gtag('event', 'download', { platform, arch, version });
+
+  // Show star modal after a short delay
+  setTimeout(() => {
+    showStarModal();
+  }, 2000);
+}
+
+/**
+ * Show GitHub star modal
+ */
+function showStarModal() {
+  // Check if user has already dismissed the modal
+  const dismissed = localStorage.getItem('star-modal-dismissed');
+  if (dismissed === 'true') {
+    return;
+  }
+
+  const modal = document.getElementById('star-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+  }
+}
+
+/**
+ * Close GitHub star modal
+ */
+function closeStarModal() {
+  const modal = document.getElementById('star-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+  }
+}
+
+/**
+ * Dismiss star modal permanently
+ */
+function dismissStarModal() {
+  localStorage.setItem('star-modal-dismissed', 'true');
+  closeStarModal();
+}
+
+/**
+ * Setup star modal event listeners
+ */
+function setupStarModal() {
+  const closeBtn = document.getElementById('close-star-modal');
+  const maybeLaterBtn = document.getElementById('maybe-later-btn');
+  const starBtn = document.getElementById('star-github-btn');
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      dismissStarModal();
+    });
+  }
+
+  if (maybeLaterBtn) {
+    maybeLaterBtn.addEventListener('click', () => {
+      closeStarModal();
+    });
+  }
+
+  if (starBtn) {
+    starBtn.addEventListener('click', () => {
+      dismissStarModal();
+    });
+  }
+
+  // Close modal on ESC key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('star-modal');
+      if (modal && !modal.classList.contains('hidden')) {
+        dismissStarModal();
+      }
+    }
+  });
+
+  // Close modal when clicking outside
+  const modal = document.getElementById('star-modal');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        dismissStarModal();
+      }
+    });
+  }
 }
 
 /**
  * Mobile menu toggle
+ * Note: Mobile menu is now handled in header.js
  */
 function setupMobileMenu() {
-  const menuBtn = document.getElementById('mobile-menu-btn');
-  const nav = document.querySelector('nav');
-
-  if (menuBtn && nav) {
-    menuBtn.addEventListener('click', () => {
-      // Mobile menu implementation
-      alert('Mobile menu coming soon!');
-    });
-  }
+  // Mobile menu functionality is now handled in header.js
+  // This function is kept for backwards compatibility
 }
 
 /**
@@ -358,6 +438,9 @@ async function init() {
 
   // Setup platform tabs (installation page only)
   setupPlatformTabs();
+
+  // Setup star modal (home page only)
+  setupStarModal();
 
   // Smooth scrolling for anchor links
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
