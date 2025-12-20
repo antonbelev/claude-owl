@@ -4,16 +4,17 @@
  */
 
 import React, { useState } from 'react';
-import { RefreshCw, Plus } from 'lucide-react';
+import { RefreshCw, Plus, Globe, Server } from 'lucide-react';
 import { useMCPServers } from '../../hooks/useMCPServers';
 import { ServerCard } from './ServerCard';
 import { AddServerForm } from './AddServerForm';
 import { ServerDetailView } from './ServerDetailView';
+import { RemoteServersBrowser } from '../RemoteMCPBrowser';
 import { Button } from '../ui/button';
 import { Alert, AlertDescription } from '../ui/alert';
 import type { MCPServer, MCPScope, AddMCPServerRequest } from '@/shared/types/mcp.types';
 
-type TabType = 'installed' | 'add';
+type TabType = 'installed' | 'add' | 'discover';
 
 export const MCPManager: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('installed');
@@ -61,13 +62,14 @@ export const MCPManager: React.FC = () => {
       {/* Tab Navigation */}
       <div className="flex gap-2 border-b border-neutral-200 mb-6">
         <button
-          className={`px-4 py-2 font-medium transition-colors ${
+          className={`px-4 py-2 font-medium transition-colors flex items-center gap-2 ${
             activeTab === 'installed'
               ? 'text-blue-600 border-b-2 border-blue-600'
               : 'text-neutral-600 hover:text-neutral-900'
           }`}
           onClick={() => setActiveTab('installed')}
         >
+          <Server className="h-4 w-4" />
           Installed Servers ({servers.length})
         </button>
         <button
@@ -79,6 +81,17 @@ export const MCPManager: React.FC = () => {
           onClick={() => setActiveTab('add')}
         >
           Add Server
+        </button>
+        <button
+          className={`px-4 py-2 font-medium transition-colors flex items-center gap-2 ${
+            activeTab === 'discover'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-neutral-600 hover:text-neutral-900'
+          }`}
+          onClick={() => setActiveTab('discover')}
+        >
+          <Globe className="h-4 w-4" />
+          Discover Remote Servers
         </button>
       </div>
 
@@ -159,6 +172,17 @@ export const MCPManager: React.FC = () => {
         {activeTab === 'add' && (
           <div>
             <AddServerForm onSubmit={handleAddServer} onCancel={() => setActiveTab('installed')} />
+          </div>
+        )}
+
+        {activeTab === 'discover' && (
+          <div className="h-full">
+            <RemoteServersBrowser
+              onServerAdded={() => {
+                refresh();
+                setActiveTab('installed');
+              }}
+            />
           </div>
         )}
       </div>
