@@ -794,9 +794,7 @@ interface AddMarketplaceModalProps {
   onAdd: (
     source: string
   ) => Promise<{ success: boolean; marketplaceName?: string; error?: string }>;
-  onValidate: (
-    url: string
-  ) => Promise<{
+  onValidate: (url: string) => Promise<{
     valid: boolean;
     url: string;
     hasManifest: boolean;
