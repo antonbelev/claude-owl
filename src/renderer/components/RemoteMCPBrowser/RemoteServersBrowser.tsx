@@ -29,6 +29,7 @@ import { useRemoteMCPServers } from '../../hooks/useRemoteMCPServers';
 import { RemoteServerCard } from './RemoteServerCard';
 import { ConnectionTestModal } from './ConnectionTestModal';
 import { SecurityWarningDialog } from './SecurityWarningDialog';
+import { AuthConfigModal } from './AuthConfigModal';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import {
@@ -101,6 +102,7 @@ export const RemoteServersBrowser: React.FC<RemoteServersBrowserProps> = ({ onSe
   const [addingServer, setAddingServer] = useState<RemoteMCPServer | null>(null);
   const [securityContext, setSecurityContext] = useState<SecurityContext | null>(null);
   const [securityWarnings, setSecurityWarnings] = useState<SecurityWarning[]>([]);
+  const [configuringAuth, setConfiguringAuth] = useState<RemoteMCPServer | null>(null);
 
   // Scope selection state (currently using user scope by default)
   const [scope] = useState<'user' | 'project'>('user');
@@ -202,7 +204,7 @@ export const RemoteServersBrowser: React.FC<RemoteServersBrowserProps> = ({ onSe
     setAddingServer(server);
   }, [getServerDetails]);
 
-  // Handle confirm add
+  // Handle confirm add - routes to auth config if needed
   const handleConfirmAdd = useCallback(async () => {
     if (!addingServer) return;
 
@@ -211,6 +213,17 @@ export const RemoteServersBrowser: React.FC<RemoteServersBrowserProps> = ({ onSe
       return; // Project must be selected
     }
 
+    // Check if this server requires authentication
+    if (addingServer.authType !== 'open') {
+      // Route to auth configuration modal
+      setAddingServer(null);
+      setSecurityContext(null);
+      setSecurityWarnings([]);
+      setConfiguringAuth(addingServer);
+      return;
+    }
+
+    // For open servers, add directly
     const result = await addServer(addingServer, scope, projectPath);
 
     if (result.success) {
@@ -222,6 +235,17 @@ export const RemoteServersBrowser: React.FC<RemoteServersBrowserProps> = ({ onSe
       }
     }
   }, [addingServer, scope, selectedProject, addServer, onServerAdded]);
+
+  // Handle auth configuration complete
+  const handleAuthConfigComplete = useCallback(
+    (success: boolean, _message?: string) => {
+      setConfiguringAuth(null);
+      if (success && onServerAdded) {
+        onServerAdded();
+      }
+    },
+    [onServerAdded]
+  );
 
   // Handle refresh
   const handleRefresh = useCallback(() => {
@@ -248,15 +272,13 @@ export const RemoteServersBrowser: React.FC<RemoteServersBrowserProps> = ({ onSe
         {/* Attribution */}
         <div className="flex items-center gap-2 text-xs text-neutral-500 mb-4">
           <span>Data sourced from</span>
-          <a
-            href="https://mcpservers.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-700 flex items-center gap-1"
+          <button
+            onClick={() => window.electronAPI.openExternal('https://mcpservers.org')}
+            className="text-blue-600 hover:text-blue-700 flex items-center gap-1 hover:underline"
           >
             mcpservers.org
             <ExternalLink className="h-3 w-3" />
-          </a>
+          </button>
           <Heart className="h-3 w-3 text-red-400" />
           {lastUpdated && (
             <span className="text-neutral-400">
@@ -441,6 +463,23 @@ export const RemoteServersBrowser: React.FC<RemoteServersBrowserProps> = ({ onSe
           securityContext={securityContext}
           warnings={securityWarnings}
           onConfirm={handleConfirmAdd}
+        />
+      )}
+
+      {/* Authentication Configuration Modal */}
+      {configuringAuth && (
+        <AuthConfigModal
+          open={!!configuringAuth}
+          onOpenChange={open => {
+            if (!open) {
+              setConfiguringAuth(null);
+            }
+          }}
+          server={configuringAuth}
+          securityContext={securityContext || undefined}
+          scope={scope}
+          selectedProject={selectedProject}
+          onComplete={handleAuthConfigComplete}
         />
       )}
     </div>

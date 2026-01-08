@@ -34,16 +34,19 @@ const CURATED_SERVERS: RemoteMCPServer[] = [
     description: "GitHub's official MCP Server for repository access",
     endpoint: 'https://api.githubcopilot.com/mcp/',
     transport: 'http',
-    authType: 'oauth',
+    authType: 'api-key',
     authConfig: {
-      oauthProvider: 'GitHub',
-      requiredScopes: ['repo', 'workflow'],
+      apiKeyHeader: 'Authorization',
+      apiKeyEnvVar: 'GITHUB_PERSONAL_ACCESS_TOKEN',
+      apiKeyUrl: 'https://github.com/settings/tokens?type=beta',
+      apiKeyInstructions:
+        'Create a Fine-grained Personal Access Token with "Contents" and "Metadata" read permissions for the repositories you want to access.',
     },
     provider: 'GitHub',
     verified: true,
     category: 'developer-tools',
     tags: ['git', 'repositories', 'issues', 'pull-requests'],
-    documentationUrl: 'https://github.com/github/mcp',
+    documentationUrl: 'https://github.com/github/github-mcp-server',
     source: 'mcpservers.org',
   },
   {

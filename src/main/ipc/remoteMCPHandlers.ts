@@ -22,14 +22,24 @@ import {
   type RefreshDirectoryResponse,
   type GetCacheStatusResponse,
   type BatchTestResult,
+  type CheckAuthStatusRequest,
+  type CheckAuthStatusResponse,
+  type LaunchOAuthFlowRequest,
+  type LaunchOAuthFlowResponse,
+  type ConfigureApiKeyRequest,
+  type ConfigureApiKeyResponse,
+  type DiscoverAuthRequest,
+  type DiscoverAuthResponse,
 } from '@/shared/types';
 import { RemoteMCPRegistryService } from '../services/RemoteMCPRegistryService';
 import { SecurityAssessmentService } from '../services/SecurityAssessmentService';
 import { ClaudeService } from '../services/ClaudeService';
+import { AuthDiscoveryService } from '../services/AuthDiscoveryService';
 
 const registryService = new RemoteMCPRegistryService();
 const securityService = new SecurityAssessmentService();
 const claudeService = new ClaudeService();
+const authDiscoveryService = new AuthDiscoveryService();
 
 /**
  * Register all Remote MCP IPC handlers
@@ -388,6 +398,178 @@ export function registerRemoteMCPHandlers(): void {
             serverCount: 0,
           },
           error: error instanceof Error ? error.message : 'Failed to get cache status',
+        };
+      }
+    }
+  );
+
+  // ============================================================================
+  // Authentication Handlers
+  // ============================================================================
+
+  // Check authentication status
+  ipcMain.handle(
+    REMOTE_MCP_CHANNELS.CHECK_AUTH_STATUS,
+    async (_, request: CheckAuthStatusRequest): Promise<CheckAuthStatusResponse> => {
+      console.log('[RemoteMCPHandlers] Check auth status request:', request.serverName);
+
+      try {
+        const result = await claudeService.checkMCPAuthStatus(request.serverName);
+
+        console.log('[RemoteMCPHandlers] Check auth status result:', result);
+
+        const response: CheckAuthStatusResponse = {
+          success: true,
+          authStatus: result.authStatus,
+          isInstalled: result.isInstalled,
+        };
+        if (result.configLocation) {
+          response.configLocation = result.configLocation;
+        }
+        return response;
+      } catch (error) {
+        console.error('[RemoteMCPHandlers] Check auth status error:', error);
+        return {
+          success: false,
+          authStatus: 'unknown',
+          isInstalled: false,
+          error: error instanceof Error ? error.message : 'Failed to check auth status',
+        };
+      }
+    }
+  );
+
+  // Launch OAuth flow (adds server and triggers OAuth)
+  ipcMain.handle(
+    REMOTE_MCP_CHANNELS.LAUNCH_OAUTH_FLOW,
+    async (_, request: LaunchOAuthFlowRequest): Promise<LaunchOAuthFlowResponse> => {
+      console.log('[RemoteMCPHandlers] Launch OAuth flow request:', {
+        serverName: request.serverName,
+        serverUrl: request.serverUrl,
+        transport: request.transport,
+        projectPath: request.projectPath,
+      });
+
+      try {
+        const result = await claudeService.launchOAuthFlow(
+          request.serverName,
+          request.projectPath,
+          request.serverUrl,
+          request.transport
+        );
+
+        console.log('[RemoteMCPHandlers] Launch OAuth flow result:', result);
+
+        return result;
+      } catch (error) {
+        console.error('[RemoteMCPHandlers] Launch OAuth flow error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to launch OAuth flow',
+        };
+      }
+    }
+  );
+
+  // Configure API key authentication
+  ipcMain.handle(
+    REMOTE_MCP_CHANNELS.CONFIGURE_API_KEY,
+    async (_, request: ConfigureApiKeyRequest): Promise<ConfigureApiKeyResponse> => {
+      console.log('[RemoteMCPHandlers] Configure API key request:', {
+        serverName: request.server.name,
+        scope: request.scope,
+        projectPath: request.projectPath,
+      });
+
+      try {
+        // Validate credentials
+        if (!request.credentials.envVarName || !request.credentials.apiKeyValue) {
+          return {
+            success: false,
+            error: 'Environment variable name and API key value are required',
+          };
+        }
+
+        // Add the server with API key authentication
+        const addOptions: {
+          name: string;
+          url: string;
+          transport: 'http' | 'sse';
+          scope: 'user' | 'project';
+          projectPath?: string;
+          envVarName: string;
+          apiKeyValue: string;
+          headerName?: string;
+        } = {
+          name: request.server.id,
+          url: request.server.endpoint,
+          transport: request.server.transport,
+          scope: request.scope,
+          envVarName: request.credentials.envVarName,
+          apiKeyValue: request.credentials.apiKeyValue,
+        };
+
+        if (request.projectPath) {
+          addOptions.projectPath = request.projectPath;
+        }
+        if (request.server.authConfig?.apiKeyHeader) {
+          addOptions.headerName = request.server.authConfig.apiKeyHeader;
+        }
+
+        const result = await claudeService.addMCPServerWithApiKey(addOptions);
+
+        console.log('[RemoteMCPHandlers] Configure API key result:', result);
+
+        const response: ConfigureApiKeyResponse = {
+          success: result.success,
+        };
+        if (result.message) {
+          response.message = result.message;
+        }
+        if (result.error) {
+          response.error = result.error;
+        }
+        return response;
+      } catch (error) {
+        console.error('[RemoteMCPHandlers] Configure API key error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to configure API key',
+        };
+      }
+    }
+  );
+
+  // ============================================================================
+  // Auth Discovery Handler
+  // ============================================================================
+
+  // Discover authentication requirements for a server
+  ipcMain.handle(
+    REMOTE_MCP_CHANNELS.DISCOVER_AUTH,
+    async (_, request: DiscoverAuthRequest): Promise<DiscoverAuthResponse> => {
+      console.log('[RemoteMCPHandlers] Discover auth request:', request.endpoint);
+
+      try {
+        const result = await authDiscoveryService.discoverAuth(request.endpoint);
+
+        console.log('[RemoteMCPHandlers] Discover auth result:', {
+          endpoint: result.endpoint,
+          requiresAuth: result.requiresAuth,
+          authType: result.authType,
+          supportsDCR: result.supportsDCR,
+        });
+
+        return result;
+      } catch (error) {
+        console.error('[RemoteMCPHandlers] Discover auth error:', error);
+        return {
+          success: false,
+          endpoint: request.endpoint,
+          requiresAuth: false,
+          authType: 'unknown',
+          supportsDCR: false,
+          error: error instanceof Error ? error.message : 'Failed to discover auth requirements',
         };
       }
     }

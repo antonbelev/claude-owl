@@ -215,6 +215,44 @@ When working with Claude configs:
 - Use **descriptive variable names** (`claudeInstallationStatus` not `status`)
 - **Error handling** at every layer (try-catch in services, error states in UI)
 
+### External Links
+
+**IMPORTANT:** All external links (http/https URLs) MUST open in the user's default browser, NOT in Electron's Chrome window.
+
+**❌ NEVER use regular anchor tags for external links:**
+```tsx
+// BAD - Opens in Electron window
+<a href="https://example.com" target="_blank" rel="noopener noreferrer">
+  Click here
+</a>
+```
+
+**✅ ALWAYS use `window.electronAPI.openExternal()` for external links:**
+```tsx
+// GOOD - Opens in default browser
+<button
+  onClick={() => window.electronAPI.openExternal('https://example.com')}
+  className="text-blue-600 hover:underline"
+>
+  Click here
+</button>
+
+// Also GOOD - With Button component
+<Button
+  variant="outline"
+  onClick={() => window.electronAPI.openExternal('https://example.com')}
+>
+  <ExternalLink className="h-4 w-4 mr-2" />
+  Visit Website
+</Button>
+```
+
+**Why?**
+- Desktop apps should respect the user's default browser choice
+- Opening links in Electron's window is confusing and breaks user expectations
+- Users may want to use browser extensions, bookmarks, or passwords
+- The `openExternal` method is already implemented and validates URLs for security
+
 ## Important Notes
 
 ### Security

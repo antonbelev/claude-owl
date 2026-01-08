@@ -49,6 +49,31 @@ export interface RemoteMCPAuthConfig {
   apiKeyEnvVar?: string;
   /** OAuth scopes needed */
   requiredScopes?: string[];
+  /** Custom headers template (for header auth) */
+  headersTemplate?: Record<string, string>;
+  /** Instructions for getting an API key */
+  apiKeyInstructions?: string;
+  /** URL to get API key */
+  apiKeyUrl?: string;
+}
+
+/**
+ * Authentication status for a server
+ */
+export type MCPAuthStatus = 'authenticated' | 'not_authenticated' | 'unknown' | 'not_required';
+
+/**
+ * Authentication credentials to configure
+ */
+export interface MCPAuthCredentials {
+  /** Type of authentication */
+  type: 'oauth' | 'api-key' | 'header';
+  /** Environment variable name for API key */
+  envVarName?: string;
+  /** API key value (only used transiently, never stored) */
+  apiKeyValue?: string;
+  /** Custom headers */
+  headers?: Record<string, string>;
 }
 
 /**

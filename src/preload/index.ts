@@ -136,6 +136,10 @@ const REMOTE_MCP_CHANNELS = {
   ADD_REMOTE_SERVER: 'remote-mcp:add',
   REFRESH_DIRECTORY: 'remote-mcp:refresh',
   GET_CACHE_STATUS: 'remote-mcp:cache-status',
+  CHECK_AUTH_STATUS: 'remote-mcp:check-auth-status',
+  LAUNCH_OAUTH_FLOW: 'remote-mcp:launch-oauth',
+  CONFIGURE_API_KEY: 'remote-mcp:configure-api-key',
+  DISCOVER_AUTH: 'remote-mcp:discover-auth',
 } as const;
 
 // Expose protected methods that allow the renderer process to use
@@ -301,6 +305,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
   refreshRemoteMCPDirectory: () => ipcRenderer.invoke(REMOTE_MCP_CHANNELS.REFRESH_DIRECTORY),
   getRemoteMCPCacheStatus: () => ipcRenderer.invoke(REMOTE_MCP_CHANNELS.GET_CACHE_STATUS),
 
+  // Remote MCP Authentication
+  checkMCPAuthStatus: (args: unknown) =>
+    ipcRenderer.invoke(REMOTE_MCP_CHANNELS.CHECK_AUTH_STATUS, args),
+  launchMCPOAuthFlow: (args: unknown) =>
+    ipcRenderer.invoke(REMOTE_MCP_CHANNELS.LAUNCH_OAUTH_FLOW, args),
+  configureMCPApiKey: (args: unknown) =>
+    ipcRenderer.invoke(REMOTE_MCP_CHANNELS.CONFIGURE_API_KEY, args),
+  discoverMCPAuth: (args: unknown) =>
+    ipcRenderer.invoke(REMOTE_MCP_CHANNELS.DISCOVER_AUTH, args),
+
   // Claude CLI
   executeCLI: (args: unknown) => ipcRenderer.invoke(IPC_CHANNELS.EXECUTE_CLI, args),
   stopCLI: (args: unknown) => ipcRenderer.invoke(IPC_CHANNELS.STOP_CLI, args),
@@ -429,4 +443,8 @@ export interface ElectronAPI {
   addRemoteMCPServer: (args: unknown) => Promise<unknown>;
   refreshRemoteMCPDirectory: () => Promise<unknown>;
   getRemoteMCPCacheStatus: () => Promise<unknown>;
+  checkMCPAuthStatus: (args: unknown) => Promise<unknown>;
+  launchMCPOAuthFlow: (args: unknown) => Promise<unknown>;
+  configureMCPApiKey: (args: unknown) => Promise<unknown>;
+  discoverMCPAuth: (args: unknown) => Promise<unknown>;
 }

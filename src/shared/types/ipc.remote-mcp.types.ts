@@ -12,6 +12,8 @@ import type {
   SecurityContext,
   RemoteServerFilters,
   DirectoryCacheStatus,
+  MCPAuthStatus,
+  MCPAuthCredentials,
 } from './remote-mcp.types';
 
 /**
@@ -37,6 +39,15 @@ export const REMOTE_MCP_CHANNELS = {
   REFRESH_DIRECTORY: 'remote-mcp:refresh',
   /** Get cache status */
   GET_CACHE_STATUS: 'remote-mcp:cache-status',
+
+  /** Check authentication status for a server */
+  CHECK_AUTH_STATUS: 'remote-mcp:check-auth-status',
+  /** Launch Claude Code for OAuth authentication */
+  LAUNCH_OAUTH_FLOW: 'remote-mcp:launch-oauth',
+  /** Configure API key authentication */
+  CONFIGURE_API_KEY: 'remote-mcp:configure-api-key',
+  /** Discover authentication requirements for a server */
+  DISCOVER_AUTH: 'remote-mcp:discover-auth',
 } as const;
 
 // ============================================================================
@@ -253,6 +264,169 @@ export interface GetCacheStatusResponse {
   error?: string;
 }
 
+// ============================================================================
+// Authentication Request/Response Types
+// ============================================================================
+
+/**
+ * Request to check authentication status for a server
+ */
+export interface CheckAuthStatusRequest {
+  /** Server name (as configured in Claude Code) */
+  serverName: string;
+}
+
+/**
+ * Response from checking authentication status
+ */
+export interface CheckAuthStatusResponse {
+  /** Whether the operation succeeded */
+  success: boolean;
+  /** Authentication status */
+  authStatus: MCPAuthStatus;
+  /** Whether the server is installed */
+  isInstalled: boolean;
+  /** Config location if installed */
+  configLocation?: string;
+  /** Error message if failed */
+  error?: string;
+}
+
+/**
+ * Request to launch OAuth flow in Claude Code
+ */
+export interface LaunchOAuthFlowRequest {
+  /** Server name/id to add */
+  serverName: string;
+  /** Server URL endpoint */
+  serverUrl: string;
+  /** Transport type */
+  transport: 'http' | 'sse';
+  /** Optional: Project path for project-scoped servers */
+  projectPath?: string;
+}
+
+/**
+ * Response from launching OAuth flow
+ */
+export interface LaunchOAuthFlowResponse {
+  /** Whether the launch succeeded */
+  success: boolean;
+  /** Message to display to user */
+  message?: string;
+  /** Error message if failed */
+  error?: string;
+}
+
+/**
+ * Request to configure API key authentication
+ */
+export interface ConfigureApiKeyRequest {
+  /** Server to configure */
+  server: RemoteMCPServer;
+  /** Authentication credentials */
+  credentials: MCPAuthCredentials;
+  /** Scope for the configuration */
+  scope: 'user' | 'project';
+  /** Project path (required if scope is 'project') */
+  projectPath?: string;
+}
+
+/**
+ * Response from configuring API key
+ */
+export interface ConfigureApiKeyResponse {
+  /** Whether the configuration succeeded */
+  success: boolean;
+  /** Success message */
+  message?: string;
+  /** Error message if failed */
+  error?: string;
+}
+
+// ============================================================================
+// Auth Discovery Types
+// ============================================================================
+
+/**
+ * Protected Resource Metadata (RFC 9728)
+ */
+export interface ProtectedResourceMetadata {
+  /** Resource identifier */
+  resource: string;
+  /** Human-readable name */
+  resource_name?: string;
+  /** Documentation URL */
+  resource_documentation?: string;
+  /** List of authorization server URLs */
+  authorization_servers?: string[];
+  /** Supported bearer token methods */
+  bearer_methods_supported?: string[];
+  /** Supported scopes */
+  scopes_supported?: string[];
+}
+
+/**
+ * Authorization Server Metadata (RFC 8414)
+ */
+export interface AuthorizationServerMetadata {
+  /** Issuer identifier */
+  issuer: string;
+  /** Authorization endpoint */
+  authorization_endpoint?: string;
+  /** Token endpoint */
+  token_endpoint?: string;
+  /** Dynamic client registration endpoint (if supported) */
+  registration_endpoint?: string;
+  /** Revocation endpoint */
+  revocation_endpoint?: string;
+  /** Supported response types */
+  response_types_supported?: string[];
+  /** Supported grant types */
+  grant_types_supported?: string[];
+  /** Supported code challenge methods (PKCE) */
+  code_challenge_methods_supported?: string[];
+}
+
+/**
+ * Discovered authentication type
+ */
+export type DiscoveredAuthType = 'oauth-dcr' | 'oauth-static' | 'api-key' | 'open' | 'unknown';
+
+/**
+ * Request to discover authentication requirements
+ */
+export interface DiscoverAuthRequest {
+  /** MCP server endpoint URL */
+  endpoint: string;
+}
+
+/**
+ * Response from authentication discovery
+ */
+export interface DiscoverAuthResponse {
+  /** Whether discovery was successful */
+  success: boolean;
+  /** The endpoint that was probed */
+  endpoint: string;
+  /** Whether the server requires authentication */
+  requiresAuth: boolean;
+  /** Discovered authentication type */
+  authType: DiscoveredAuthType;
+  /** Whether Dynamic Client Registration is supported */
+  supportsDCR: boolean;
+  /** Protected resource metadata (if available) */
+  protectedResource?: ProtectedResourceMetadata;
+  /** Authorization server metadata (if available) */
+  authorizationServer?: AuthorizationServerMetadata;
+  /** Supported scopes */
+  scopes?: string[];
+  /** Error message if discovery failed */
+  error?: string;
+  /** Detailed discovery steps for debugging */
+  discoverySteps?: string[];
+}
+
 // Re-export types for convenience
 export type {
   RemoteMCPServer,
@@ -262,4 +436,6 @@ export type {
   SecurityContext,
   RemoteServerFilters,
   DirectoryCacheStatus,
+  MCPAuthStatus,
+  MCPAuthCredentials,
 } from './remote-mcp.types';
