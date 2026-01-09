@@ -7,16 +7,7 @@
  */
 
 import React, { useState, useMemo, useCallback } from 'react';
-import {
-  Search,
-  RefreshCw,
-  ExternalLink,
-  Heart,
-  Grid,
-  List,
-  Loader2,
-  Info,
-} from 'lucide-react';
+import { Search, RefreshCw, ExternalLink, Heart, Grid, List, Loader2, Info } from 'lucide-react';
 import type {
   RemoteMCPServer,
   RemoteMCPCategory,
@@ -32,13 +23,7 @@ import { SecurityWarningDialog } from './SecurityWarningDialog';
 import { AuthConfigModal } from './AuthConfigModal';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Badge } from '../ui/badge';
 import type { ProjectInfo } from '@/shared/types';
@@ -158,51 +143,57 @@ export const RemoteServersBrowser: React.FC<RemoteServersBrowserProps> = ({ onSe
   }, [filteredServers, selectedCategory]);
 
   // Handle test connection
-  const handleTestConnection = useCallback(async (server: RemoteMCPServer) => {
-    setTestingIds(prev => new Set(prev).add(server.id));
+  const handleTestConnection = useCallback(
+    async (server: RemoteMCPServer) => {
+      setTestingIds(prev => new Set(prev).add(server.id));
 
-    try {
-      const result = await testConnection(server.endpoint, server.transport);
-      setTestResults(prev => new Map(prev).set(server.id, result));
-    } finally {
-      setTestingIds(prev => {
-        const next = new Set(prev);
-        next.delete(server.id);
-        return next;
-      });
-    }
-  }, [testConnection]);
+      try {
+        const result = await testConnection(server.endpoint, server.transport);
+        setTestResults(prev => new Map(prev).set(server.id, result));
+      } finally {
+        setTestingIds(prev => {
+          const next = new Set(prev);
+          next.delete(server.id);
+          return next;
+        });
+      }
+    },
+    [testConnection]
+  );
 
   // Handle add server click
-  const handleAddClick = useCallback(async (server: RemoteMCPServer) => {
-    // Get security context
-    const details = await getServerDetails(server.id);
-    if (details) {
-      setSecurityContext(details.securityContext);
+  const handleAddClick = useCallback(
+    async (server: RemoteMCPServer) => {
+      // Get security context
+      const details = await getServerDetails(server.id);
+      if (details) {
+        setSecurityContext(details.securityContext);
 
-      // Generate warnings based on security context
-      const warnings: SecurityWarning[] = [];
-      if (!details.securityContext.isVerifiedProvider) {
-        warnings.push({
-          severity: 'warning',
-          title: 'Unverified Provider',
-          description: 'This server is not from a verified provider.',
-          recommendation: 'Review the documentation before proceeding.',
-        });
+        // Generate warnings based on security context
+        const warnings: SecurityWarning[] = [];
+        if (!details.securityContext.isVerifiedProvider) {
+          warnings.push({
+            severity: 'warning',
+            title: 'Unverified Provider',
+            description: 'This server is not from a verified provider.',
+            recommendation: 'Review the documentation before proceeding.',
+          });
+        }
+        if (details.securityContext.riskLevel === 'high') {
+          warnings.push({
+            severity: 'critical',
+            title: 'High Risk',
+            description: 'Multiple risk factors have been identified.',
+            recommendation: 'Proceed with extreme caution.',
+          });
+        }
+        setSecurityWarnings(warnings);
       }
-      if (details.securityContext.riskLevel === 'high') {
-        warnings.push({
-          severity: 'critical',
-          title: 'High Risk',
-          description: 'Multiple risk factors have been identified.',
-          recommendation: 'Proceed with extreme caution.',
-        });
-      }
-      setSecurityWarnings(warnings);
-    }
 
-    setAddingServer(server);
-  }, [getServerDetails]);
+      setAddingServer(server);
+    },
+    [getServerDetails]
+  );
 
   // Handle confirm add - routes to auth config if needed
   const handleConfirmAdd = useCallback(async () => {

@@ -45,14 +45,16 @@ function getAuthTypeDisplay(authType: DiscoveredAuthType): {
     case 'oauth-dcr':
       return {
         label: 'OAuth (Auto-register)',
-        description: 'This server supports OAuth with automatic client registration. Claude Code can handle authentication automatically.',
+        description:
+          'This server supports OAuth with automatic client registration. Claude Code can handle authentication automatically.',
         icon: <Shield className="h-4 w-4" />,
         color: 'text-green-500',
       };
     case 'oauth-static':
       return {
         label: 'OAuth (Manual setup)',
-        description: 'This server requires OAuth but doesn\'t support automatic registration. You may need to use a Personal Access Token instead.',
+        description:
+          "This server requires OAuth but doesn't support automatic registration. You may need to use a Personal Access Token instead.",
         icon: <AlertTriangle className="h-4 w-4" />,
         color: 'text-yellow-500',
       };
@@ -142,12 +144,7 @@ export const AuthDiscoveryPanel: React.FC<AuthDiscoveryPanelProps> = ({
         <AlertTitle className="text-sm font-medium">Discovery Failed</AlertTitle>
         <AlertDescription className="text-xs">
           {error}
-          <Button
-            variant="link"
-            size="sm"
-            className="h-auto p-0 ml-2"
-            onClick={runDiscovery}
-          >
+          <Button variant="link" size="sm" className="h-auto p-0 ml-2" onClick={runDiscovery}>
             <RefreshCw className="h-3 w-3 mr-1" />
             Retry
           </Button>
@@ -163,7 +160,13 @@ export const AuthDiscoveryPanel: React.FC<AuthDiscoveryPanelProps> = ({
     return (
       <div className="space-y-3">
         {/* Auth Type Result */}
-        <Alert className={result.authType === 'oauth-static' ? 'bg-yellow-50 border-yellow-200' : 'bg-blue-50 border-blue-200'}>
+        <Alert
+          className={
+            result.authType === 'oauth-static'
+              ? 'bg-yellow-50 border-yellow-200'
+              : 'bg-blue-50 border-blue-200'
+          }
+        >
           <div className={authDisplay.color}>{authDisplay.icon}</div>
           <AlertTitle className="text-sm font-medium flex items-center gap-2">
             Detected: {authDisplay.label}
@@ -173,9 +176,7 @@ export const AuthDiscoveryPanel: React.FC<AuthDiscoveryPanelProps> = ({
               </Badge>
             )}
           </AlertTitle>
-          <AlertDescription className="text-xs">
-            {authDisplay.description}
-          </AlertDescription>
+          <AlertDescription className="text-xs">{authDisplay.description}</AlertDescription>
         </Alert>
 
         {/* OAuth without DCR warning */}
@@ -218,12 +219,7 @@ export const AuthDiscoveryPanel: React.FC<AuthDiscoveryPanelProps> = ({
         )}
 
         {/* Refresh Button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-6 text-xs"
-          onClick={runDiscovery}
-        >
+        <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={runDiscovery}>
           <RefreshCw className="h-3 w-3 mr-1" />
           Re-check
         </Button>

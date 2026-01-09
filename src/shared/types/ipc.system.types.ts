@@ -67,3 +67,18 @@ export interface GetCCUsageVersionResponse extends IPCResponse {
 }
 
 export interface GetUsageReportResponse extends IPCResponse<UsageReport> {}
+
+/**
+ * Version checking request/response types
+ */
+
+export interface VersionInfo {
+  currentVersion: string;
+  latestVersion: string;
+  isOutdated: boolean;
+  releaseUrl?: string;
+  releaseNotes?: string;
+  publishedAt?: string;
+}
+
+export interface CheckVersionResponse extends IPCResponse<VersionInfo> {}

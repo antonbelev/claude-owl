@@ -247,10 +247,7 @@ export const SecurityWarningDialog: React.FC<SecurityWarningDialogProps> = ({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            onClick={onConfirm}
-            variant={hasCriticalWarnings ? 'destructive' : 'default'}
-          >
+          <Button onClick={onConfirm} variant={hasCriticalWarnings ? 'destructive' : 'default'}>
             {hasCriticalWarnings ? 'I Understand, Continue' : 'Continue'}
           </Button>
         </DialogFooter>

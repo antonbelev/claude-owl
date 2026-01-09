@@ -149,6 +149,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getAppVersion: () => ipcRenderer.invoke(IPC_CHANNELS.GET_APP_VERSION),
   getClaudeVersion: () => ipcRenderer.invoke(IPC_CHANNELS.GET_CLAUDE_VERSION),
   checkClaudeInstalled: () => ipcRenderer.invoke(IPC_CHANNELS.CHECK_CLAUDE_INSTALLED),
+  checkVersion: () => ipcRenderer.invoke(IPC_CHANNELS.CHECK_VERSION),
   openExternal: (url: string) => ipcRenderer.invoke('system:open-external', url),
 
   // Settings
@@ -312,8 +313,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke(REMOTE_MCP_CHANNELS.LAUNCH_OAUTH_FLOW, args),
   configureMCPApiKey: (args: unknown) =>
     ipcRenderer.invoke(REMOTE_MCP_CHANNELS.CONFIGURE_API_KEY, args),
-  discoverMCPAuth: (args: unknown) =>
-    ipcRenderer.invoke(REMOTE_MCP_CHANNELS.DISCOVER_AUTH, args),
+  discoverMCPAuth: (args: unknown) => ipcRenderer.invoke(REMOTE_MCP_CHANNELS.DISCOVER_AUTH, args),
 
   // Claude CLI
   executeCLI: (args: unknown) => ipcRenderer.invoke(IPC_CHANNELS.EXECUTE_CLI, args),
@@ -340,6 +340,7 @@ export interface ElectronAPI {
   getAppVersion: () => Promise<string>;
   getClaudeVersion: () => Promise<string | null>;
   checkClaudeInstalled: () => Promise<unknown>;
+  checkVersion: () => Promise<unknown>;
   openExternal: (url: string) => Promise<unknown>;
   getSettings: (args: unknown) => Promise<unknown>;
   saveSettings: (args: unknown) => Promise<unknown>;

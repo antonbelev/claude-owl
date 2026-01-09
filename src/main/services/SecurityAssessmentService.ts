@@ -163,8 +163,7 @@ export class SecurityAssessmentService {
       warnings.push({
         severity: 'critical',
         title: 'TLS Certificate Issue',
-        description:
-          'The server has a TLS certificate issue. Your connection may not be secure.',
+        description: 'The server has a TLS certificate issue. Your connection may not be secure.',
         recommendation: 'Do not proceed unless you understand the security implications.',
       });
     }

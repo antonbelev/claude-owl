@@ -170,8 +170,8 @@ export const ApiKeyConfigForm: React.FC<ApiKeyConfigFormProps> = ({
         />
         {errors.envVarName && <p className="text-xs text-red-500">{errors.envVarName}</p>}
         <p className="text-xs text-neutral-500">
-          The key will be stored as <code className="bg-neutral-100 px-1 rounded">${envVarName}</code>{' '}
-          in your settings.
+          The key will be stored as{' '}
+          <code className="bg-neutral-100 px-1 rounded">${envVarName}</code> in your settings.
         </p>
       </div>
 
@@ -190,7 +190,8 @@ export const ApiKeyConfigForm: React.FC<ApiKeyConfigFormProps> = ({
         <AlertTriangle className="h-4 w-4 text-yellow-500" />
         <AlertDescription className="text-xs">
           <span className="font-medium">Security Notice:</span> Your API key will be stored in
-          Claude Code&apos;s configuration file. Never share this file or commit it to version control.
+          Claude Code&apos;s configuration file. Never share this file or commit it to version
+          control.
         </AlertDescription>
       </Alert>
 
