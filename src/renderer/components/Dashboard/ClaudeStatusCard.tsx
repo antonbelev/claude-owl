@@ -77,7 +77,9 @@ export const ClaudeStatusCard: React.FC = () => {
             variant="outline"
             size="sm"
             className="w-full"
-            onClick={() => window.electronAPI.openExternal('https://code.claude.com/docs/en/quickstart')}
+            onClick={() =>
+              window.electronAPI.openExternal('https://code.claude.com/docs/en/quickstart')
+            }
           >
             <ExternalLink className="h-4 w-4 mr-2" />
             Installation Guide

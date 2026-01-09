@@ -156,7 +156,9 @@ export class AuthDiscoveryService {
 
               // Step 5: Check for DCR support
               if (authServer.registration_endpoint) {
-                steps.push(`DCR supported: registration_endpoint found at ${authServer.registration_endpoint}`);
+                steps.push(
+                  `DCR supported: registration_endpoint found at ${authServer.registration_endpoint}`
+                );
                 result.supportsDCR = true;
                 result.authType = 'oauth-dcr';
               } else {
@@ -235,12 +237,16 @@ export class AuthDiscoveryService {
 
         if (response.ok) {
           const metadata = (await response.json()) as ProtectedResourceMetadata;
-          steps.push(`Found protected resource metadata: ${metadata.resource_name || metadata.resource}`);
+          steps.push(
+            `Found protected resource metadata: ${metadata.resource_name || metadata.resource}`
+          );
           return metadata;
         }
         steps.push(`${metadataUrl} returned ${response.status}`);
       } catch (error) {
-        steps.push(`Failed to fetch ${metadataUrl}: ${error instanceof Error ? error.message : String(error)}`);
+        steps.push(
+          `Failed to fetch ${metadataUrl}: ${error instanceof Error ? error.message : String(error)}`
+        );
       }
     }
 
@@ -284,7 +290,9 @@ export class AuthDiscoveryService {
         }
         steps.push(`${metadataUrl} returned ${response.status}`);
       } catch (error) {
-        steps.push(`Failed to fetch ${metadataUrl}: ${error instanceof Error ? error.message : String(error)}`);
+        steps.push(
+          `Failed to fetch ${metadataUrl}: ${error instanceof Error ? error.message : String(error)}`
+        );
       }
     }
 

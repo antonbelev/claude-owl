@@ -10,7 +10,12 @@
 
 import React, { useState, useCallback } from 'react';
 import { Lock, Key, Unlock, AlertTriangle, CheckCircle2, ExternalLink } from 'lucide-react';
-import type { RemoteMCPServer, SecurityContext, MCPAuthCredentials, DiscoverAuthResponse } from '@/shared/types';
+import type {
+  RemoteMCPServer,
+  SecurityContext,
+  MCPAuthCredentials,
+  DiscoverAuthResponse,
+} from '@/shared/types';
 import {
   Dialog,
   DialogContent,
@@ -186,7 +191,6 @@ export const AuthConfigModal: React.FC<AuthConfigModalProps> = ({
       setIsAuthenticating(false);
     }
   }, [server.id, server.endpoint, server.transport, scope, selectedProject?.path]);
-
 
   // Handle API key configuration
   const handleConfigureApiKey = useCallback(
@@ -364,13 +368,16 @@ export const AuthConfigModal: React.FC<AuthConfigModalProps> = ({
           )}
 
           {/* API Key Configuration - Used for api-key, header, or OAuth fallback */}
-          {step === 'configure' && (effectiveAuthType === 'api-key' || effectiveAuthType === 'header' || useApiKeyFallback) && (
-            <ApiKeyConfigForm
-              server={server}
-              onSubmit={handleConfigureApiKey}
-              isSubmitting={configuring}
-            />
-          )}
+          {step === 'configure' &&
+            (effectiveAuthType === 'api-key' ||
+              effectiveAuthType === 'header' ||
+              useApiKeyFallback) && (
+              <ApiKeyConfigForm
+                server={server}
+                onSubmit={handleConfigureApiKey}
+                isSubmitting={configuring}
+              />
+            )}
         </div>
 
         <DialogFooter className="gap-2">
@@ -395,7 +402,11 @@ export const AuthConfigModal: React.FC<AuthConfigModalProps> = ({
                 Back
               </Button>
               {oauthServerAdded ? (
-                <Button onClick={() => onComplete(true, 'Server added. Complete authentication in Claude Code.')}>
+                <Button
+                  onClick={() =>
+                    onComplete(true, 'Server added. Complete authentication in Claude Code.')
+                  }
+                >
                   Done
                 </Button>
               ) : (
@@ -406,11 +417,14 @@ export const AuthConfigModal: React.FC<AuthConfigModalProps> = ({
             </>
           )}
 
-          {step === 'configure' && (effectiveAuthType === 'api-key' || effectiveAuthType === 'header' || useApiKeyFallback) && (
-            <Button variant="outline" onClick={() => setStep('overview')}>
-              Back
-            </Button>
-          )}
+          {step === 'configure' &&
+            (effectiveAuthType === 'api-key' ||
+              effectiveAuthType === 'header' ||
+              useApiKeyFallback) && (
+              <Button variant="outline" onClick={() => setStep('overview')}>
+                Back
+              </Button>
+            )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

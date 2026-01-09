@@ -8,15 +8,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import {
-  Terminal,
-  AlertTriangle,
-  Info,
-  Copy,
-  Check,
-  ChevronRight,
-  Shield,
-} from 'lucide-react';
+import { Terminal, AlertTriangle, Info, Copy, Check, ChevronRight, Shield } from 'lucide-react';
 import type { RemoteMCPServer } from '@/shared/types';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { Button } from '../ui/button';
@@ -56,15 +48,18 @@ export const OAuthServerGuide: React.FC<OAuthServerGuideProps> = ({
   const addCommand = `claude mcp add ${server.id} --transport ${server.transport} ${server.endpoint}`;
   const authCommand = 'claude /mcp';
 
-  const handleCopyCommand = useCallback(async (command: string, setCopied: (v: boolean) => void) => {
-    try {
-      await navigator.clipboard.writeText(command);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy command:', err);
-    }
-  }, []);
+  const handleCopyCommand = useCallback(
+    async (command: string, setCopied: (v: boolean) => void) => {
+      try {
+        await navigator.clipboard.writeText(command);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy command:', err);
+      }
+    },
+    []
+  );
 
   return (
     <div className="space-y-4">
@@ -81,17 +76,13 @@ export const OAuthServerGuide: React.FC<OAuthServerGuideProps> = ({
       {/* Step 1: Add Server */}
       <div
         className={`p-4 rounded-lg border-2 transition-colors ${
-          serverAdded
-            ? 'bg-green-50 border-green-200'
-            : 'bg-white border-blue-200'
+          serverAdded ? 'bg-green-50 border-green-200' : 'bg-white border-blue-200'
         }`}
       >
         <div className="flex items-start gap-3">
           <div
             className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium ${
-              serverAdded
-                ? 'bg-green-500 text-white'
-                : 'bg-blue-500 text-white'
+              serverAdded ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'
             }`}
           >
             {serverAdded ? <Check className="h-4 w-4" /> : '1'}
@@ -108,12 +99,7 @@ export const OAuthServerGuide: React.FC<OAuthServerGuideProps> = ({
 
             {!serverAdded && (
               <>
-                <Button
-                  onClick={onAddServer}
-                  disabled={isAddingServer}
-                  size="sm"
-                  className="mb-2"
-                >
+                <Button onClick={onAddServer} disabled={isAddingServer} size="sm" className="mb-2">
                   <Terminal className="h-3.5 w-3.5 mr-1.5" />
                   {isAddingServer ? 'Adding...' : 'Add Server'}
                 </Button>
@@ -150,17 +136,13 @@ export const OAuthServerGuide: React.FC<OAuthServerGuideProps> = ({
       {/* Step 2: Authenticate */}
       <div
         className={`p-4 rounded-lg border-2 transition-colors ${
-          !serverAdded
-            ? 'bg-neutral-50 border-neutral-200 opacity-60'
-            : 'bg-white border-blue-200'
+          !serverAdded ? 'bg-neutral-50 border-neutral-200 opacity-60' : 'bg-white border-blue-200'
         }`}
       >
         <div className="flex items-start gap-3">
           <div
             className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium ${
-              !serverAdded
-                ? 'bg-neutral-300 text-white'
-                : 'bg-blue-500 text-white'
+              !serverAdded ? 'bg-neutral-300 text-white' : 'bg-blue-500 text-white'
             }`}
           >
             2
@@ -187,9 +169,7 @@ export const OAuthServerGuide: React.FC<OAuthServerGuideProps> = ({
 
                 {/* Manual command */}
                 <div className="flex items-center gap-2 p-2 bg-neutral-100 rounded-md">
-                  <code className="flex-1 text-xs text-neutral-600">
-                    {authCommand}
-                  </code>
+                  <code className="flex-1 text-xs text-neutral-600">{authCommand}</code>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -205,7 +185,8 @@ export const OAuthServerGuide: React.FC<OAuthServerGuideProps> = ({
                 </div>
 
                 <p className="text-xs text-neutral-400 mt-2">
-                  In the MCP manager, find &quot;{server.name}&quot; and select &quot;Authenticate&quot;
+                  In the MCP manager, find &quot;{server.name}&quot; and select
+                  &quot;Authenticate&quot;
                 </p>
               </>
             )}

@@ -7,6 +7,7 @@ export interface ElectronAPI {
   getAppVersion: () => Promise<unknown>;
   getClaudeVersion: () => Promise<unknown>;
   checkClaudeInstalled: () => Promise<unknown>;
+  checkVersion: () => Promise<unknown>;
   openExternal: (url: string) => Promise<unknown>;
 
   // Settings

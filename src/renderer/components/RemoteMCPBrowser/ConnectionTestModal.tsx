@@ -107,7 +107,12 @@ export const ConnectionTestModal: React.FC<ConnectionTestModalProps> = ({
 
     try {
       // Simulate step progress
-      const steps = ['DNS Resolution', 'TLS/SSL Verification', 'HTTP Reachability', 'MCP Protocol Detection'];
+      const steps = [
+        'DNS Resolution',
+        'TLS/SSL Verification',
+        'HTTP Reachability',
+        'MCP Protocol Detection',
+      ];
       for (let i = 0; i < steps.length; i++) {
         setCurrentStep(i + 1);
         await new Promise(resolve => setTimeout(resolve, 300)); // Visual feedback
@@ -143,9 +148,7 @@ export const ConnectionTestModal: React.FC<ConnectionTestModalProps> = ({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Connection Test</DialogTitle>
-          <DialogDescription>
-            Testing connection to {server.name}
-          </DialogDescription>
+          <DialogDescription>Testing connection to {server.name}</DialogDescription>
         </DialogHeader>
 
         <div className="py-4">
@@ -166,29 +169,32 @@ export const ConnectionTestModal: React.FC<ConnectionTestModalProps> = ({
           <div className="space-y-3">
             {testing && !result && (
               <>
-                {['DNS Resolution', 'TLS/SSL Verification', 'HTTP Reachability', 'MCP Protocol Detection'].map(
-                  (stepName, index) => (
-                    <div
-                      key={stepName}
-                      className={`flex items-center gap-3 p-2 rounded ${
-                        index < currentStep
-                          ? 'bg-green-50'
-                          : index === currentStep - 1
-                            ? 'bg-blue-50'
-                            : 'bg-neutral-50'
-                      }`}
-                    >
-                      {index < currentStep - 1 ? (
-                        <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      ) : index === currentStep - 1 ? (
-                        <Loader2 className="h-4 w-4 text-blue-500 animate-spin" />
-                      ) : (
-                        <div className="h-4 w-4 rounded-full border-2 border-neutral-300" />
-                      )}
-                      <span className="text-sm">{stepName}</span>
-                    </div>
-                  )
-                )}
+                {[
+                  'DNS Resolution',
+                  'TLS/SSL Verification',
+                  'HTTP Reachability',
+                  'MCP Protocol Detection',
+                ].map((stepName, index) => (
+                  <div
+                    key={stepName}
+                    className={`flex items-center gap-3 p-2 rounded ${
+                      index < currentStep
+                        ? 'bg-green-50'
+                        : index === currentStep - 1
+                          ? 'bg-blue-50'
+                          : 'bg-neutral-50'
+                    }`}
+                  >
+                    {index < currentStep - 1 ? (
+                      <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    ) : index === currentStep - 1 ? (
+                      <Loader2 className="h-4 w-4 text-blue-500 animate-spin" />
+                    ) : (
+                      <div className="h-4 w-4 rounded-full border-2 border-neutral-300" />
+                    )}
+                    <span className="text-sm">{stepName}</span>
+                  </div>
+                ))}
               </>
             )}
 
@@ -227,7 +233,9 @@ export const ConnectionTestModal: React.FC<ConnectionTestModalProps> = ({
                     <Alert className="bg-green-50 border-green-200">
                       <CheckCircle2 className="h-4 w-4 text-green-500" />
                       <AlertDescription className="text-green-800">
-                        <span className="font-medium">Server is reachable and appears to be a valid MCP server</span>
+                        <span className="font-medium">
+                          Server is reachable and appears to be a valid MCP server
+                        </span>
                         {result.latencyMs && (
                           <span className="text-xs ml-2">({result.latencyMs}ms)</span>
                         )}
@@ -271,9 +279,7 @@ export const ConnectionTestModal: React.FC<ConnectionTestModalProps> = ({
             </Button>
           )}
           {result?.success && onContinueToSetup && (
-            <Button onClick={handleContinue}>
-              Continue to Setup
-            </Button>
+            <Button onClick={handleContinue}>Continue to Setup</Button>
           )}
         </DialogFooter>
       </DialogContent>

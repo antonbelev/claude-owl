@@ -288,7 +288,10 @@ export class RemoteMCPRegistryService {
     source: 'live' | 'cache';
     lastUpdated: string;
   }> {
-    console.log('[RemoteMCPRegistryService] Fetching server directory, forceRefresh:', forceRefresh);
+    console.log(
+      '[RemoteMCPRegistryService] Fetching server directory, forceRefresh:',
+      forceRefresh
+    );
 
     // Check in-memory cache first
     if (!forceRefresh && this.cachedServers && this.cacheTimestamp) {
@@ -686,7 +689,10 @@ export class RemoteMCPRegistryService {
             details: `Server returned ${res.statusCode}: ${res.statusMessage}`,
             error: `Server returned ${res.statusCode}`,
             errorCode: 'SERVER_ERROR',
-            suggestions: ['The server may be experiencing issues', 'Check the server documentation'],
+            suggestions: [
+              'The server may be experiencing issues',
+              'Check the server documentation',
+            ],
           };
           if (res.statusCode) result.status = res.statusCode;
           resolve(result);
@@ -770,11 +776,7 @@ export class RemoteMCPRegistryService {
   private async cacheServers(servers: RemoteMCPServer[], timestamp: string): Promise<void> {
     try {
       await fs.mkdir(this.cacheDir, { recursive: true });
-      await fs.writeFile(
-        this.cacheFile,
-        JSON.stringify({ servers, timestamp }, null, 2),
-        'utf-8'
-      );
+      await fs.writeFile(this.cacheFile, JSON.stringify({ servers, timestamp }, null, 2), 'utf-8');
       console.log('[RemoteMCPRegistryService] Cached', servers.length, 'servers to disk');
     } catch (error) {
       console.warn('[RemoteMCPRegistryService] Failed to cache servers:', error);

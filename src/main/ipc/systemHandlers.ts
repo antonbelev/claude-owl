@@ -1,9 +1,11 @@
 import { ipcMain, shell } from 'electron';
-import { IPC_CHANNELS, CheckClaudeInstalledResponse } from '@/shared/types';
+import { IPC_CHANNELS, CheckClaudeInstalledResponse, CheckVersionResponse } from '@/shared/types';
 import { ClaudeService } from '../services/ClaudeService';
+import { VersionService } from '../services/VersionService';
 import { app } from 'electron';
 
 const claudeService = new ClaudeService();
+const versionService = new VersionService();
 
 /**
  * Validate URL to prevent opening dangerous protocols
@@ -54,6 +56,39 @@ export function registerSystemHandlers() {
       }
     }
   );
+
+  // Check for app version updates
+  ipcMain.handle(IPC_CHANNELS.CHECK_VERSION, async (): Promise<CheckVersionResponse> => {
+    console.log('[SystemHandlers] Check version request received');
+
+    try {
+      const currentVersion = app.getVersion();
+      console.log('[SystemHandlers] Current app version:', currentVersion);
+
+      const versionInfo = await versionService.checkVersion(currentVersion);
+
+      console.log('[SystemHandlers] Version check completed:', {
+        isOutdated: versionInfo.isOutdated,
+        currentVersion: versionInfo.currentVersion,
+        latestVersion: versionInfo.latestVersion,
+      });
+
+      return {
+        success: true,
+        data: versionInfo,
+      };
+    } catch (error) {
+      console.error('[SystemHandlers] Version check failed:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to check version',
+      };
+    }
+  });
 
   // Open external URL in default browser
   ipcMain.handle('system:open-external', async (_event, url: string) => {

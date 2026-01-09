@@ -171,6 +171,8 @@ export type {
   CheckCCUsageInstalledResponse,
   GetCCUsageVersionResponse,
   GetUsageReportResponse,
+  VersionInfo,
+  CheckVersionResponse,
 } from './ipc.system.types';
 
 // Re-export metrics types

@@ -75,7 +75,9 @@ export interface UseRemoteMCPServersResult {
 /**
  * Hook to manage remote MCP server discovery and connection testing
  */
-export function useRemoteMCPServers(initialFilters?: RemoteServerFilters): UseRemoteMCPServersResult {
+export function useRemoteMCPServers(
+  initialFilters?: RemoteServerFilters
+): UseRemoteMCPServersResult {
   const [servers, setServers] = useState<RemoteMCPServer[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -85,35 +87,39 @@ export function useRemoteMCPServers(initialFilters?: RemoteServerFilters): UseRe
   const [filters, setFilters] = useState<RemoteServerFilters>(initialFilters || {});
 
   // Refresh server list
-  const refresh = useCallback(async (forceRefresh = false) => {
-    console.log('[useRemoteMCPServers] Refreshing server list, forceRefresh:', forceRefresh);
-    setLoading(true);
-    setError(null);
+  const refresh = useCallback(
+    async (forceRefresh = false) => {
+      console.log('[useRemoteMCPServers] Refreshing server list, forceRefresh:', forceRefresh);
+      setLoading(true);
+      setError(null);
 
-    try {
-      const response = (await window.electronAPI.fetchRemoteMCPDirectory({
-        forceRefresh,
-        filters,
-      })) as FetchDirectoryResponse;
+      try {
+        const response = (await window.electronAPI.fetchRemoteMCPDirectory({
+          forceRefresh,
+          filters,
+        })) as FetchDirectoryResponse;
 
-      if (response.success) {
-        setServers(response.servers);
-        setSource(response.source);
-        setLastUpdated(response.lastUpdated);
-        console.log('[useRemoteMCPServers] Loaded servers:', response.servers.length);
-      } else {
-        const errorMsg = response.error || 'Failed to load remote servers';
+        if (response.success) {
+          setServers(response.servers);
+          setSource(response.source);
+          setLastUpdated(response.lastUpdated);
+          console.log('[useRemoteMCPServers] Loaded servers:', response.servers.length);
+        } else {
+          const errorMsg = response.error || 'Failed to load remote servers';
+          setError(errorMsg);
+          console.error('[useRemoteMCPServers] Error loading servers:', errorMsg);
+        }
+      } catch (err) {
+        const errorMsg =
+          err instanceof Error ? err.message : 'Unknown error loading remote servers';
         setError(errorMsg);
-        console.error('[useRemoteMCPServers] Error loading servers:', errorMsg);
+        console.error('[useRemoteMCPServers] Exception loading servers:', err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Unknown error loading remote servers';
-      setError(errorMsg);
-      console.error('[useRemoteMCPServers] Exception loading servers:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
+    },
+    [filters]
+  );
 
   // Load servers on mount and when filters change
   useEffect(() => {
@@ -124,7 +130,8 @@ export function useRemoteMCPServers(initialFilters?: RemoteServerFilters): UseRe
   useEffect(() => {
     const loadCacheStatus = async () => {
       try {
-        const response = (await window.electronAPI.getRemoteMCPCacheStatus()) as GetCacheStatusResponse;
+        const response =
+          (await window.electronAPI.getRemoteMCPCacheStatus()) as GetCacheStatusResponse;
         if (response.success) {
           setCacheStatus(response.cacheStatus);
         }
@@ -136,27 +143,30 @@ export function useRemoteMCPServers(initialFilters?: RemoteServerFilters): UseRe
   }, [lastUpdated]);
 
   // Search servers
-  const search = useCallback(async (query: string): Promise<RemoteMCPServer[]> => {
-    console.log('[useRemoteMCPServers] Searching servers:', query);
+  const search = useCallback(
+    async (query: string): Promise<RemoteMCPServer[]> => {
+      console.log('[useRemoteMCPServers] Searching servers:', query);
 
-    try {
-      const response = (await window.electronAPI.searchRemoteMCPServers({
-        query,
-        category: filters.category,
-        authType: filters.authType,
-      })) as SearchServersResponse;
+      try {
+        const response = (await window.electronAPI.searchRemoteMCPServers({
+          query,
+          category: filters.category,
+          authType: filters.authType,
+        })) as SearchServersResponse;
 
-      if (response.success) {
-        return response.servers;
-      } else {
-        console.error('[useRemoteMCPServers] Search error:', response.error);
+        if (response.success) {
+          return response.servers;
+        } else {
+          console.error('[useRemoteMCPServers] Search error:', response.error);
+          return [];
+        }
+      } catch (err) {
+        console.error('[useRemoteMCPServers] Search exception:', err);
         return [];
       }
-    } catch (err) {
-      console.error('[useRemoteMCPServers] Search exception:', err);
-      return [];
-    }
-  }, [filters.category, filters.authType]);
+    },
+    [filters.category, filters.authType]
+  );
 
   // Get server details
   const getServerDetails = useCallback(

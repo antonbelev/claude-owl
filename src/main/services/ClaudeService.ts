@@ -1097,9 +1097,7 @@ export class ClaudeService {
       // does NOT substitute ${ENV_VAR} patterns in headers
       const headerName = options.headerName || 'Authorization';
       const headerValue =
-        headerName === 'Authorization'
-          ? `Bearer ${options.apiKeyValue}`
-          : options.apiKeyValue;
+        headerName === 'Authorization' ? `Bearer ${options.apiKeyValue}` : options.apiKeyValue;
 
       const serverConfig = {
         type: options.transport,
@@ -1185,5 +1183,4 @@ export class ClaudeService {
 
     return parts.join(' ');
   }
-
 }

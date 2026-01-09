@@ -98,7 +98,11 @@ export const MCPServersManager: React.FC = () => {
       />
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={v => setActiveTab(v as 'installed' | 'discover')} className="flex-1 flex flex-col">
+      <Tabs
+        value={activeTab}
+        onValueChange={v => setActiveTab(v as 'installed' | 'discover')}
+        className="flex-1 flex flex-col"
+      >
         <TabsList className="mb-4">
           <TabsTrigger value="installed" className="flex items-center gap-2">
             <Server className="h-4 w-4" />
