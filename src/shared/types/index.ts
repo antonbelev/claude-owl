@@ -14,6 +14,9 @@ export * from './metrics.types';
 export * from './ipc.metrics.types';
 export * from './ipc.types';
 export * from './year-review.types';
+export * from './mcp.types';
+export * from './remote-mcp.types';
+export * from './ipc.remote-mcp.types';
 
 // Model constants and utilities
 export * from '../constants/models';
