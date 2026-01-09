@@ -433,32 +433,32 @@ export class ClaudeService {
 
   /**
    * Build the `claude mcp add` command from options
+   *
+   * Command syntax: claude mcp add [options] <name> <commandOrUrl> [args...]
+   *
+   * Note: --env and --header are variadic options and must come AFTER the
+   * positional arguments (name and URL), otherwise the CLI gets confused.
+   *
+   * Correct order:
+   *   claude mcp add --transport http --scope user <name> <url> --env KEY=value --header "Header: value"
    */
   private buildMCPAddCommand(options: MCPAddOptions): string {
-    const parts: string[] = ['claude', 'mcp', 'add', this.escapeArg(options.name)];
+    const parts: string[] = ['claude', 'mcp', 'add'];
 
-    // Add transport and scope
+    // Add transport and scope options first (non-variadic)
     parts.push('--transport', options.transport);
     parts.push('--scope', options.scope);
 
-    // Add environment variables
-    if (options.env && Object.keys(options.env).length > 0) {
-      for (const [key, value] of Object.entries(options.env)) {
-        parts.push('--env', this.escapeArg(`${key}=${value}`));
-      }
-    }
+    // Add positional arguments: <name> <commandOrUrl>
+    parts.push(this.escapeArg(options.name));
 
-    // Add HTTP headers (for HTTP/SSE transports)
-    if (options.headers && Object.keys(options.headers).length > 0) {
-      for (const [key, value] of Object.entries(options.headers)) {
-        parts.push('--header', this.escapeArg(`${key}: ${value}`));
-      }
+    // Add URL for HTTP/SSE transports
+    if ((options.transport === 'http' || options.transport === 'sse') && options.url) {
+      parts.push(this.escapeArg(options.url));
     }
 
     // Add command and args for stdio transport
     if (options.transport === 'stdio' && options.command) {
-      parts.push('--');
-
       // Windows-specific: Wrap npx with cmd /c
       // See: https://code.claude.com/docs/en/mcp
       if (process.platform === 'win32' && options.command.toLowerCase().includes('npx')) {
@@ -473,9 +473,21 @@ export class ClaudeService {
       }
     }
 
-    // Add URL for HTTP/SSE transports
-    if ((options.transport === 'http' || options.transport === 'sse') && options.url) {
-      parts.push(this.escapeArg(options.url));
+    // Add variadic options AFTER positional arguments
+    // (--env and --header consume all following values until next option)
+
+    // Add environment variables
+    if (options.env && Object.keys(options.env).length > 0) {
+      for (const [key, value] of Object.entries(options.env)) {
+        parts.push('--env', this.escapeArg(`${key}=${value}`));
+      }
+    }
+
+    // Add HTTP headers (for HTTP/SSE transports)
+    if (options.headers && Object.keys(options.headers).length > 0) {
+      for (const [key, value] of Object.entries(options.headers)) {
+        parts.push('--header', this.escapeArg(`${key}: ${value}`));
+      }
     }
 
     return parts.join(' ');
@@ -838,5 +850,337 @@ export class ClaudeService {
         error: `Failed to remove marketplace: ${errorMessage}`,
       };
     }
+  }
+
+  // ========================================================================
+  // MCP Authentication Methods
+  // ========================================================================
+
+  /**
+   * Check authentication status for an MCP server
+   * This runs `claude mcp get <serverName>` to check if the server is authenticated
+   */
+  async checkMCPAuthStatus(serverName: string): Promise<{
+    authStatus: 'authenticated' | 'not_authenticated' | 'unknown' | 'not_required';
+    isInstalled: boolean;
+    configLocation?: string;
+  }> {
+    console.log('[ClaudeService] Checking MCP auth status for:', serverName);
+
+    try {
+      // First, check if the server is installed
+      const servers = await this.listMCPServers();
+      const installedServer = servers.find(s => s.name === serverName);
+
+      if (!installedServer) {
+        console.log('[ClaudeService] Server not installed:', serverName);
+        return {
+          authStatus: 'unknown',
+          isInstalled: false,
+        };
+      }
+
+      // For stdio servers, auth is not typically required
+      if (installedServer.transport === 'stdio') {
+        return {
+          authStatus: 'not_required',
+          isInstalled: true,
+          configLocation: installedServer.projectPath
+            ? path.join(installedServer.projectPath, '.claude.json')
+            : path.join(os.homedir(), '.claude.json'),
+        };
+      }
+
+      // For http/sse servers, check auth via /mcp command (non-interactive check)
+      // We'll parse the output of `claude /mcp` to see if this server shows as authenticated
+      const command = `claude /mcp --json`;
+      console.log('[ClaudeService] Executing command:', command);
+
+      try {
+        const { stdout, stderr } = await execAsync(command, {
+          env: this.getExecEnv(),
+          timeout: 15000,
+        });
+
+        const output = stdout + stderr;
+
+        // Parse the output to find auth status
+        // The /mcp command shows server status including auth state
+        if (output.includes(`"${serverName}"`) || output.includes(`'${serverName}'`)) {
+          // Check for auth-related indicators
+          if (
+            output.toLowerCase().includes('not authenticated') ||
+            output.toLowerCase().includes('auth: x') ||
+            output.toLowerCase().includes('no token')
+          ) {
+            return {
+              authStatus: 'not_authenticated',
+              isInstalled: true,
+              configLocation: installedServer.projectPath
+                ? path.join(installedServer.projectPath, '.claude.json')
+                : path.join(os.homedir(), '.claude.json'),
+            };
+          }
+
+          if (
+            output.toLowerCase().includes('authenticated') ||
+            output.toLowerCase().includes('auth: ✓') ||
+            output.toLowerCase().includes('connected')
+          ) {
+            return {
+              authStatus: 'authenticated',
+              isInstalled: true,
+              configLocation: installedServer.projectPath
+                ? path.join(installedServer.projectPath, '.claude.json')
+                : path.join(os.homedir(), '.claude.json'),
+            };
+          }
+        }
+
+        // Couldn't determine status
+        return {
+          authStatus: 'unknown',
+          isInstalled: true,
+          configLocation: installedServer.projectPath
+            ? path.join(installedServer.projectPath, '.claude.json')
+            : path.join(os.homedir(), '.claude.json'),
+        };
+      } catch {
+        // /mcp command might fail or require interaction
+        // Fall back to unknown status
+        return {
+          authStatus: 'unknown',
+          isInstalled: true,
+          configLocation: installedServer.projectPath
+            ? path.join(installedServer.projectPath, '.claude.json')
+            : path.join(os.homedir(), '.claude.json'),
+        };
+      }
+    } catch (error) {
+      console.error('[ClaudeService] Failed to check MCP auth status:', error);
+      return {
+        authStatus: 'unknown',
+        isInstalled: false,
+      };
+    }
+  }
+
+  /**
+   * Launch Claude Code's /mcp command for OAuth authentication
+   * This opens a new terminal window with `claude /mcp` where users can select their server and authenticate
+   * Note: The server should already be added via addMCPServer before calling this
+   */
+  async launchOAuthFlow(
+    serverName: string,
+    projectPath?: string,
+    _serverUrl?: string,
+    _transport?: 'http' | 'sse'
+  ): Promise<{ success: boolean; message?: string; error?: string }> {
+    console.log('[ClaudeService] Launching OAuth flow for:', serverName, {
+      projectPath,
+    });
+
+    try {
+      const env = this.getExecEnv();
+
+      // Open the MCP manager where users can select the server and authenticate
+      const mcpCommand = 'claude /mcp';
+
+      console.log('[ClaudeService] Opening MCP manager:', mcpCommand);
+
+      if (process.platform === 'darwin') {
+        // macOS: Open Terminal.app with claude /mcp command
+        const cdCommand = projectPath ? `cd "${projectPath}" && ` : '';
+        const script = `
+          tell application "Terminal"
+            activate
+            do script "${cdCommand}${mcpCommand}"
+          end tell
+        `;
+
+        await execAsync(`osascript -e '${script.replace(/'/g, "'\\''")}'`, { env });
+
+        return {
+          success: true,
+          message: `Opened Claude Code MCP manager. Select "${serverName}" and choose "Authenticate" to complete setup.`,
+        };
+      } else if (process.platform === 'win32') {
+        // Windows: Open cmd.exe with claude /mcp
+        const cdCommand = projectPath ? `cd /d "${projectPath}" && ` : '';
+        await execAsync(`start cmd /k "${cdCommand}${mcpCommand}"`, { env });
+
+        return {
+          success: true,
+          message: `Opened Claude Code MCP manager. Select "${serverName}" and choose "Authenticate" to complete setup.`,
+        };
+      } else {
+        // Linux: Try common terminals
+        const cdCommand = projectPath ? `cd "${projectPath}" && ` : '';
+        const terminals = ['gnome-terminal', 'konsole', 'xterm', 'x-terminal-emulator'];
+
+        for (const terminal of terminals) {
+          try {
+            if (terminal === 'gnome-terminal') {
+              await execAsync(
+                `${terminal} -- bash -c '${cdCommand}${mcpCommand}; echo "Press Enter to close..."; read'`,
+                { env }
+              );
+            } else if (terminal === 'konsole') {
+              await execAsync(
+                `${terminal} -e bash -c '${cdCommand}${mcpCommand}; echo "Press Enter to close..."; read'`,
+                { env }
+              );
+            } else {
+              await execAsync(`${terminal} -e bash -c '${cdCommand}${mcpCommand}'`, { env });
+            }
+
+            return {
+              success: true,
+              message: `Opened Claude Code MCP manager. Select "${serverName}" and choose "Authenticate" to complete setup.`,
+            };
+          } catch {
+            // Try next terminal
+            continue;
+          }
+        }
+
+        return {
+          success: false,
+          error: `Could not open a terminal. Please run 'claude /mcp' manually and select "${serverName}" to authenticate.`,
+        };
+      }
+    } catch (error) {
+      console.error('[ClaudeService] Failed to launch OAuth flow:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        error: `Failed to launch: ${errorMessage}`,
+      };
+    }
+  }
+
+  /**
+   * Add an MCP server with API key authentication
+   * Uses `claude mcp add-json` to properly configure headers for HTTP transport.
+   *
+   * Note: Claude Code CLI does NOT substitute ${ENV_VAR} in headers - it requires
+   * the literal token value directly in the Authorization header.
+   * See: https://github.com/github/github-mcp-server/issues/552
+   */
+  async addMCPServerWithApiKey(options: {
+    name: string;
+    url: string;
+    transport: 'http' | 'sse';
+    scope: MCPScope;
+    projectPath?: string;
+    envVarName: string;
+    apiKeyValue: string;
+    headerName?: string;
+  }): Promise<MCPCommandResult> {
+    console.log('[ClaudeService] Adding MCP server with API key (using add-json):', {
+      name: options.name,
+      scope: options.scope,
+      headerName: options.headerName || 'Authorization',
+    });
+
+    // Validate project path if scope is 'project'
+    if (options.scope === 'project' && !options.projectPath) {
+      return {
+        success: false,
+        error: 'projectPath is required when scope is "project"',
+      };
+    }
+
+    try {
+      // Build the server config JSON for add-json command
+      // Note: We must put the actual token in the header value - Claude Code
+      // does NOT substitute ${ENV_VAR} patterns in headers
+      const headerName = options.headerName || 'Authorization';
+      const headerValue =
+        headerName === 'Authorization' ? `Bearer ${options.apiKeyValue}` : options.apiKeyValue;
+
+      const serverConfig = {
+        type: options.transport,
+        url: options.url,
+        headers: {
+          [headerName]: headerValue,
+        },
+      };
+
+      // Build the add-json command
+      const command = this.buildMCPAddJsonCommand({
+        name: options.name,
+        scope: options.scope,
+        config: serverConfig,
+      });
+
+      const cwd =
+        options.scope === 'project' && options.projectPath ? options.projectPath : undefined;
+
+      console.log('[ClaudeService] Executing add-json command:', command, { cwd });
+
+      const { stdout, stderr } = await execAsync(command, { cwd, env: this.getExecEnv() });
+
+      // Parse output to determine success
+      const output = stdout + stderr;
+      const success =
+        !stderr.toLowerCase().includes('error') && !output.toLowerCase().includes('failed');
+
+      console.log('[ClaudeService] MCP add-json result:', { success, output });
+
+      if (success) {
+        return {
+          success: true,
+          message: `Successfully configured ${options.name} with API key authentication.`,
+        };
+      }
+
+      return {
+        success: false,
+        error: output,
+      };
+    } catch (error) {
+      console.error('[ClaudeService] Failed to add MCP server with API key:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        error: `Failed to configure API key authentication: ${errorMessage}`,
+      };
+    }
+  }
+
+  /**
+   * Build the `claude mcp add-json` command
+   *
+   * Command syntax: claude mcp add-json [options] <name> <json>
+   *
+   * This command properly handles headers for HTTP transport, unlike `claude mcp add --header`.
+   */
+  private buildMCPAddJsonCommand(options: {
+    name: string;
+    scope: MCPScope;
+    config: {
+      type: 'http' | 'sse';
+      url: string;
+      headers?: Record<string, string>;
+      env?: Record<string, string>;
+    };
+  }): string {
+    const parts: string[] = ['claude', 'mcp', 'add-json'];
+
+    // Add scope option
+    parts.push('--scope', options.scope);
+
+    // Add server name
+    parts.push(this.escapeArg(options.name));
+
+    // Add JSON config - use single quotes to prevent shell variable expansion
+    // The JSON contains ${ENV_VAR} patterns that must be preserved literally
+    const jsonConfig = JSON.stringify(options.config);
+    // Escape any single quotes in the JSON and wrap in single quotes
+    const escapedJson = "'" + jsonConfig.replace(/'/g, "'\\''") + "'";
+    parts.push(escapedJson);
+
+    return parts.join(' ');
   }
 }

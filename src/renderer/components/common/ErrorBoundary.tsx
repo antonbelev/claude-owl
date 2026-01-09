@@ -138,14 +138,16 @@ Timestamp: ${new Date().toISOString()}
                 <p className="text-sm text-blue-900">
                   <strong className="font-semibold">Need help?</strong> Please copy the error
                   details above and report this issue on{' '}
-                  <a
-                    href="https://github.com/anthropics/claude-owl/issues"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() =>
+                      window.electronAPI.openExternal(
+                        'https://github.com/anthropics/claude-owl/issues'
+                      )
+                    }
                     className="underline hover:text-blue-700"
                   >
                     GitHub
-                  </a>
+                  </button>
                   .
                 </p>
               </div>

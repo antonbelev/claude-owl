@@ -73,15 +73,16 @@ export const ClaudeStatusCard: React.FC = () => {
           <p className="text-sm text-neutral-600">
             Please install Claude Code CLI to use this application.
           </p>
-          <Button variant="outline" size="sm" asChild className="w-full">
-            <a
-              href="https://code.claude.com/docs/en/quickstart"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Installation Guide
-            </a>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={() =>
+              window.electronAPI.openExternal('https://code.claude.com/docs/en/quickstart')
+            }
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Installation Guide
           </Button>
         </CardContent>
         <CardFooter>

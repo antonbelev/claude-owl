@@ -126,6 +126,22 @@ const STATUSLINE_CHANNELS = {
   EXPORT_STATUSLINE_SCRIPT: 'statusline:export-script',
 } as const;
 
+// Define remote MCP channel strings directly to avoid tree-shaking
+const REMOTE_MCP_CHANNELS = {
+  FETCH_DIRECTORY: 'remote-mcp:fetch-directory',
+  SEARCH_SERVERS: 'remote-mcp:search',
+  GET_SERVER_DETAILS: 'remote-mcp:get-details',
+  TEST_CONNECTION: 'remote-mcp:test-connection',
+  TEST_ALL_CONNECTIONS: 'remote-mcp:test-all',
+  ADD_REMOTE_SERVER: 'remote-mcp:add',
+  REFRESH_DIRECTORY: 'remote-mcp:refresh',
+  GET_CACHE_STATUS: 'remote-mcp:cache-status',
+  CHECK_AUTH_STATUS: 'remote-mcp:check-auth-status',
+  LAUNCH_OAUTH_FLOW: 'remote-mcp:launch-oauth',
+  CONFIGURE_API_KEY: 'remote-mcp:configure-api-key',
+  DISCOVER_AUTH: 'remote-mcp:discover-auth',
+} as const;
+
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -133,6 +149,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getAppVersion: () => ipcRenderer.invoke(IPC_CHANNELS.GET_APP_VERSION),
   getClaudeVersion: () => ipcRenderer.invoke(IPC_CHANNELS.GET_CLAUDE_VERSION),
   checkClaudeInstalled: () => ipcRenderer.invoke(IPC_CHANNELS.CHECK_CLAUDE_INSTALLED),
+  checkVersion: () => ipcRenderer.invoke(IPC_CHANNELS.CHECK_VERSION),
   openExternal: (url: string) => ipcRenderer.invoke('system:open-external', url),
 
   // Settings
@@ -273,6 +290,31 @@ contextBridge.exposeInMainWorld('electronAPI', {
   exportStatusLineScript: (args: unknown) =>
     ipcRenderer.invoke(STATUSLINE_CHANNELS.EXPORT_STATUSLINE_SCRIPT, args),
 
+  // Remote MCP Servers
+  fetchRemoteMCPDirectory: (args?: unknown) =>
+    ipcRenderer.invoke(REMOTE_MCP_CHANNELS.FETCH_DIRECTORY, args),
+  searchRemoteMCPServers: (args: unknown) =>
+    ipcRenderer.invoke(REMOTE_MCP_CHANNELS.SEARCH_SERVERS, args),
+  getRemoteMCPServerDetails: (args: unknown) =>
+    ipcRenderer.invoke(REMOTE_MCP_CHANNELS.GET_SERVER_DETAILS, args),
+  testRemoteMCPConnection: (args: unknown) =>
+    ipcRenderer.invoke(REMOTE_MCP_CHANNELS.TEST_CONNECTION, args),
+  testAllRemoteMCPConnections: (args: unknown) =>
+    ipcRenderer.invoke(REMOTE_MCP_CHANNELS.TEST_ALL_CONNECTIONS, args),
+  addRemoteMCPServer: (args: unknown) =>
+    ipcRenderer.invoke(REMOTE_MCP_CHANNELS.ADD_REMOTE_SERVER, args),
+  refreshRemoteMCPDirectory: () => ipcRenderer.invoke(REMOTE_MCP_CHANNELS.REFRESH_DIRECTORY),
+  getRemoteMCPCacheStatus: () => ipcRenderer.invoke(REMOTE_MCP_CHANNELS.GET_CACHE_STATUS),
+
+  // Remote MCP Authentication
+  checkMCPAuthStatus: (args: unknown) =>
+    ipcRenderer.invoke(REMOTE_MCP_CHANNELS.CHECK_AUTH_STATUS, args),
+  launchMCPOAuthFlow: (args: unknown) =>
+    ipcRenderer.invoke(REMOTE_MCP_CHANNELS.LAUNCH_OAUTH_FLOW, args),
+  configureMCPApiKey: (args: unknown) =>
+    ipcRenderer.invoke(REMOTE_MCP_CHANNELS.CONFIGURE_API_KEY, args),
+  discoverMCPAuth: (args: unknown) => ipcRenderer.invoke(REMOTE_MCP_CHANNELS.DISCOVER_AUTH, args),
+
   // Claude CLI
   executeCLI: (args: unknown) => ipcRenderer.invoke(IPC_CHANNELS.EXECUTE_CLI, args),
   stopCLI: (args: unknown) => ipcRenderer.invoke(IPC_CHANNELS.STOP_CLI, args),
@@ -298,6 +340,7 @@ export interface ElectronAPI {
   getAppVersion: () => Promise<string>;
   getClaudeVersion: () => Promise<string | null>;
   checkClaudeInstalled: () => Promise<unknown>;
+  checkVersion: () => Promise<unknown>;
   openExternal: (url: string) => Promise<unknown>;
   getSettings: (args: unknown) => Promise<unknown>;
   saveSettings: (args: unknown) => Promise<unknown>;
@@ -393,4 +436,16 @@ export interface ElectronAPI {
   disableStatusLine: () => Promise<unknown>;
   scanStatusLineScript: (args: unknown) => Promise<unknown>;
   exportStatusLineScript: (args: unknown) => Promise<unknown>;
+  fetchRemoteMCPDirectory: (args?: unknown) => Promise<unknown>;
+  searchRemoteMCPServers: (args: unknown) => Promise<unknown>;
+  getRemoteMCPServerDetails: (args: unknown) => Promise<unknown>;
+  testRemoteMCPConnection: (args: unknown) => Promise<unknown>;
+  testAllRemoteMCPConnections: (args: unknown) => Promise<unknown>;
+  addRemoteMCPServer: (args: unknown) => Promise<unknown>;
+  refreshRemoteMCPDirectory: () => Promise<unknown>;
+  getRemoteMCPCacheStatus: () => Promise<unknown>;
+  checkMCPAuthStatus: (args: unknown) => Promise<unknown>;
+  launchMCPOAuthFlow: (args: unknown) => Promise<unknown>;
+  configureMCPApiKey: (args: unknown) => Promise<unknown>;
+  discoverMCPAuth: (args: unknown) => Promise<unknown>;
 }

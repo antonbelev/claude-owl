@@ -238,8 +238,8 @@ describe('ClaudeService - Windows Platform Support', () => {
 
       // Should NOT include cmd /c
       expect(command).not.toContain('cmd /c');
-      // Should still include npx normally
-      expect(command).toContain('-- npx');
+      // Should still include npx normally (without -- separator)
+      expect(command).toContain('npx');
     });
 
     it('should NOT add "cmd /c" for non-npx commands on Windows', () => {
@@ -262,7 +262,7 @@ describe('ClaudeService - Windows Platform Support', () => {
 
       // Should NOT include cmd /c for non-npx commands
       expect(command).not.toContain('cmd /c');
-      expect(command).toContain('-- node');
+      expect(command).toContain('node server.js');
     });
 
     it('should handle HTTP transport the same on both platforms', () => {

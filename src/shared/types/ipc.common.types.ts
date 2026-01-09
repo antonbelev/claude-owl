@@ -61,6 +61,7 @@ export const IPC_CHANNELS = {
   GET_APP_VERSION: 'system:version',
   GET_CLAUDE_VERSION: 'system:claude-version',
   CHECK_CLAUDE_INSTALLED: 'system:check-claude',
+  CHECK_VERSION: 'system:check-version',
 
   // CCUsage (deprecated - replaced by Metrics)
   CHECK_CCUSAGE_INSTALLED: 'ccusage:check-installed',
