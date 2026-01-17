@@ -6,7 +6,7 @@
 
 import { useState } from 'react';
 import { Check, AlertTriangle, X, ChevronRight, ExternalLink } from 'lucide-react';
-import type { HookEventSummary } from '@/shared/types/hook.types';
+import type { HookEventSummary, HookWithMetadata } from '@/shared/types/hook.types';
 import { HookDetailsViewer } from './HookDetailsViewer';
 import { Card, CardContent } from '@/renderer/components/ui/card';
 import { Button } from '@/renderer/components/ui/button';
@@ -14,10 +14,14 @@ import { Badge } from '@/renderer/components/ui/badge';
 
 interface HookEventListProps {
   events: HookEventSummary[];
-  className?: string;
+  className?: string | undefined;
+  /** Callback when user wants to edit a hook */
+  onEditHook?: ((hook: HookWithMetadata) => void) | undefined;
+  /** Callback when user wants to delete a hook */
+  onDeleteHook?: ((hook: HookWithMetadata) => void) | undefined;
 }
 
-export function HookEventList({ events, className }: HookEventListProps) {
+export function HookEventList({ events, className, onEditHook, onDeleteHook }: HookEventListProps) {
   const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
 
   const toggleEvent = (eventName: string) => {
@@ -124,7 +128,12 @@ export function HookEventList({ events, className }: HookEventListProps) {
                         Configured Hooks ({eventSummary.count})
                       </h4>
                       {eventSummary.hooks.map((hook, index) => (
-                        <HookDetailsViewer key={index} hook={hook} />
+                        <HookDetailsViewer
+                          key={index}
+                          hook={hook}
+                          onEdit={onEditHook}
+                          onDelete={onDeleteHook}
+                        />
                       ))}
                     </div>
                   ) : (

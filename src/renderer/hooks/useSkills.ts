@@ -19,6 +19,15 @@ export interface UseSkillsResult {
     allowedTools?: string[],
     projectPath?: string
   ) => Promise<boolean>;
+  /** Update an existing skill (uses same backend as create - overwrites) */
+  updateSkill: (
+    name: string,
+    description: string,
+    content: string,
+    location: 'user' | 'project',
+    allowedTools?: string[],
+    projectPath?: string
+  ) => Promise<boolean>;
   deleteSkill: (
     name: string,
     location: 'user' | 'project',
@@ -135,12 +144,16 @@ export function useSkills(): UseSkillsResult {
     fetchSkills();
   }, [fetchSkills]);
 
+  // updateSkill is an alias for createSkill since the backend overwrites
+  const updateSkill = createSkill;
+
   return {
     skills,
     loading,
     error,
     refetch: fetchSkills,
     createSkill,
+    updateSkill,
     deleteSkill,
   };
 }

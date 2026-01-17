@@ -1,24 +1,71 @@
 /**
- * HooksPage - Main page for Hooks Manager (Phase 1)
+ * HooksPage - Main page for Hooks Manager
  *
- * Read-only hooks viewing, validation, and template library
+ * Full CRUD support for Claude Code hooks
  */
 
 import { useState } from 'react';
 import { SecurityWarningBanner } from '@/renderer/components/HooksManager/SecurityWarningBanner';
 import { HookEventList } from '@/renderer/components/HooksManager/HookEventList';
 import { HookTemplateGallery } from '@/renderer/components/HooksManager/HookTemplateGallery';
-import { useAllHooks } from '@/renderer/hooks/useHooks';
+import { HookEditModal } from '@/renderer/components/HooksManager/HookEditModal';
+import { useAllHooks, useDeleteHook } from '@/renderer/hooks/useHooks';
 import { Button } from '@/renderer/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/renderer/components/ui/tabs';
 import { Badge } from '@/renderer/components/ui/badge';
 import { Alert, AlertDescription } from '@/renderer/components/ui/alert';
-import { RefreshCw, AlertCircle } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/renderer/components/ui/dialog';
+import { RefreshCw, AlertCircle, Plus } from 'lucide-react';
 import { LoadingSpinner } from '@/renderer/components/common/LoadingSpinner';
+import type { HookWithMetadata } from '@/shared/types/hook.types';
 
 export function HooksPage() {
   const { data: events, isLoading, isError, error, refetch, isRefetching } = useAllHooks();
+  const deleteHook = useDeleteHook();
   const [activeTab, setActiveTab] = useState<'hooks' | 'templates'>('hooks');
+
+  // Modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingHook, setEditingHook] = useState<HookWithMetadata | null>(null);
+  const [deletingHook, setDeletingHook] = useState<HookWithMetadata | null>(null);
+
+  const handleCreateHook = () => {
+    setEditingHook(null);
+    setShowEditModal(true);
+  };
+
+  const handleEditHook = (hook: HookWithMetadata) => {
+    setEditingHook(hook);
+    setShowEditModal(true);
+  };
+
+  const handleDeleteHook = (hook: HookWithMetadata) => {
+    setDeletingHook(hook);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingHook) return;
+
+    const hookId = `${deletingHook.event}:${deletingHook.configIndex}:${deletingHook.hookIndex}`;
+    const scope = deletingHook.location === 'local' ? 'project' : deletingHook.location;
+
+    try {
+      await deleteHook.mutateAsync({
+        hookId,
+        scope: scope as 'user' | 'project',
+      });
+      setDeletingHook(null);
+    } catch (err) {
+      console.error('[HooksPage] Failed to delete hook:', err);
+    }
+  };
 
   return (
     <div className="h-full flex flex-col p-8 bg-white">
@@ -27,13 +74,19 @@ export function HooksPage() {
         <div>
           <h1 className="text-3xl font-semibold text-neutral-900 mb-2">Hooks Manager</h1>
           <p className="text-base text-neutral-600">
-            View and manage Claude Code hooks with security validation
+            Create and manage hooks to customize Claude Code behavior
           </p>
         </div>
-        <Button onClick={() => refetch()} disabled={isRefetching} variant="outline">
-          <RefreshCw className={`h-4 w-4 mr-2 ${isRefetching ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => refetch()} disabled={isRefetching} variant="outline">
+            <RefreshCw className={`h-4 w-4 mr-2 ${isRefetching ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          <Button onClick={handleCreateHook}>
+            <Plus className="h-4 w-4 mr-2" />
+            Create Hook
+          </Button>
+        </div>
       </div>
 
       {/* Security Warning */}
@@ -91,7 +144,11 @@ export function HooksPage() {
                     {events.filter(e => e.count > 0).length} events with hooks
                   </div>
                 </div>
-                <HookEventList events={events} />
+                <HookEventList
+                  events={events}
+                  onEditHook={handleEditHook}
+                  onDeleteHook={handleDeleteHook}
+                />
               </>
             ) : (
               <div className="text-center py-12">
@@ -109,13 +166,53 @@ export function HooksPage() {
 
       {/* Footer Note */}
       <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="font-semibold text-blue-900 mb-1">📝 Phase 1: Read-Only Mode</p>
+        <p className="font-semibold text-blue-900 mb-1">Hooks Documentation</p>
         <p className="text-sm text-blue-800">
-          This is Phase 1 implementation focused on viewing and validation. To modify hooks, use the
-          &quot;Edit in settings.json&quot; button to open the file in your external editor.
-          Template-based editing will be available in Phase 2.
+          Hooks let you customize Claude Code&apos;s behavior by running scripts or prompts at key moments.
+          Learn more in the{' '}
+          <button
+            type="button"
+            onClick={() => window.electronAPI.openExternal('https://code.claude.com/docs/en/hooks')}
+            className="underline hover:text-blue-900"
+          >
+            official documentation
+          </button>
+          .
         </p>
       </div>
+
+      {/* Edit Modal */}
+      <HookEditModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        hook={editingHook}
+        onSuccess={() => refetch()}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deletingHook} onOpenChange={(open: boolean) => !open && setDeletingHook(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Hook</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this {deletingHook?.event} hook?
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeletingHook(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={deleteHook.isPending}
+            >
+              {deleteHook.isPending ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

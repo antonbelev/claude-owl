@@ -62,6 +62,9 @@ const HOOKS_CHANNELS = {
   GET_TEMPLATES: 'hooks:get-templates',
   GET_SETTINGS_PATH: 'hooks:get-settings-path',
   OPEN_SETTINGS_FILE: 'hooks:open-settings',
+  CREATE_HOOK: 'hooks:create',
+  UPDATE_HOOK: 'hooks:update',
+  DELETE_HOOK: 'hooks:delete',
 } as const;
 
 // Define MCP channel strings directly to avoid tree-shaking
@@ -251,6 +254,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke(HOOKS_CHANNELS.GET_SETTINGS_PATH, args),
   openHookSettingsFile: (args: unknown) =>
     ipcRenderer.invoke(HOOKS_CHANNELS.OPEN_SETTINGS_FILE, args),
+  createHook: (args: unknown) => ipcRenderer.invoke(HOOKS_CHANNELS.CREATE_HOOK, args),
+  updateHook: (args: unknown) => ipcRenderer.invoke(HOOKS_CHANNELS.UPDATE_HOOK, args),
+  deleteHook: (args: unknown) => ipcRenderer.invoke(HOOKS_CHANNELS.DELETE_HOOK, args),
 
   // MCP Servers
   addMCPServer: (args: unknown) => ipcRenderer.invoke(MCP_CHANNELS.ADD_MCP_SERVER, args),
@@ -415,6 +421,9 @@ export interface ElectronAPI {
   getHookTemplates: () => Promise<unknown>;
   getHookSettingsPath: (args: unknown) => Promise<unknown>;
   openHookSettingsFile: (args: unknown) => Promise<unknown>;
+  createHook: (args: unknown) => Promise<unknown>;
+  updateHook: (args: unknown) => Promise<unknown>;
+  deleteHook: (args: unknown) => Promise<unknown>;
   addMCPServer: (args: unknown) => Promise<unknown>;
   removeMCPServer: (args: unknown) => Promise<unknown>;
   listMCPServers: (args?: unknown) => Promise<unknown>;

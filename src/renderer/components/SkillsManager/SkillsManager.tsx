@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSkills } from '../../hooks/useSkills';
 import type { Skill, ProjectInfo } from '@/shared/types';
 import { parseMarkdownWithFrontmatter, validateSkillMarkdown } from '@/shared/utils/markdown.utils';
@@ -30,11 +30,13 @@ import {
   Clock,
   Plus,
   Search,
+  Pencil,
 } from 'lucide-react';
 
 export const SkillsManager: React.FC = () => {
-  const { skills, loading, error, refetch, createSkill, deleteSkill } = useSkills();
+  const { skills, loading, error, refetch, createSkill, updateSkill, deleteSkill } = useSkills();
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<Skill | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,6 +50,12 @@ export const SkillsManager: React.FC = () => {
 
   const handleCloseModal = () => {
     setShowCreateModal(false);
+    setEditingSkill(null);
+  };
+
+  const handleEditSkill = (skill: Skill) => {
+    setSelectedSkill(null); // Close detail modal
+    setEditingSkill(skill);
   };
 
   const handleViewSkill = (skill: Skill) => {
@@ -249,13 +257,22 @@ export const SkillsManager: React.FC = () => {
         )}
       </div>
 
-      {showCreateModal && <SkillCreateModal onClose={handleCloseModal} onCreate={createSkill} />}
+      {showCreateModal && <SkillEditModal onClose={handleCloseModal} onSave={createSkill} />}
+
+      {editingSkill && (
+        <SkillEditModal
+          skill={editingSkill}
+          onClose={handleCloseModal}
+          onSave={updateSkill}
+        />
+      )}
 
       {selectedSkill && (
         <SkillDetailModal
           skill={selectedSkill}
           onClose={handleCloseDetail}
           onDelete={handleDeleteSkill}
+          onEdit={handleEditSkill}
         />
       )}
 
@@ -322,9 +339,11 @@ const SkillCard: React.FC<SkillCardProps> = ({ skill, onView }) => {
   );
 };
 
-interface SkillCreateModalProps {
+interface SkillEditModalProps {
+  /** Skill to edit (if undefined, creates new skill) */
+  skill?: Skill;
   onClose: () => void;
-  onCreate: (
+  onSave: (
     name: string,
     description: string,
     content: string,
@@ -334,28 +353,63 @@ interface SkillCreateModalProps {
   ) => Promise<boolean>;
 }
 
-const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }) => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [content, setContent] = useState('');
-  const [location, setLocation] = useState<'user' | 'project'>('user');
+const SkillEditModal: React.FC<SkillEditModalProps> = ({ skill, onClose, onSave }) => {
+  const isEditMode = !!skill;
+  const formRef = React.useRef<HTMLFormElement>(null);
+
+  // Initialize form state from skill (edit mode) or empty (create mode)
+  const [name, setName] = useState(skill?.frontmatter.name || '');
+  const [description, setDescription] = useState(skill?.frontmatter.description || '');
+  const [content, setContent] = useState(skill?.content || '');
+  const [location, setLocation] = useState<'user' | 'project'>(
+    (skill?.location as 'user' | 'project') || 'user'
+  );
   const [selectedProject, setSelectedProject] = useState<ProjectInfo | null>(null);
-  const [allowedTools, setAllowedTools] = useState('');
-  const [creating, setCreating] = useState(false);
+  const [allowedTools, setAllowedTools] = useState(
+    skill?.frontmatter['allowed-tools']?.join(', ') || ''
+  );
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
 
+  // Track initial values for dirty detection in edit mode
+  const initialValues = React.useRef({
+    name: skill?.frontmatter.name || '',
+    description: skill?.frontmatter.description || '',
+    content: skill?.content || '',
+    allowedTools: skill?.frontmatter['allowed-tools']?.join(', ') || '',
+  });
+
   useEffect(() => {
-    const hasContent = !!(
-      name.trim() ||
-      description.trim() ||
-      content.trim() ||
-      allowedTools.trim()
-    );
-    setHasUnsavedChanges(hasContent);
-  }, [name, description, content, allowedTools]);
+    if (isEditMode) {
+      // In edit mode, check if values differ from initial
+      const hasChanges =
+        name !== initialValues.current.name ||
+        description !== initialValues.current.description ||
+        content !== initialValues.current.content ||
+        allowedTools !== initialValues.current.allowedTools;
+      setHasUnsavedChanges(hasChanges);
+    } else {
+      // In create mode, check if any content exists
+      const hasContent = !!(
+        name.trim() ||
+        description.trim() ||
+        content.trim() ||
+        allowedTools.trim()
+      );
+      setHasUnsavedChanges(hasContent);
+    }
+  }, [name, description, content, allowedTools, isEditMode]);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -401,13 +455,35 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
     e.target.value = '';
   };
 
-  const handleClose = () => {
-    if (hasUnsavedChanges && !creating) {
+  const handleClose = useCallback(() => {
+    if (hasUnsavedChanges && !saving) {
       setShowCloseConfirm(true);
     } else {
       onClose();
     }
-  };
+  }, [hasUnsavedChanges, saving, onClose]);
+
+  // Handle keyboard shortcuts (Escape to close, Cmd/Ctrl+S to save)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Escape to close
+      if (e.key === 'Escape' && !saving) {
+        e.preventDefault();
+        handleClose();
+      }
+
+      // Cmd/Ctrl + S to save
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault();
+        if (!saving) {
+          formRef.current?.requestSubmit();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [saving, handleClose]);
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -418,13 +494,13 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate project selection when location is 'project'
-    if (location === 'project' && !selectedProject) {
+    // Validate project selection when location is 'project' (only for create)
+    if (!isEditMode && location === 'project' && !selectedProject) {
       setError('Please select a project');
       return;
     }
 
-    setCreating(true);
+    setSaving(true);
     setError(null);
 
     const toolsArray = allowedTools.trim()
@@ -434,17 +510,27 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
           .filter(t => t)
       : undefined;
 
-    const projectPath = location === 'project' ? selectedProject?.path : undefined;
-    const success = await onCreate(name, description, content, location, toolsArray, projectPath);
+    // For edit mode, use skill's original projectPath if location is project
+    const projectPath = isEditMode
+      ? skill?.projectPath
+      : location === 'project'
+        ? selectedProject?.path
+        : undefined;
+
+    const success = await onSave(name, description, content, location, toolsArray, projectPath);
 
     if (success) {
       setHasUnsavedChanges(false);
       onClose();
     } else {
-      setError('Failed to create skill. Please check your inputs and try again.');
+      setError(
+        isEditMode
+          ? 'Failed to update skill. Please check your inputs and try again.'
+          : 'Failed to create skill. Please check your inputs and try again.'
+      );
     }
 
-    setCreating(false);
+    setSaving(false);
   };
 
   return (
@@ -458,13 +544,15 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
           onClick={e => e.stopPropagation()}
         >
           <div className="flex justify-between items-center p-6 border-b">
-            <h2 className="text-2xl font-semibold">Create New Skill</h2>
+            <h2 className="text-2xl font-semibold">
+              {isEditMode ? `Edit Skill: ${skill?.frontmatter.name}` : 'Create New Skill'}
+            </h2>
             <Button variant="ghost" size="icon" onClick={handleClose}>
               <X className="h-5 w-5" />
             </Button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <form ref={formRef} onSubmit={handleSubmit} className="p-6 space-y-6">
             {error && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
@@ -528,10 +616,13 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
                 pattern="^[a-z0-9]+(-[a-z0-9]+)*$"
                 maxLength={64}
                 required
+                disabled={isEditMode}
                 data-testid="skill-name-input"
               />
               <p className="text-sm text-neutral-600">
-                Lowercase letters, numbers, and hyphens only (max 64 chars)
+                {isEditMode
+                  ? 'Name cannot be changed when editing'
+                  : 'Lowercase letters, numbers, and hyphens only (max 64 chars)'}
               </p>
             </div>
 
@@ -578,6 +669,7 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
               onScopeChange={setLocation}
               onProjectChange={setSelectedProject}
               compact={true}
+              disabled={isEditMode}
               userLabel="User Skills"
               projectLabel="Project Skills"
               userDescription="Personal skills in ~/.claude/skills/"
@@ -600,11 +692,17 @@ const SkillCreateModal: React.FC<SkillCreateModalProps> = ({ onClose, onCreate }
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button type="button" onClick={handleClose} variant="secondary" disabled={creating}>
+              <Button type="button" onClick={handleClose} variant="secondary" disabled={saving}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={creating} data-testid="submit-skill-btn">
-                {creating ? 'Creating...' : 'Create Skill'}
+              <Button type="submit" disabled={saving} data-testid="submit-skill-btn">
+                {saving
+                  ? isEditMode
+                    ? 'Saving...'
+                    : 'Creating...'
+                  : isEditMode
+                    ? 'Save Changes'
+                    : 'Create Skill'}
               </Button>
             </div>
           </form>
@@ -653,9 +751,10 @@ interface SkillDetailModalProps {
   skill: Skill;
   onClose: () => void;
   onDelete: (skill: Skill) => void;
+  onEdit: (skill: Skill) => void;
 }
 
-const SkillDetailModal: React.FC<SkillDetailModalProps> = ({ skill, onClose, onDelete }) => {
+const SkillDetailModal: React.FC<SkillDetailModalProps> = ({ skill, onClose, onDelete, onEdit }) => {
   const locationVariant =
     skill.location === 'user' ? 'default' : skill.location === 'project' ? 'secondary' : 'outline';
 
@@ -743,23 +842,33 @@ const SkillDetailModal: React.FC<SkillDetailModalProps> = ({ skill, onClose, onD
         </div>
 
         <div className="flex justify-between p-6 border-t gap-3">
-          {skill.location !== 'plugin' && (
-            <Button
-              onClick={() => onDelete(skill)}
-              variant="destructive"
-              data-testid="delete-skill-btn"
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete Skill
+          <div className="flex gap-2">
+            {skill.location !== 'plugin' && (
+              <Button
+                onClick={() => onDelete(skill)}
+                variant="destructive"
+                data-testid="delete-skill-btn"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </Button>
+            )}
+          </div>
+          <div className="flex gap-2">
+            {skill.location !== 'plugin' && (
+              <Button
+                onClick={() => onEdit(skill)}
+                variant="outline"
+                data-testid="edit-skill-btn"
+              >
+                <Pencil className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            )}
+            <Button onClick={onClose} variant="secondary">
+              Close
             </Button>
-          )}
-          <Button
-            onClick={onClose}
-            variant="secondary"
-            className={skill.location === 'plugin' ? 'ml-auto' : ''}
-          >
-            Close
-          </Button>
+          </div>
         </div>
       </div>
     </div>
