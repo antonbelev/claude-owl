@@ -13,6 +13,12 @@ import type {
   GetSettingsPathResponse,
   OpenSettingsFileRequest,
   OpenSettingsFileResponse,
+  CreateHookRequest,
+  CreateHookResponse,
+  UpdateHookRequest,
+  UpdateHookResponse,
+  DeleteHookRequest,
+  DeleteHookResponse,
 } from '../../shared/types/ipc.types';
 import { HooksService } from '../services/HooksService';
 
@@ -23,6 +29,9 @@ const HOOKS_CHANNELS = {
   GET_TEMPLATES: 'hooks:get-templates',
   GET_SETTINGS_PATH: 'hooks:get-settings-path',
   OPEN_SETTINGS_FILE: 'hooks:open-settings',
+  CREATE_HOOK: 'hooks:create',
+  UPDATE_HOOK: 'hooks:update',
+  DELETE_HOOK: 'hooks:delete',
 } as const;
 
 const hooksService = new HooksService();
@@ -148,6 +157,138 @@ export function registerHooksHandlers(): void {
         return {
           success: false,
           error: error instanceof Error ? error.message : 'Failed to open settings file',
+        };
+      }
+    }
+  );
+
+  /**
+   * Create a new hook
+   */
+  ipcMain.handle(
+    HOOKS_CHANNELS.CREATE_HOOK,
+    async (_, request: CreateHookRequest): Promise<CreateHookResponse> => {
+      console.log('[HooksHandlers] Create hook request:', {
+        event: request.hook.event,
+        type: request.hook.type,
+        scope: request.scope,
+        projectPath: request.projectPath,
+      });
+
+      try {
+        const result = await hooksService.createHook(
+          request.hook,
+          request.scope,
+          request.projectPath
+        );
+
+        if (!result.success) {
+          console.error('[HooksHandlers] Hook creation failed:', result.error);
+          return {
+            success: false,
+            error: result.error || 'Hook creation failed',
+          };
+        }
+
+        console.log('[HooksHandlers] Hook created successfully:', result.hookId);
+
+        return {
+          success: true,
+          data: { hookId: result.hookId! },
+        };
+      } catch (error) {
+        console.error('[HooksHandlers] Failed to create hook:', error);
+
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to create hook',
+        };
+      }
+    }
+  );
+
+  /**
+   * Update an existing hook
+   */
+  ipcMain.handle(
+    HOOKS_CHANNELS.UPDATE_HOOK,
+    async (_, request: UpdateHookRequest): Promise<UpdateHookResponse> => {
+      console.log('[HooksHandlers] Update hook request:', {
+        hookId: request.hookId,
+        scope: request.scope,
+        projectPath: request.projectPath,
+      });
+
+      try {
+        const result = await hooksService.updateHook(
+          request.hookId,
+          request.updates,
+          request.scope,
+          request.projectPath
+        );
+
+        if (!result.success) {
+          console.error('[HooksHandlers] Hook update failed:', result.error);
+          return {
+            success: false,
+            error: result.error || 'Hook update failed',
+          };
+        }
+
+        console.log('[HooksHandlers] Hook updated successfully:', request.hookId);
+
+        return {
+          success: true,
+        };
+      } catch (error) {
+        console.error('[HooksHandlers] Failed to update hook:', error);
+
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to update hook',
+        };
+      }
+    }
+  );
+
+  /**
+   * Delete a hook
+   */
+  ipcMain.handle(
+    HOOKS_CHANNELS.DELETE_HOOK,
+    async (_, request: DeleteHookRequest): Promise<DeleteHookResponse> => {
+      console.log('[HooksHandlers] Delete hook request:', {
+        hookId: request.hookId,
+        scope: request.scope,
+        projectPath: request.projectPath,
+      });
+
+      try {
+        const result = await hooksService.deleteHook(
+          request.hookId,
+          request.scope,
+          request.projectPath
+        );
+
+        if (!result.success) {
+          console.error('[HooksHandlers] Hook deletion failed:', result.error);
+          return {
+            success: false,
+            error: result.error || 'Hook deletion failed',
+          };
+        }
+
+        console.log('[HooksHandlers] Hook deleted successfully:', request.hookId);
+
+        return {
+          success: true,
+        };
+      } catch (error) {
+        console.error('[HooksHandlers] Failed to delete hook:', error);
+
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to delete hook',
         };
       }
     }

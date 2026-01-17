@@ -1,11 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { Bot, Plus, Search, X, Edit2, Trash2, AlertCircle } from 'lucide-react';
+import { Bot, Plus, Search, X, Edit2, Trash2, AlertCircle, Copy } from 'lucide-react';
 import { useAgents } from '../../hooks/useAgents';
-import type { Agent, AgentFrontmatter, ProjectInfo, AgentModelAlias } from '@/shared/types';
-import { AGENT_MODEL_OPTIONS } from '@/shared/types';
+import type { Agent } from '@/shared/types';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { PageHeader } from '../common/PageHeader';
-import { ScopeSelector } from '../common/ScopeSelector';
+import { AgentEditModal } from './AgentEditModal';
 import {
   Card,
   CardHeader,
@@ -16,7 +15,6 @@ import {
 import { Button } from '@/renderer/components/ui/button';
 import { Badge } from '@/renderer/components/ui/badge';
 import { Input } from '@/renderer/components/ui/input';
-import { Textarea } from '@/renderer/components/ui/textarea';
 import { Label } from '@/renderer/components/ui/label';
 import {
   Select,
@@ -33,6 +31,7 @@ export const AgentsManager: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
+  const [copyingAgent, setCopyingAgent] = useState<Agent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [locationFilter, setLocationFilter] = useState<'all' | 'user' | 'project' | 'plugin'>(
     'all'
@@ -41,11 +40,22 @@ export const AgentsManager: React.FC = () => {
 
   const handleCreateAgent = () => {
     setEditingAgent(null);
+    setCopyingAgent(null);
     setShowCreateModal(true);
   };
 
   const handleEditAgent = (agent: Agent) => {
     setEditingAgent(agent);
+    setCopyingAgent(null);
+    setShowCreateModal(true);
+    setSelectedAgent(null);
+  };
+
+  const handleCopyAgent = (agent: Agent) => {
+    // Create a copy by opening the edit modal with agent data but no agent reference
+    // This allows user to save as new agent in user/project location
+    setCopyingAgent(agent);
+    setEditingAgent(null);
     setShowCreateModal(true);
     setSelectedAgent(null);
   };
@@ -53,6 +63,7 @@ export const AgentsManager: React.FC = () => {
   const handleCloseModal = () => {
     setShowCreateModal(false);
     setEditingAgent(null);
+    setCopyingAgent(null);
   };
 
   const handleViewAgent = (agent: Agent) => {
@@ -66,7 +77,6 @@ export const AgentsManager: React.FC = () => {
   const handleDeleteAgent = (agent: Agent) => {
     // Plugin agents cannot be deleted
     if (agent.location === 'plugin') {
-      alert('Plugin agents cannot be deleted.');
       return;
     }
 
@@ -246,6 +256,7 @@ export const AgentsManager: React.FC = () => {
                 onView={handleViewAgent}
                 onEdit={handleEditAgent}
                 onDelete={handleDeleteAgent}
+                onCopy={handleCopyAgent}
               />
             ))}
           </div>
@@ -253,7 +264,12 @@ export const AgentsManager: React.FC = () => {
       </div>
 
       {showCreateModal && (
-        <AgentEditModal agent={editingAgent} onClose={handleCloseModal} onSave={saveAgent} />
+        <AgentEditModal
+          agent={editingAgent}
+          copyFrom={copyingAgent}
+          onClose={handleCloseModal}
+          onSave={saveAgent}
+        />
       )}
 
       {selectedAgent && (
@@ -262,6 +278,7 @@ export const AgentsManager: React.FC = () => {
           onClose={handleCloseDetail}
           onEdit={handleEditAgent}
           onDelete={handleDeleteAgent}
+          onCopy={handleCopyAgent}
         />
       )}
 
@@ -285,14 +302,16 @@ interface AgentCardProps {
   onView: (agent: Agent) => void;
   onEdit: (agent: Agent) => void;
   onDelete: (agent: Agent) => void;
+  onCopy: (agent: Agent) => void;
 }
 
-const AgentCard: React.FC<AgentCardProps> = ({ agent, onView, onEdit, onDelete }) => {
+const AgentCard: React.FC<AgentCardProps> = ({ agent, onView, onEdit, onDelete, onCopy }) => {
   const locationBadge =
     agent.location === 'user' ? 'User' : agent.location === 'project' ? 'Project' : 'Plugin';
   const locationVariant: 'default' | 'secondary' | 'outline' =
     agent.location === 'user' ? 'default' : agent.location === 'project' ? 'secondary' : 'outline';
   const canEdit = agent.location !== 'plugin';
+  const isPlugin = agent.location === 'plugin';
 
   const handleCardClick = () => {
     onView(agent);
@@ -306,6 +325,11 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent, onView, onEdit, onDelete }
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     onDelete(agent);
+  };
+
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onCopy(agent);
   };
 
   return (
@@ -339,269 +363,44 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent, onView, onEdit, onDelete }
         </div>
       </CardContent>
 
-      {canEdit && (
-        <CardFooter className="flex gap-2 pt-4">
+      <CardFooter className="flex gap-2 pt-4">
+        {canEdit ? (
+          <>
+            <Button
+              onClick={handleEdit}
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              title="Edit agent"
+            >
+              <Edit2 className="h-3 w-3 mr-1" />
+              Edit
+            </Button>
+            <Button
+              onClick={handleDelete}
+              variant="outline"
+              size="sm"
+              className="flex-1 text-destructive hover:bg-destructive/10"
+              title="Delete agent"
+            >
+              <Trash2 className="h-3 w-3 mr-1" />
+              Delete
+            </Button>
+          </>
+        ) : isPlugin ? (
           <Button
-            onClick={handleEdit}
+            onClick={handleCopy}
             variant="outline"
             size="sm"
             className="flex-1"
-            title="Edit agent"
+            title="Copy to user or project"
           >
-            <Edit2 className="h-3 w-3 mr-1" />
-            Edit
+            <Copy className="h-3 w-3 mr-1" />
+            Copy to My Agents
           </Button>
-          <Button
-            onClick={handleDelete}
-            variant="outline"
-            size="sm"
-            className="flex-1 text-destructive hover:bg-destructive/10"
-            title="Delete agent"
-          >
-            <Trash2 className="h-3 w-3 mr-1" />
-            Delete
-          </Button>
-        </CardFooter>
-      )}
+        ) : null}
+      </CardFooter>
     </Card>
-  );
-};
-
-interface AgentEditModalProps {
-  agent: Agent | null;
-  onClose: () => void;
-  onSave: (agent: Omit<Agent, 'lastModified'>) => Promise<boolean>;
-}
-
-const AgentEditModal: React.FC<AgentEditModalProps> = ({ agent, onClose, onSave }) => {
-  const isEditing = agent !== null;
-  const [name, setName] = useState(agent?.frontmatter.name || '');
-  const [description, setDescription] = useState(agent?.frontmatter.description || '');
-  const [content, setContent] = useState(agent?.content || '');
-  const [location, setLocation] = useState<'user' | 'project'>(
-    (agent?.location as 'user' | 'project') || 'user'
-  );
-  const [selectedProject, setSelectedProject] = useState<ProjectInfo | null>(null);
-  const [model, setModel] = useState<AgentModelAlias>(agent?.frontmatter.model || 'default');
-  const [tools, setTools] = useState(agent?.frontmatter.tools?.join(', ') || '');
-  const [saving, setSaving] = useState(false);
-  const [validationError, setValidationError] = useState('');
-
-  // Handle Escape key to close modal
-  React.useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !saving) {
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [onClose, saving]);
-
-  const handleSave = async () => {
-    // Validation
-    if (!name.trim()) {
-      setValidationError('Agent name is required');
-      return;
-    }
-
-    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(name)) {
-      setValidationError('Agent name must be lowercase with hyphens only (e.g., my-agent)');
-      return;
-    }
-
-    if (!description.trim()) {
-      setValidationError('Description is required');
-      return;
-    }
-
-    if (!content.trim()) {
-      setValidationError('System prompt is required');
-      return;
-    }
-
-    // Validate project selection when location is 'project'
-    if (location === 'project' && !selectedProject) {
-      setValidationError('Please select a project');
-      return;
-    }
-
-    setSaving(true);
-    setValidationError('');
-
-    const frontmatter: AgentFrontmatter = {
-      name: name.trim(),
-      description: description.trim(),
-    };
-
-    if (model && model !== 'default') {
-      frontmatter.model = model;
-    }
-
-    if (tools.trim()) {
-      frontmatter.tools = tools
-        .split(',')
-        .map(t => t.trim())
-        .filter(Boolean);
-    }
-
-    const agentData: Omit<Agent, 'lastModified'> = {
-      frontmatter,
-      content: content.trim(),
-      filePath: agent?.filePath || '',
-      location,
-      ...(location === 'project' && selectedProject?.path
-        ? { projectPath: selectedProject.path }
-        : {}),
-    };
-
-    const success = await onSave(agentData);
-
-    setSaving(false);
-
-    if (success) {
-      onClose();
-    } else {
-      setValidationError('Failed to save agent. Please try again.');
-    }
-  };
-
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div
-        className="modal-content agent-modal"
-        onClick={e => e.stopPropagation()}
-        style={{ background: '#ffffff' }}
-      >
-        <div className="modal-header">
-          <h2>{isEditing ? 'Edit Subagent' : 'Create New Subagent'}</h2>
-          <button onClick={onClose} className="modal-close">
-            ×
-          </button>
-        </div>
-
-        <div className="modal-body">
-          {validationError && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{validationError}</AlertDescription>
-            </Alert>
-          )}
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="agent-name">
-                Name <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="agent-name"
-                type="text"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="my-custom-agent"
-                disabled={isEditing}
-              />
-              <p className="text-xs text-muted-foreground">Lowercase with hyphens only</p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="agent-description">
-                Description <span className="text-destructive">*</span>
-              </Label>
-              <Textarea
-                id="agent-description"
-                value={description}
-                onChange={e => setDescription(e.target.value)}
-                placeholder="What does this agent do?"
-                rows={3}
-              />
-            </div>
-
-            <ScopeSelector
-              scope={location}
-              selectedProject={selectedProject}
-              onScopeChange={setLocation}
-              onProjectChange={setSelectedProject}
-              compact={true}
-              disabled={isEditing}
-              userLabel="User Subagents"
-              projectLabel="Project Subagents"
-              userDescription="Stored in ~/.claude/agents/"
-              projectDescription="Stored in .claude/agents/"
-            />
-
-            <div className="space-y-2">
-              <Label htmlFor="agent-model">Model</Label>
-              <Select value={model} onValueChange={value => setModel(value as AgentModelAlias)}>
-                <SelectTrigger id="agent-model">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="z-[1100] max-w-md">
-                  {AGENT_MODEL_OPTIONS.map(option => (
-                    <SelectItem
-                      key={option.alias}
-                      value={option.alias}
-                      className="py-2.5"
-                      textValue={option.label}
-                    >
-                      <div className="flex flex-col gap-0.5">
-                        <span className="font-medium">{option.label}</span>
-                        <span className="text-xs text-muted-foreground">{option.description}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                Model to use for this subagent. Select &quot;Inherit&quot; to use parent context
-                model.
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="agent-tools">Tools (optional)</Label>
-              <Input
-                id="agent-tools"
-                type="text"
-                value={tools}
-                onChange={e => setTools(e.target.value)}
-                placeholder="Read, Write, Bash (comma-separated)"
-              />
-              <p className="text-xs text-muted-foreground">
-                Comma-separated tool names. Leave empty to allow all tools.
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="agent-content">
-                System Prompt <span className="text-destructive">*</span>
-              </Label>
-              <Textarea
-                id="agent-content"
-                value={content}
-                onChange={e => setContent(e.target.value)}
-                placeholder="Enter the system prompt for this agent..."
-                rows={12}
-                className="font-mono"
-              />
-              <p className="text-xs text-muted-foreground">
-                The more specific and detailed your prompt, the better the agent will perform.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="modal-footer">
-          <Button onClick={onClose} variant="outline" disabled={saving}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave} variant="default" disabled={saving}>
-            {saving ? 'Saving...' : isEditing ? 'Save Changes' : 'Create Subagent'}
-          </Button>
-        </div>
-      </div>
-    </div>
   );
 };
 
@@ -610,6 +409,7 @@ interface AgentDetailModalProps {
   onClose: () => void;
   onEdit: (agent: Agent) => void;
   onDelete: (agent: Agent) => void;
+  onCopy: (agent: Agent) => void;
 }
 
 const AgentDetailModal: React.FC<AgentDetailModalProps> = ({
@@ -617,8 +417,10 @@ const AgentDetailModal: React.FC<AgentDetailModalProps> = ({
   onClose,
   onEdit,
   onDelete,
+  onCopy,
 }) => {
   const canEdit = agent.location !== 'plugin';
+  const isPlugin = agent.location === 'plugin';
 
   // Handle Escape key to close modal
   React.useEffect(() => {
@@ -638,6 +440,10 @@ const AgentDetailModal: React.FC<AgentDetailModalProps> = ({
 
   const handleDelete = () => {
     onDelete(agent);
+  };
+
+  const handleCopy = () => {
+    onCopy(agent);
   };
 
   return (
@@ -702,16 +508,25 @@ const AgentDetailModal: React.FC<AgentDetailModalProps> = ({
           </div>
         </div>
 
-        {canEdit && (
-          <div className="modal-footer">
-            <Button onClick={handleDelete} variant="destructive">
-              Delete Subagent
+        <div className="modal-footer">
+          {canEdit ? (
+            <>
+              <Button onClick={handleDelete} variant="destructive">
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Subagent
+              </Button>
+              <Button onClick={handleEdit} variant="default">
+                <Edit2 className="h-4 w-4 mr-2" />
+                Edit Subagent
+              </Button>
+            </>
+          ) : isPlugin ? (
+            <Button onClick={handleCopy} variant="default">
+              <Copy className="h-4 w-4 mr-2" />
+              Copy to My Agents
             </Button>
-            <Button onClick={handleEdit} variant="default">
-              Edit Subagent
-            </Button>
-          </div>
-        )}
+          ) : null}
+        </div>
       </div>
     </div>
   );
