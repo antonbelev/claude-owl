@@ -168,8 +168,8 @@ export function HooksPage() {
       <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="font-semibold text-blue-900 mb-1">Hooks Documentation</p>
         <p className="text-sm text-blue-800">
-          Hooks let you customize Claude Code&apos;s behavior by running scripts or prompts at key moments.
-          Learn more in the{' '}
+          Hooks let you customize Claude Code&apos;s behavior by running scripts or prompts at key
+          moments. Learn more in the{' '}
           <button
             type="button"
             onClick={() => window.electronAPI.openExternal('https://code.claude.com/docs/en/hooks')}
@@ -190,24 +190,23 @@ export function HooksPage() {
       />
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={!!deletingHook} onOpenChange={(open: boolean) => !open && setDeletingHook(null)}>
+      <Dialog
+        open={!!deletingHook}
+        onOpenChange={(open: boolean) => !open && setDeletingHook(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Hook</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this {deletingHook?.event} hook?
-              This action cannot be undone.
+              Are you sure you want to delete this {deletingHook?.event} hook? This action cannot be
+              undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeletingHook(null)}>
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmDelete}
-              disabled={deleteHook.isPending}
-            >
+            <Button variant="destructive" onClick={confirmDelete} disabled={deleteHook.isPending}>
               {deleteHook.isPending ? 'Deleting...' : 'Delete'}
             </Button>
           </DialogFooter>

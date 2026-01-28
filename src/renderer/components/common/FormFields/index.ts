@@ -12,4 +12,10 @@ export { DescriptionField } from './DescriptionField';
 export { ContentField } from './ContentField';
 export { ToolsField } from './ToolsField';
 export { ModelSelector } from './ModelSelector';
-export type { NameFieldProps, DescriptionFieldProps, ContentFieldProps, ToolsFieldProps, ModelSelectorProps } from './types';
+export type {
+  NameFieldProps,
+  DescriptionFieldProps,
+  ContentFieldProps,
+  ToolsFieldProps,
+  ModelSelectorProps,
+} from './types';

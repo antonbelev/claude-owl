@@ -42,10 +42,12 @@ export interface EditModalHeaderProps {
   /** Optional subtitle */
   subtitle?: string | undefined;
   /** Optional badge */
-  badge?: {
-    text: string;
-    variant?: BadgeProps['variant'];
-  } | undefined;
+  badge?:
+    | {
+        text: string;
+        variant?: BadgeProps['variant'];
+      }
+    | undefined;
   /** Whether to show close button (default: true) */
   showCloseButton?: boolean | undefined;
   /** Callback when close button clicked */

@@ -260,11 +260,7 @@ export const SkillsManager: React.FC = () => {
       {showCreateModal && <SkillEditModal onClose={handleCloseModal} onSave={createSkill} />}
 
       {editingSkill && (
-        <SkillEditModal
-          skill={editingSkill}
-          onClose={handleCloseModal}
-          onSave={updateSkill}
-        />
+        <SkillEditModal skill={editingSkill} onClose={handleCloseModal} onSave={updateSkill} />
       )}
 
       {selectedSkill && (
@@ -754,7 +750,12 @@ interface SkillDetailModalProps {
   onEdit: (skill: Skill) => void;
 }
 
-const SkillDetailModal: React.FC<SkillDetailModalProps> = ({ skill, onClose, onDelete, onEdit }) => {
+const SkillDetailModal: React.FC<SkillDetailModalProps> = ({
+  skill,
+  onClose,
+  onDelete,
+  onEdit,
+}) => {
   const locationVariant =
     skill.location === 'user' ? 'default' : skill.location === 'project' ? 'secondary' : 'outline';
 
@@ -856,11 +857,7 @@ const SkillDetailModal: React.FC<SkillDetailModalProps> = ({ skill, onClose, onD
           </div>
           <div className="flex gap-2">
             {skill.location !== 'plugin' && (
-              <Button
-                onClick={() => onEdit(skill)}
-                variant="outline"
-                data-testid="edit-skill-btn"
-              >
+              <Button onClick={() => onEdit(skill)} variant="outline" data-testid="edit-skill-btn">
                 <Pencil className="h-4 w-4 mr-2" />
                 Edit
               </Button>

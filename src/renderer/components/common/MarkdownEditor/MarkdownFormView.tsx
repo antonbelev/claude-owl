@@ -35,7 +35,8 @@ export const MarkdownFormView: React.FC<MarkdownFormViewProps> = ({
   // Render a field based on its type
   const renderField = (field: FrontmatterField) => {
     const value = frontmatter[field.key];
-    const isFieldDisabled = disabled === true || (isEditMode === true && field.immutableOnEdit === true);
+    const isFieldDisabled =
+      disabled === true || (isEditMode === true && field.immutableOnEdit === true);
 
     switch (field.type) {
       case 'name':
@@ -113,9 +114,7 @@ export const MarkdownFormView: React.FC<MarkdownFormViewProps> = ({
               disabled={isFieldDisabled}
               data-testid={`field-${field.key}`}
             />
-            {field.helpText && (
-              <p className="text-xs text-muted-foreground">{field.helpText}</p>
-            )}
+            {field.helpText && <p className="text-xs text-muted-foreground">{field.helpText}</p>}
           </div>
         );
 
@@ -135,9 +134,7 @@ export const MarkdownFormView: React.FC<MarkdownFormViewProps> = ({
               disabled={isFieldDisabled}
               data-testid={`field-${field.key}`}
             />
-            {field.helpText && (
-              <p className="text-xs text-muted-foreground">{field.helpText}</p>
-            )}
+            {field.helpText && <p className="text-xs text-muted-foreground">{field.helpText}</p>}
           </div>
         );
 
@@ -180,9 +177,7 @@ export const MarkdownFormView: React.FC<MarkdownFormViewProps> = ({
                 ))}
               </SelectContent>
             </Select>
-            {field.helpText && (
-              <p className="text-xs text-muted-foreground">{field.helpText}</p>
-            )}
+            {field.helpText && <p className="text-xs text-muted-foreground">{field.helpText}</p>}
           </div>
         );
 

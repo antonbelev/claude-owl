@@ -24,11 +24,7 @@ export const EditModalFooter: React.FC<EditModalFooterProps> = ({
         <Button variant="outline" onClick={onCancel} disabled={isLoading}>
           {cancelLabel}
         </Button>
-        <Button
-          variant={saveVariant}
-          onClick={onSave}
-          disabled={isLoading || isSaveDisabled}
-        >
+        <Button variant={saveVariant} onClick={onSave} disabled={isLoading || isSaveDisabled}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {isLoading ? 'Saving...' : saveLabel}
         </Button>

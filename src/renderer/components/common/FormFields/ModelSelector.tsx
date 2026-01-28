@@ -73,11 +73,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
         {label}
         {required && <span className="text-destructive ml-1">*</span>}
       </Label>
-      <Select
-        value={value}
-        onValueChange={val => onChange(val as ModelAlias)}
-        disabled={disabled}
-      >
+      <Select value={value} onValueChange={val => onChange(val as ModelAlias)} disabled={disabled}>
         <SelectTrigger id={testId} data-testid={testId}>
           <SelectValue placeholder="Select a model..." />
         </SelectTrigger>
@@ -97,9 +93,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
           ))}
         </SelectContent>
       </Select>
-      {helpText && (
-        <p className="text-xs text-muted-foreground">{helpText}</p>
-      )}
+      {helpText && <p className="text-xs text-muted-foreground">{helpText}</p>}
     </div>
   );
 };
