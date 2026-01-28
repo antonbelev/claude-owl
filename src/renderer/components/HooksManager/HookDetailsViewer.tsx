@@ -115,11 +115,7 @@ export function HookDetailsViewer({ hook, className, onEdit, onDelete }: HookDet
           {/* Actions */}
           <div className="flex gap-2 pt-4 border-t border-neutral-200">
             {onEdit && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onEdit(hook)}
-              >
+              <Button variant="outline" size="sm" onClick={() => onEdit(hook)}>
                 <Pencil className="h-4 w-4 mr-2" />
                 Edit
               </Button>

@@ -27,7 +27,8 @@ export const NameField: React.FC<NameFieldProps> = ({
 }) => {
   // Validate on change (show error only if non-empty and invalid)
   const isInvalid = value.length > 0 && !KEBAB_CASE_PATTERN.test(value);
-  const displayError = error || (isInvalid ? 'Must be lowercase with hyphens (e.g., my-name)' : undefined);
+  const displayError =
+    error || (isInvalid ? 'Must be lowercase with hyphens (e.g., my-name)' : undefined);
 
   return (
     <div className="space-y-2">

@@ -83,16 +83,19 @@ export function CommandEditor({ command, onSave, onCancel, isLoading }: CommandE
   const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
 
   // Track initial values for change detection
-  const initialValues = useMemo(() => ({
-    name: command?.name || '',
-    description: command?.frontmatter.description || '',
-    argumentHint: command?.frontmatter['argument-hint'] || '',
-    model: command?.frontmatter.model || 'default',
-    allowedTools: command?.frontmatter['allowed-tools'] || [],
-    disableModelInvocation: command?.frontmatter['disable-model-invocation'] || false,
-    namespace: command?.namespace || '',
-    content: command?.content || '',
-  }), [command]);
+  const initialValues = useMemo(
+    () => ({
+      name: command?.name || '',
+      description: command?.frontmatter.description || '',
+      argumentHint: command?.frontmatter['argument-hint'] || '',
+      model: command?.frontmatter.model || 'default',
+      allowedTools: command?.frontmatter['allowed-tools'] || [],
+      disableModelInvocation: command?.frontmatter['disable-model-invocation'] || false,
+      namespace: command?.namespace || '',
+      content: command?.content || '',
+    }),
+    [command]
+  );
 
   // Calculate if there are unsaved changes
   const hasChanges = useMemo(() => {
@@ -263,86 +266,86 @@ export function CommandEditor({ command, onSave, onCancel, isLoading }: CommandE
             </div>
           </div>
 
-        {errors.length > 0 && currentStep === 'config' && (
-          <Alert variant="destructive" className="m-6">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              <ul className="list-disc list-inside space-y-1">
-                {errors.map((error, idx) => (
-                  <li key={idx}>{error}</li>
-                ))}
-              </ul>
-            </AlertDescription>
-          </Alert>
-        )}
+          {errors.length > 0 && currentStep === 'config' && (
+            <Alert variant="destructive" className="m-6">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                <ul className="list-disc list-inside space-y-1">
+                  {errors.map((error, idx) => (
+                    <li key={idx}>{error}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
+          )}
 
-        <div className="flex-1 overflow-y-auto p-6">
-          {currentStep === 'config' && (
-            <>
-              <CommandConfigForm
+          <div className="flex-1 overflow-y-auto p-6">
+            {currentStep === 'config' && (
+              <>
+                <CommandConfigForm
+                  name={name}
+                  description={description}
+                  argumentHint={argumentHint}
+                  model={model}
+                  allowedTools={allowedTools}
+                  disableModelInvocation={disableModelInvocation}
+                  location={location}
+                  selectedProject={selectedProject}
+                  namespace={namespace}
+                  content={content}
+                  errors={errors}
+                  onNameChange={setName}
+                  onDescriptionChange={setDescription}
+                  onArgumentHintChange={setArgumentHint}
+                  onModelChange={val => setModel(val as any)}
+                  onToolsChange={setAllowedTools}
+                  onDisableModelInvocationChange={setDisableModelInvocation}
+                  onLocationChange={loc => setLocation(loc as 'user' | 'project')}
+                  onProjectChange={setSelectedProject}
+                  onNamespaceChange={setNamespace}
+                  onContentChange={setContent}
+                />
+
+                <Alert className="mt-6">
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    Next: You&apos;ll review the generated markdown and have the option to edit it
+                    manually.
+                  </AlertDescription>
+                </Alert>
+              </>
+            )}
+
+            {currentStep === 'review' && (
+              <CommandReviewStep
                 name={name}
-                description={description}
-                argumentHint={argumentHint}
-                model={model}
-                allowedTools={allowedTools}
-                disableModelInvocation={disableModelInvocation}
                 location={location}
-                selectedProject={selectedProject}
                 namespace={namespace}
+                frontmatter={buildFrontmatterForReview({
+                  description,
+                  argumentHint,
+                  model,
+                  allowedTools,
+                  disableModelInvocation,
+                })}
                 content={content}
-                errors={errors}
-                onNameChange={setName}
-                onDescriptionChange={setDescription}
-                onArgumentHintChange={setArgumentHint}
-                onModelChange={val => setModel(val as any)}
-                onToolsChange={setAllowedTools}
-                onDisableModelInvocationChange={setDisableModelInvocation}
-                onLocationChange={loc => setLocation(loc as 'user' | 'project')}
-                onProjectChange={setSelectedProject}
-                onNamespaceChange={setNamespace}
-                onContentChange={setContent}
+                onBack={handleBackToConfig}
+                onConfirm={handleConfirmReview}
+                isLoading={isLoading}
               />
-
-              <Alert className="mt-6">
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  Next: You&apos;ll review the generated markdown and have the option to edit it
-                  manually.
-                </AlertDescription>
-              </Alert>
-            </>
-          )}
-
-          {currentStep === 'review' && (
-            <CommandReviewStep
-              name={name}
-              location={location}
-              namespace={namespace}
-              frontmatter={buildFrontmatterForReview({
-                description,
-                argumentHint,
-                model,
-                allowedTools,
-                disableModelInvocation,
-              })}
-              content={content}
-              onBack={handleBackToConfig}
-              onConfirm={handleConfirmReview}
-              isLoading={isLoading}
-            />
-          )}
-        </div>
-
-        {currentStep === 'config' && (
-          <div className="flex justify-between gap-4 p-6 border-t border-neutral-200">
-            <Button onClick={handleClose} variant="outline" disabled={isLoading}>
-              Cancel
-            </Button>
-            <Button onClick={handleNextStep} disabled={isLoading}>
-              Next: Review
-            </Button>
+            )}
           </div>
-        )}
+
+          {currentStep === 'config' && (
+            <div className="flex justify-between gap-4 p-6 border-t border-neutral-200">
+              <Button onClick={handleClose} variant="outline" disabled={isLoading}>
+                Cancel
+              </Button>
+              <Button onClick={handleNextStep} disabled={isLoading}>
+                Next: Review
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 

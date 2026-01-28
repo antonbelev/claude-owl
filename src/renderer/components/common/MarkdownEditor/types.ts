@@ -5,7 +5,16 @@
 import type { ModelAlias } from '../FormFields/types';
 
 /** Field types supported in the form view */
-export type FieldType = 'name' | 'description' | 'content' | 'tools' | 'model' | 'text' | 'number' | 'boolean' | 'select';
+export type FieldType =
+  | 'name'
+  | 'description'
+  | 'content'
+  | 'tools'
+  | 'model'
+  | 'text'
+  | 'number'
+  | 'boolean'
+  | 'select';
 
 /** Definition of a frontmatter field */
 export interface FrontmatterField {

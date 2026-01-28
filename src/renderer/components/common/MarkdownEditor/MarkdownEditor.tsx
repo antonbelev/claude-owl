@@ -195,11 +195,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
       </TabsContent>
 
       <TabsContent value="raw">
-        <MarkdownRawView
-          value={rawMarkdown}
-          onChange={handleRawChange}
-          disabled={disabled}
-        />
+        <MarkdownRawView value={rawMarkdown} onChange={handleRawChange} disabled={disabled} />
       </TabsContent>
     </Tabs>
   );

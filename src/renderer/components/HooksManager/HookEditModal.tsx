@@ -6,7 +6,11 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { EditModal, EditModalFooter, UnsavedChangesAlert } from '@/renderer/components/common/EditModal';
+import {
+  EditModal,
+  EditModalFooter,
+  UnsavedChangesAlert,
+} from '@/renderer/components/common/EditModal';
 import { ScopeSelector } from '@/renderer/components/common/ScopeSelector';
 import { Label } from '@/renderer/components/ui/label';
 import { Input } from '@/renderer/components/ui/input';
@@ -28,15 +32,69 @@ import type { HookDefinition } from '@/shared/types/ipc.hooks.types';
 import type { ProjectInfo } from '@/shared/types';
 
 /** All available hook events */
-const HOOK_EVENTS: Array<{ value: HookEvent; label: string; description: string; requiresMatcher: boolean; supportsPrompt: boolean }> = [
-  { value: 'PreToolUse', label: 'Pre-Tool Use', description: 'Before Claude uses a tool (can block or modify)', requiresMatcher: true, supportsPrompt: true },
-  { value: 'PostToolUse', label: 'Post-Tool Use', description: 'After a tool completes successfully', requiresMatcher: true, supportsPrompt: false },
-  { value: 'UserPromptSubmit', label: 'User Prompt Submit', description: 'When user submits a prompt', requiresMatcher: false, supportsPrompt: true },
-  { value: 'Notification', label: 'Notification', description: 'When Claude sends notifications', requiresMatcher: false, supportsPrompt: false },
-  { value: 'Stop', label: 'Stop', description: 'When Claude finishes responding', requiresMatcher: false, supportsPrompt: true },
-  { value: 'SubagentStop', label: 'Subagent Stop', description: 'When a subagent task completes', requiresMatcher: false, supportsPrompt: true },
-  { value: 'SessionStart', label: 'Session Start', description: 'When a session starts or resumes', requiresMatcher: false, supportsPrompt: false },
-  { value: 'SessionEnd', label: 'Session End', description: 'When a session terminates', requiresMatcher: false, supportsPrompt: false },
+const HOOK_EVENTS: Array<{
+  value: HookEvent;
+  label: string;
+  description: string;
+  requiresMatcher: boolean;
+  supportsPrompt: boolean;
+}> = [
+  {
+    value: 'PreToolUse',
+    label: 'Pre-Tool Use',
+    description: 'Before Claude uses a tool (can block or modify)',
+    requiresMatcher: true,
+    supportsPrompt: true,
+  },
+  {
+    value: 'PostToolUse',
+    label: 'Post-Tool Use',
+    description: 'After a tool completes successfully',
+    requiresMatcher: true,
+    supportsPrompt: false,
+  },
+  {
+    value: 'UserPromptSubmit',
+    label: 'User Prompt Submit',
+    description: 'When user submits a prompt',
+    requiresMatcher: false,
+    supportsPrompt: true,
+  },
+  {
+    value: 'Notification',
+    label: 'Notification',
+    description: 'When Claude sends notifications',
+    requiresMatcher: false,
+    supportsPrompt: false,
+  },
+  {
+    value: 'Stop',
+    label: 'Stop',
+    description: 'When Claude finishes responding',
+    requiresMatcher: false,
+    supportsPrompt: true,
+  },
+  {
+    value: 'SubagentStop',
+    label: 'Subagent Stop',
+    description: 'When a subagent task completes',
+    requiresMatcher: false,
+    supportsPrompt: true,
+  },
+  {
+    value: 'SessionStart',
+    label: 'Session Start',
+    description: 'When a session starts or resumes',
+    requiresMatcher: false,
+    supportsPrompt: false,
+  },
+  {
+    value: 'SessionEnd',
+    label: 'Session End',
+    description: 'When a session terminates',
+    requiresMatcher: false,
+    supportsPrompt: false,
+  },
 ];
 
 interface HookEditModalProps {
@@ -50,12 +108,7 @@ interface HookEditModalProps {
   onSuccess?: () => void;
 }
 
-export function HookEditModal({
-  isOpen,
-  onClose,
-  hook,
-  onSuccess,
-}: HookEditModalProps) {
+export function HookEditModal({ isOpen, onClose, hook, onSuccess }: HookEditModalProps) {
   const isEditMode = !!hook;
   const createHook = useCreateHook();
   const updateHook = useUpdateHook();
@@ -239,7 +292,9 @@ export function HookEditModal({
     isOpen,
     onClose: handleClose,
     title: isEditMode ? `Edit Hook` : 'Create Hook',
-    subtitle: isEditMode ? `${hook?.event} hook` : 'Add a new hook to customize Claude Code behavior',
+    subtitle: isEditMode
+      ? `${hook?.event} hook`
+      : 'Add a new hook to customize Claude Code behavior',
     isLoading,
     hasUnsavedChanges: hasChanges,
     maxWidth: 'max-w-2xl',
@@ -276,14 +331,14 @@ export function HookEditModal({
             <Label htmlFor="event-type">Event Type</Label>
             <Select
               value={event}
-              onValueChange={(v) => setEvent(v as HookEvent)}
+              onValueChange={v => setEvent(v as HookEvent)}
               disabled={isEditMode}
             >
               <SelectTrigger id="event-type" data-testid="hook-event-select">
                 <SelectValue placeholder="Select event type" />
               </SelectTrigger>
               <SelectContent>
-                {HOOK_EVENTS.map((e) => (
+                {HOOK_EVENTS.map(e => (
                   <SelectItem key={e.value} value={e.value}>
                     <div className="flex flex-col">
                       <span>{e.label}</span>
@@ -306,13 +361,15 @@ export function HookEditModal({
                 {requiresMatcher && <span className="text-destructive ml-1">*</span>}
               </Label>
               {!requiresMatcher && (
-                <Badge variant="secondary" className="text-xs">Optional</Badge>
+                <Badge variant="secondary" className="text-xs">
+                  Optional
+                </Badge>
               )}
             </div>
             <Input
               id="matcher"
               value={matcher}
-              onChange={(e) => setMatcher(e.target.value)}
+              onChange={e => setMatcher(e.target.value)}
               placeholder="e.g., Bash(*), Edit(src/**/*.ts)"
               disabled={isLoading}
               data-testid="hook-matcher-input"
@@ -327,7 +384,7 @@ export function HookEditModal({
             <Label>Hook Type</Label>
             <RadioGroup
               value={hookType}
-              onValueChange={(v) => setHookType(v as HookType)}
+              onValueChange={v => setHookType(v as HookType)}
               className="flex gap-4"
               disabled={isLoading}
             >
@@ -339,11 +396,7 @@ export function HookEditModal({
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="prompt"
-                  id="type-prompt"
-                  disabled={!supportsPrompt}
-                />
+                <RadioGroupItem value="prompt" id="type-prompt" disabled={!supportsPrompt} />
                 <Label
                   htmlFor="type-prompt"
                   className={`flex items-center gap-2 cursor-pointer ${!supportsPrompt ? 'opacity-50' : ''}`}
@@ -351,7 +404,9 @@ export function HookEditModal({
                   <MessageSquare className="h-4 w-4" />
                   Prompt
                   {!supportsPrompt && (
-                    <Badge variant="secondary" className="text-xs">Not supported</Badge>
+                    <Badge variant="secondary" className="text-xs">
+                      Not supported
+                    </Badge>
                   )}
                 </Label>
               </div>
@@ -367,7 +422,7 @@ export function HookEditModal({
               <Textarea
                 id="command"
                 value={command}
-                onChange={(e) => setCommand(e.target.value)}
+                onChange={e => setCommand(e.target.value)}
                 placeholder="e.g., /path/to/script.sh"
                 rows={3}
                 className="font-mono text-sm"
@@ -389,7 +444,7 @@ export function HookEditModal({
               <Textarea
                 id="prompt"
                 value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
+                onChange={e => setPrompt(e.target.value)}
                 placeholder="Review this tool call for security issues..."
                 rows={4}
                 disabled={isLoading}
@@ -408,7 +463,7 @@ export function HookEditModal({
               id="timeout"
               type="number"
               value={timeout}
-              onChange={(e) => setTimeout(e.target.value ? parseInt(e.target.value, 10) : '')}
+              onChange={e => setTimeout(e.target.value ? parseInt(e.target.value, 10) : '')}
               min={1}
               max={600}
               placeholder="60"
@@ -436,7 +491,9 @@ export function HookEditModal({
           <div className="pt-2 border-t">
             <button
               type="button"
-              onClick={() => window.electronAPI.openExternal('https://code.claude.com/docs/en/hooks')}
+              onClick={() =>
+                window.electronAPI.openExternal('https://code.claude.com/docs/en/hooks')
+              }
               className="text-sm text-blue-600 hover:underline flex items-center gap-1"
             >
               <ExternalLink className="h-3 w-3" />

@@ -43,10 +43,7 @@ interface AgentEditModalProps {
 /**
  * Generate markdown content from form fields
  */
-function generateMarkdown(
-  frontmatter: AgentFrontmatter,
-  content: string
-): string {
+function generateMarkdown(frontmatter: AgentFrontmatter, content: string): string {
   const yamlLines: string[] = ['---'];
 
   yamlLines.push(`name: ${frontmatter.name}`);
@@ -153,7 +150,7 @@ export const AgentEditModal: React.FC<AgentEditModalProps> = ({
   const sourceAgent = agent || copyFrom;
 
   // Form state - for copy mode, pre-fill with source agent's data but blank name
-  const [name, setName] = useState(isCopyMode ? '' : (sourceAgent?.frontmatter.name || ''));
+  const [name, setName] = useState(isCopyMode ? '' : sourceAgent?.frontmatter.name || '');
   const [description, setDescription] = useState(sourceAgent?.frontmatter.description || '');
   const [content, setContent] = useState(sourceAgent?.content || '');
   const [location, setLocation] = useState<'user' | 'project'>(
@@ -172,14 +169,17 @@ export const AgentEditModal: React.FC<AgentEditModalProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   // Track initial values for change detection
-  const initialValues = useMemo(() => ({
-    name: isCopyMode ? '' : (sourceAgent?.frontmatter.name || ''),
-    description: sourceAgent?.frontmatter.description || '',
-    content: sourceAgent?.content || '',
-    model: sourceAgent?.frontmatter.model || 'default',
-    tools: sourceAgent?.frontmatter.tools?.join(', ') || '',
-    location: isEditMode ? (agent?.location as 'user' | 'project') : 'user',
-  }), [sourceAgent, isEditMode, isCopyMode, agent]);
+  const initialValues = useMemo(
+    () => ({
+      name: isCopyMode ? '' : sourceAgent?.frontmatter.name || '',
+      description: sourceAgent?.frontmatter.description || '',
+      content: sourceAgent?.content || '',
+      model: sourceAgent?.frontmatter.model || 'default',
+      tools: sourceAgent?.frontmatter.tools?.join(', ') || '',
+      location: isEditMode ? (agent?.location as 'user' | 'project') : 'user',
+    }),
+    [sourceAgent, isEditMode, isCopyMode, agent]
+  );
 
   // Initialize raw markdown
   useEffect(() => {
@@ -211,7 +211,10 @@ export const AgentEditModal: React.FC<AgentEditModalProps> = ({
         initialFrontmatter.model = initialValues.model;
       }
       if (initialValues.tools) {
-        initialFrontmatter.tools = initialValues.tools.split(',').map(t => t.trim()).filter(Boolean);
+        initialFrontmatter.tools = initialValues.tools
+          .split(',')
+          .map(t => t.trim())
+          .filter(Boolean);
       }
       const initialMarkdown = generateMarkdown(initialFrontmatter, initialValues.content);
       return rawMarkdown !== initialMarkdown;
@@ -230,44 +233,40 @@ export const AgentEditModal: React.FC<AgentEditModalProps> = ({
 
     // In create mode, any filled field counts as changes
     return !!(name.trim() || description.trim() || content.trim());
-  }, [
-    activeTab,
-    rawMarkdown,
-    name,
-    description,
-    content,
-    model,
-    tools,
-    initialValues,
-    isEditMode,
-  ]);
+  }, [activeTab, rawMarkdown, name, description, content, model, tools, initialValues, isEditMode]);
 
   // Sync form to raw when switching to raw tab
-  const handleTabChange = useCallback((tab: string) => {
-    if (tab === 'raw' && activeTab === 'form') {
-      // Generate markdown from form fields
-      const frontmatter: AgentFrontmatter = {
-        name: name.trim(),
-        description: description.trim(),
-      };
-      if (model && model !== 'default') {
-        frontmatter.model = model;
+  const handleTabChange = useCallback(
+    (tab: string) => {
+      if (tab === 'raw' && activeTab === 'form') {
+        // Generate markdown from form fields
+        const frontmatter: AgentFrontmatter = {
+          name: name.trim(),
+          description: description.trim(),
+        };
+        if (model && model !== 'default') {
+          frontmatter.model = model;
+        }
+        if (tools.trim()) {
+          frontmatter.tools = tools
+            .split(',')
+            .map(t => t.trim())
+            .filter(Boolean);
+        }
+        setRawMarkdown(generateMarkdown(frontmatter, content));
+      } else if (tab === 'form' && activeTab === 'raw') {
+        // Parse markdown to form fields
+        const parsed = parseMarkdown(rawMarkdown);
+        setName(parsed.name);
+        setDescription(parsed.description);
+        setModel(parsed.model);
+        setTools(parsed.tools);
+        setContent(parsed.content);
       }
-      if (tools.trim()) {
-        frontmatter.tools = tools.split(',').map(t => t.trim()).filter(Boolean);
-      }
-      setRawMarkdown(generateMarkdown(frontmatter, content));
-    } else if (tab === 'form' && activeTab === 'raw') {
-      // Parse markdown to form fields
-      const parsed = parseMarkdown(rawMarkdown);
-      setName(parsed.name);
-      setDescription(parsed.description);
-      setModel(parsed.model);
-      setTools(parsed.tools);
-      setContent(parsed.content);
-    }
-    setActiveTab(tab as 'form' | 'raw');
-  }, [activeTab, name, description, model, tools, content, rawMarkdown]);
+      setActiveTab(tab as 'form' | 'raw');
+    },
+    [activeTab, name, description, model, tools, content, rawMarkdown]
+  );
 
   const handleSave = async () => {
     setError(null);
@@ -354,9 +353,8 @@ export const AgentEditModal: React.FC<AgentEditModalProps> = ({
   };
 
   // Build badge for edit mode
-  const badge = isEditMode && agent
-    ? { text: agent.location, variant: 'outline' as const }
-    : undefined;
+  const badge =
+    isEditMode && agent ? { text: agent.location, variant: 'outline' as const } : undefined;
 
   // Determine modal title and subtitle
   const getTitle = () => {
@@ -504,7 +502,8 @@ export const AgentEditModal: React.FC<AgentEditModalProps> = ({
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Model to use for this subagent. Select &quot;Inherit&quot; to use parent context model.
+                Model to use for this subagent. Select &quot;Inherit&quot; to use parent context
+                model.
               </p>
             </div>
 
@@ -549,9 +548,7 @@ export const AgentEditModal: React.FC<AgentEditModalProps> = ({
           {/* Raw Markdown View */}
           <TabsContent value="raw" className="mt-6">
             <div className="space-y-2">
-              <Label htmlFor="agent-raw-markdown">
-                Raw Markdown
-              </Label>
+              <Label htmlFor="agent-raw-markdown">Raw Markdown</Label>
               <Textarea
                 id="agent-raw-markdown"
                 value={rawMarkdown}

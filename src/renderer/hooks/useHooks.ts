@@ -226,24 +226,26 @@ export function useUpdateHook() {
 export function useDeleteHook() {
   const queryClient = useQueryClient();
 
-  return useMutation<void, Error, { hookId: string; scope: 'user' | 'project'; projectPath?: string }>(
-    {
-      mutationFn: async ({ hookId, scope, projectPath }) => {
-        console.log('[useDeleteHook] Deleting hook:', { hookId, scope, projectPath });
+  return useMutation<
+    void,
+    Error,
+    { hookId: string; scope: 'user' | 'project'; projectPath?: string }
+  >({
+    mutationFn: async ({ hookId, scope, projectPath }) => {
+      console.log('[useDeleteHook] Deleting hook:', { hookId, scope, projectPath });
 
-        const request: DeleteHookRequest = { hookId, scope, projectPath };
-        const response = (await window.electronAPI.deleteHook(request)) as DeleteHookResponse;
+      const request: DeleteHookRequest = { hookId, scope, projectPath };
+      const response = (await window.electronAPI.deleteHook(request)) as DeleteHookResponse;
 
-        if (!response.success) {
-          throw new Error(response.error || 'Failed to delete hook');
-        }
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to delete hook');
+      }
 
-        console.log('[useDeleteHook] Hook deleted successfully');
-      },
-      onSuccess: () => {
-        // Invalidate hooks query to refresh the list
-        queryClient.invalidateQueries({ queryKey: ['hooks', 'all'] });
-      },
-    }
-  );
+      console.log('[useDeleteHook] Hook deleted successfully');
+    },
+    onSuccess: () => {
+      // Invalidate hooks query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ['hooks', 'all'] });
+    },
+  });
 }

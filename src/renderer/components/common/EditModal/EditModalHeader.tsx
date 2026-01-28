@@ -20,10 +20,16 @@ export const EditModalHeader: React.FC<EditModalHeaderProps> = ({
     <div className="flex items-start justify-between p-6 border-b border-neutral-200">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-3 flex-wrap">
-          <h2 id="edit-modal-title" className="text-xl font-semibold text-neutral-900 truncate">{title}</h2>
+          <h2 id="edit-modal-title" className="text-xl font-semibold text-neutral-900 truncate">
+            {title}
+          </h2>
           {badge && <Badge variant={badge.variant || 'secondary'}>{badge.text}</Badge>}
         </div>
-        {subtitle && <p id="edit-modal-description" className="mt-1 text-sm text-neutral-600">{subtitle}</p>}
+        {subtitle && (
+          <p id="edit-modal-description" className="mt-1 text-sm text-neutral-600">
+            {subtitle}
+          </p>
+        )}
       </div>
       {showCloseButton && onClose && (
         <Button

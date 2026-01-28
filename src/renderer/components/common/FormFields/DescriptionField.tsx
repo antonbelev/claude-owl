@@ -22,7 +22,8 @@ export const DescriptionField: React.FC<DescriptionFieldProps> = ({
 }) => {
   const charCount = value.length;
   const isOverLimit = charCount > maxLength;
-  const displayError = error || (isOverLimit ? `Description exceeds ${maxLength} characters` : undefined);
+  const displayError =
+    error || (isOverLimit ? `Description exceeds ${maxLength} characters` : undefined);
   const defaultHelpText = `Max ${maxLength} characters (${charCount}/${maxLength})`;
 
   return (
