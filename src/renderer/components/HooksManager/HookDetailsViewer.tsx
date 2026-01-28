@@ -1,10 +1,10 @@
 /**
- * HookDetailsViewer - Read-only display of hook configuration
+ * HookDetailsViewer - Display of hook configuration with edit/delete actions
  *
- * Shows hook details with syntax highlighting and validation
+ * Shows hook details with syntax highlighting, validation, and action buttons
  */
 
-import { Edit, ExternalLink } from 'lucide-react';
+import { Pencil, Trash2, ExternalLink } from 'lucide-react';
 import type { HookWithMetadata } from '@/shared/types/hook.types';
 import { HookValidationPanel } from './HookValidationPanel';
 import { useOpenSettingsFile } from '@/renderer/hooks/useHooks';
@@ -20,10 +20,14 @@ import { Badge } from '@/renderer/components/ui/badge';
 
 interface HookDetailsViewerProps {
   hook: HookWithMetadata;
-  className?: string;
+  className?: string | undefined;
+  /** Callback when user wants to edit the hook */
+  onEdit?: ((hook: HookWithMetadata) => void) | undefined;
+  /** Callback when user wants to delete the hook */
+  onDelete?: ((hook: HookWithMetadata) => void) | undefined;
 }
 
-export function HookDetailsViewer({ hook, className }: HookDetailsViewerProps) {
+export function HookDetailsViewer({ hook, className, onEdit, onDelete }: HookDetailsViewerProps) {
   const openSettingsFile = useOpenSettingsFile();
 
   const handleOpenSettings = () => {
@@ -110,14 +114,32 @@ export function HookDetailsViewer({ hook, className }: HookDetailsViewerProps) {
 
           {/* Actions */}
           <div className="flex gap-2 pt-4 border-t border-neutral-200">
+            {onEdit && (
+              <Button variant="outline" size="sm" onClick={() => onEdit(hook)}>
+                <Pencil className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            )}
+
+            {onDelete && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onDelete(hook)}
+                className="text-destructive hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </Button>
+            )}
+
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={handleOpenSettings}
               disabled={openSettingsFile.isPending}
             >
-              <Edit className="h-4 w-4 mr-2" />
-              Edit in settings.json
+              Open settings.json
             </Button>
 
             <Button
@@ -128,7 +150,7 @@ export function HookDetailsViewer({ hook, className }: HookDetailsViewerProps) {
               }}
             >
               <ExternalLink className="h-4 w-4 mr-2" />
-              View Documentation
+              Docs
             </Button>
           </div>
         </CardContent>

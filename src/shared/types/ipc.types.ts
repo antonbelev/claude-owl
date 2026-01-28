@@ -127,6 +127,13 @@ export type {
   GetSettingsPathResponse,
   OpenSettingsFileRequest,
   OpenSettingsFileResponse,
+  HookDefinition,
+  CreateHookRequest,
+  CreateHookResponse,
+  UpdateHookRequest,
+  UpdateHookResponse,
+  DeleteHookRequest,
+  DeleteHookResponse,
 } from './ipc.hooks.types';
 
 // Re-export MCP types

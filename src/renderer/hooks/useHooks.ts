@@ -13,6 +13,13 @@ import type {
   GetSettingsPathResponse,
   OpenSettingsFileRequest,
   OpenSettingsFileResponse,
+  CreateHookRequest,
+  CreateHookResponse,
+  UpdateHookRequest,
+  UpdateHookResponse,
+  DeleteHookRequest,
+  DeleteHookResponse,
+  HookDefinition,
 } from '@/shared/types/ipc.types';
 import type { HookEventSummary, HookTemplate } from '@/shared/types/hook.types';
 
@@ -144,4 +151,101 @@ export function useHooksData(projectPath?: string) {
     error: hooksQuery.error || templatesQuery.error,
     refetchHooks: hooksQuery.refetch,
   };
+}
+
+/**
+ * Mutation to create a new hook
+ */
+export function useCreateHook() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    { hookId: string },
+    Error,
+    { hook: HookDefinition; scope: 'user' | 'project'; projectPath?: string }
+  >({
+    mutationFn: async ({ hook, scope, projectPath }) => {
+      console.log('[useCreateHook] Creating hook:', { event: hook.event, scope, projectPath });
+
+      const request: CreateHookRequest = { hook, scope, projectPath };
+      const response = (await window.electronAPI.createHook(request)) as CreateHookResponse;
+
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to create hook');
+      }
+
+      console.log('[useCreateHook] Hook created successfully:', response.data.hookId);
+
+      return { hookId: response.data.hookId };
+    },
+    onSuccess: () => {
+      // Invalidate hooks query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ['hooks', 'all'] });
+    },
+  });
+}
+
+/**
+ * Mutation to update an existing hook
+ */
+export function useUpdateHook() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    void,
+    Error,
+    {
+      hookId: string;
+      updates: Partial<HookDefinition>;
+      scope: 'user' | 'project';
+      projectPath?: string;
+    }
+  >({
+    mutationFn: async ({ hookId, updates, scope, projectPath }) => {
+      console.log('[useUpdateHook] Updating hook:', { hookId, scope, projectPath });
+
+      const request: UpdateHookRequest = { hookId, updates, scope, projectPath };
+      const response = (await window.electronAPI.updateHook(request)) as UpdateHookResponse;
+
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to update hook');
+      }
+
+      console.log('[useUpdateHook] Hook updated successfully');
+    },
+    onSuccess: () => {
+      // Invalidate hooks query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ['hooks', 'all'] });
+    },
+  });
+}
+
+/**
+ * Mutation to delete a hook
+ */
+export function useDeleteHook() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    void,
+    Error,
+    { hookId: string; scope: 'user' | 'project'; projectPath?: string }
+  >({
+    mutationFn: async ({ hookId, scope, projectPath }) => {
+      console.log('[useDeleteHook] Deleting hook:', { hookId, scope, projectPath });
+
+      const request: DeleteHookRequest = { hookId, scope, projectPath };
+      const response = (await window.electronAPI.deleteHook(request)) as DeleteHookResponse;
+
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to delete hook');
+      }
+
+      console.log('[useDeleteHook] Hook deleted successfully');
+    },
+    onSuccess: () => {
+      // Invalidate hooks query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ['hooks', 'all'] });
+    },
+  });
 }
